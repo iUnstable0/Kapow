@@ -3,6 +3,38 @@
 :root {
   --background: #171717;
   --foreground: #e2e2e2;
+
+  --sp-text-color-light: #1d1d1f;
+  --sp-text-color-dark: #f9f9f9;
+
+  --sp-text-color: var(--sp-text-color-light);
+
+  --sp-dangerous-color-light: rgb(205, 43, 43);
+  --sp-dangerous-color-light-background: rgba(222, 88, 88, 0.526);
+  --sp-dangerous-color-light-shadow: rgba(255, 63, 63, 0.5);
+  --sp-dangerous-color-light-box-shadow: rgba(255, 63, 63, 0.5);
+
+  --sp-dangerous-color-dark: rgb(255, 63, 63);
+  --sp-dangerous-color-dark-background: #492020;
+  --sp-dangerous-color-dark-shadow: rgba(255, 63, 63, 0.5);
+  --sp-dangerous-color-dark-box-shadow: rgba(145, 38, 38, 0.7);
+
+  --sp-dangerous-color: var(--sp-dangerous-color-light);
+  --sp-dangerous-color-background: var(--sp-dangerous-color-light-background);
+  --sp-dangerous-color-shadow: var(--sp-dangerous-color-light-shadow);
+  --sp-dangerous-color-box-shadow: var(--sp-dangerous-color-light-box-shadow);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sp-text-color: var(--sp-text-color-dark);
+    --sp-secondary-text-color: #a1a1aa;
+
+    --sp-dangerous-color: var(--sp-dangerous-color-dark);
+    --sp-dangerous-color-background: var(--sp-dangerous-color-dark-background);
+    --sp-dangerous-color-shadow: var(--sp-dangerous-color-dark-shadow);
+    --sp-dangerous-color-box-shadow: var(--sp-dangerous-color-dark-box-shadow);
+  }
 }
 
 body {

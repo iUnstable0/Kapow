@@ -1,11 +1,10 @@
 .keybindContainerMagnet {
   display: flex;
   flex-direction: row;
+
   gap: 8px;
 
-  /* background: red; */
-
-  color: #f9f9f9;
+  color: #1d1d1f;
 }
 
 .keybindContainer {
@@ -13,14 +12,11 @@
 
   border-radius: 4px;
 
-  /* background-color: #70707056; */
   background-color: #0000001a;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* background: blue; */
 
   transition: all 0.2s ease-in-out;
 }
@@ -28,8 +24,6 @@
 .keybindIcon {
   width: clamp(18px, 2vw, 20px);
   height: clamp(18px, 2vw, 20px);
-
-  /* display: none !important; */
 
   display: flex;
   align-items: center;
@@ -40,10 +34,7 @@
 
 .keybindText {
   font-size: clamp(14px, 2vw, 16px);
-  /* font-size: 14px; */
   font-weight: 500;
-
-  /* display: none !important; */
 
   display: flex;
   align-items: center;
@@ -53,32 +44,26 @@
 }
 
 .keybindButton {
-  color: #f9f9f9;
+  color: #1d1d1f;
 
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-
   gap: 8px;
 
-  /* background: green; */
-
   transition:
-    scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     opacity 0.2s ease-in-out;
 }
 
-.keybindButton_reversed {
+.keybindButtonReversed {
   flex-direction: row-reverse;
 }
 
 .keybindButtonIcon {
-  width: clamp(22px, 2vw, 24px);
-  height: clamp(22px, 2vw, 24px);
-
-  /* background: red; */
+  width: clamp(24px, 2vw, 32px);
+  height: clamp(24px, 2vw, 32px);
 
   display: flex;
   align-items: center;
@@ -92,7 +77,6 @@
 
 .keybindButtonText {
   font-size: clamp(16px, 2vw, 18px) !important;
-  /* display: none !important; */
 
   transition:
     color 0.2s ease-in-out,
@@ -102,8 +86,7 @@
 
 /* keybindButton.hover If Keybinds is not disabled */
 .keybindButton:hover:not(:disabled) {
-  /* transform: scale(1.1); */
-  scale: 1.1;
+  transform: scale(1.1);
 }
 
 /* keybindButton.active If Keybinds is not disabled */
@@ -120,34 +103,35 @@
 /* beybindButton:hover If Keybinds is not disabled and not dangerous */
 .keybindButton:hover:not(:disabled):not(.keybindButtonDangerous) {
   .keybindButtonIcon {
-    filter: drop-shadow(0 0 10px #c9c9c98e);
+    filter: drop-shadow(0 0 10px #30303097);
   }
 
   .keybindButtonText {
-    text-shadow: 0 0 5px #c9c9c98e;
+    /* TODO: Test the color */
+    text-shadow: 0 0 10px #30303097;
   }
 
   .keybindContainer {
-    box-shadow: 0 0 10px #4d4d4d8e;
-    background-color: rgba(148, 148, 148, 0.41);
+    box-shadow: 0 0 5px #30303097;
+    background-color: #00000029;
   }
 }
 
 /* keybindButtonDangerous.hover If Keybinds is not disabled and dangerous */
 .keybindButtonDangerous:hover:not(:disabled) {
   .keybindButtonIcon {
-    color: var(--sp-dangerous-color-dark);
-    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-dark-shadow));
+    color: var(--sp-dangerous-color-light);
+    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-light-shadow));
   }
 
   .keybindButtonText {
-    color: var(--sp-dangerous-color-dark);
-    text-shadow: 0 0 10px var(--sp-dangerous-color-dark-shadow);
+    color: var(--sp-dangerous-color-light);
+    text-shadow: 0 0 10px var(--sp-dangerous-color-light-shadow);
   }
 
   .keybindContainer {
-    box-shadow: 0 0 10px var(--sp-dangerous-color-dark-box-shadow);
-    background-color: var(--sp-dangerous-color-dark);
+    box-shadow: 0 0 10px var(--sp-dangerous-color-light-box-shadow);
+    background-color: var(--sp-dangerous-color-light);
   }
 }
 
@@ -155,23 +139,23 @@
 .keybindButton:not(:disabled):not(.keybindButtonDangerous):has(
     .keybindContainer_active
   ) {
+  .keybindContainer_active {
+    box-shadow: 0 0 5px #30303097;
+    background-color: #00000029;
+  }
+
   .keybindButton:not(:hover) {
     .keybindContainer_active {
       transform: scale(1.1);
     }
-  }
-
-  .keybindContainer_active {
-    box-shadow: 0 0 10px #4d4d4d8e;
-    background-color: rgba(148, 148, 148, 0.41);
   }
 }
 
 /* if Keybinds is not disabled and is dangerous and has keybind pressed down */
 .keybindButtonDangerous:not(:disabled):has(.keybindContainer_active) {
   .keybindContainer_active {
-    box-shadow: 0 0 10px var(--sp-dangerous-color-dark-box-shadow);
-    background-color: var(--sp-dangerous-color-dark);
+    box-shadow: 0 0 10px var(--sp-dangerous-color-light-box-shadow);
+    background-color: var(--sp-dangerous-color-light);
   }
 
   .keybindButtonDangerous:not(:hover) {
@@ -190,16 +174,17 @@
   }
 
   .keybindButtonIcon {
-    filter: drop-shadow(0 0 10px #c9c9c98e);
+    filter: drop-shadow(0 0 10px #30303097);
   }
 
   .keybindButtonText {
-    text-shadow: 0 0 5px #c9c9c98e;
+    /* TODO: Test the color */
+    text-shadow: 0 0 10px #30303097;
   }
 
   .keybindContainer {
-    box-shadow: 0 0 10px #4d4d4d8e;
-    background-color: rgba(148, 148, 148, 0.41);
+    box-shadow: 0 0 5px #30303097;
+    background-color: #00000029;
   }
 }
 
@@ -210,13 +195,13 @@
   }
 
   .keybindButtonIcon {
-    color: var(--sp-dangerous-color-dark);
-    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-dark-shadow));
+    color: var(--sp-dangerous-color-light);
+    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-light-shadow));
   }
 
   .keybindButtonText {
-    color: var(--sp-dangerous-color-dark);
-    text-shadow: 0 0 10px var(--sp-dangerous-color-dark-shadow);
+    color: var(--sp-dangerous-color-light);
+    text-shadow: 0 0 10px var(--sp-dangerous-color-light-shadow);
   }
 }
 
@@ -227,21 +212,22 @@
   }
 
   .keybindButtonIcon {
-    filter: drop-shadow(0 0 10px #c9c9c98e);
+    filter: drop-shadow(0 0 10px #30303097);
   }
 
   .keybindButtonText {
-    text-shadow: 0 0 5px #c9c9c98e;
+    /* TODO: Test the color */
+    text-shadow: 0 0 10px #30303097;
   }
 
   .keybindContainer {
-    box-shadow: 0 0 10px #4d4d4d8e;
-    background-color: rgba(148, 148, 148, 0.41);
+    box-shadow: 0 0 5px #30303097;
+    background-color: #00000029;
   }
 
   .keybindContainer {
-    box-shadow: 0 0 10px #4d4d4d8e;
-    background-color: rgba(148, 148, 148, 0.41);
+    box-shadow: 0 0 5px #30303097;
+    background-color: #00000029;
   }
 }
 
@@ -252,17 +238,17 @@
   }
 
   .keybindButtonIcon {
-    color: var(--sp-dangerous-color-dark);
-    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-dark-shadow));
+    color: var(--sp-dangerous-color-light);
+    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-light-shadow));
   }
 
   .keybindButtonText {
-    color: var(--sp-dangerous-color-dark);
-    text-shadow: 0 0 10px var(--sp-dangerous-color-dark-shadow);
+    color: var(--sp-dangerous-color-light);
+    text-shadow: 0 0 10px var(--sp-dangerous-color-light-shadow);
   }
 
   .keybindContainer {
-    box-shadow: 0 0 10px var(--sp-dangerous-color-dark-box-shadow);
-    background-color: var(--sp-dangerous-color-dark);
+    box-shadow: 0 0 10px var(--sp-dangerous-color-light-box-shadow);
+    background-color: var(--sp-dangerous-color-light);
   }
 }

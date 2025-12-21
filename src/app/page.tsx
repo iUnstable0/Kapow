@@ -20,7 +20,7 @@ import { TextMorph } from "@/components/mp/text-morph";
 
 import levels from "@/components/levels.json";
 
-const MotionImage = motion(Image);
+const MotionImage = motion.create(Image);
 
 let hasUserInteractedGlobal = false;
 
@@ -95,6 +95,7 @@ export default function Home() {
 
           <div className={styles.controls}>
             <KeybindButton
+              forcetheme={"dark"}
               keybinds={[T_Keybind.left_arrow]}
               onPress={() => {
                 if (selectedLevel > 1) {
@@ -111,6 +112,7 @@ export default function Home() {
             </KeybindButton>
 
             <KeybindButton
+              forcetheme={"dark"}
               keybinds={[T_Keybind.right_arrow]}
               onPress={() => {
                 if (selectedLevel < levels.length) {
@@ -219,6 +221,7 @@ export default function Home() {
       </div>
 
       <KeybindButton
+        forcetheme={"dark"}
         keybinds={[T_Keybind.enter]}
         onPress={() => {
           setStartLoading(true);

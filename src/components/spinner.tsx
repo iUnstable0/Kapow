@@ -3,13 +3,16 @@
 import clsx from "clsx";
 import tinycolor from "tinycolor2";
 
-import styles from "./spinner.module.scss";
+import styles from "./spinner.module.css";
 
 export default function Spinner({
   id,
   loading = true,
   size = 24,
   className,
+  forcetheme,
+  forcecolor,
+  dangerous,
   style,
   speedMultiplier = 1,
   preload = true,
@@ -18,11 +21,45 @@ export default function Spinner({
   loading: boolean;
   size: number;
   className?: React.CSSProperties;
+  forcetheme?: "light" | "dark";
+  forcecolor?: string;
+  dangerous?: boolean;
   style?: React.CSSProperties;
   speedMultiplier?: number;
   preload?: boolean;
 }) {
-  const color = "#e2e2e2";
+  const getCSSVariable = (variable: string) => {
+    if (typeof window === "undefined") {
+      return "";
+    }
+
+    return getComputedStyle(document.documentElement).getPropertyValue(
+      variable,
+    );
+  };
+
+  let color = dangerous
+    ? getCSSVariable("--sp-dangerous-color")
+    : getCSSVariable("--sp-text-color");
+
+  if (forcetheme === "light") {
+    if (dangerous) {
+      color = getCSSVariable("--sp-dangerous-color-light");
+    } else {
+      color = getCSSVariable("--sp-text-color-light");
+    }
+  } else if (forcetheme === "dark") {
+    if (dangerous) {
+      color = getCSSVariable("--sp-dangerous-color-dark");
+    } else {
+      color = getCSSVariable("--sp-text-color-dark");
+    }
+  }
+  // }
+
+  if (forcecolor) {
+    color = forcecolor;
+  }
 
   const thickness = size / 5;
 

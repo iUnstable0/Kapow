@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 // import useSound from "use-sound";
-
 import clsx from "clsx";
 
 import {
@@ -11,13 +10,13 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-import { AnimatePresence, motion } from "motion/react";
-
-import styles from "./keybind.module.scss";
+import stylesDynamic from "./keybind-dyn.module.scss";
+import stylesLight from "./keybind-light.module.scss";
+import stylesDark from "./keybind-dark.module.scss";
 
 import { Magnetic } from "./mp/magnetic";
 import Spinner from "./spinner";
-
+import { AnimatePresence, motion } from "motion/react";
 import { TextMorph } from "./mp/text-morph";
 
 const letters = "abcdefghijklmnopqrstuvwxyz.";
@@ -40,9 +39,11 @@ export enum T_Keybind {
 
 export const KeybindButton = ({
   keybinds,
+  dangerous,
   onPress,
   textClassName,
   disabled,
+  forcetheme,
   children,
   icon,
   iconClassName,
@@ -55,9 +56,11 @@ export const KeybindButton = ({
   reversed = false,
 }: {
   keybinds: T_Keybind[];
+  dangerous?: boolean;
   onPress?: () => void;
   textClassName?: string;
   disabled?: boolean;
+  forcetheme?: "light" | "dark";
   children?: React.ReactNode;
   icon?: React.ReactNode;
   iconClassName?: string;
@@ -65,10 +68,21 @@ export const KeybindButton = ({
   loadingText?: string;
   magnetic?: boolean;
   className?: string;
+  // loadingTheme?: "light" | "dark" | "dangerous";
   preload?: boolean;
   loadingTextEnabled?: boolean;
   reversed?: boolean;
 }) => {
+  let styles;
+
+  if (forcetheme === "light") {
+    styles = stylesLight;
+  } else if (forcetheme === "dark") {
+    styles = stylesDark;
+  } else {
+    styles = stylesDynamic;
+  }
+
   return (
     <motion.div
       layout
@@ -96,7 +110,9 @@ export const KeybindButton = ({
           <motion.button
             className={clsx(
               styles.keybindButton,
-              reversed && styles.keybindButton_reversed,
+              dangerous && styles.keybindButtonDangerous,
+              reversed && styles.keybindButtonReversed,
+              // dangerous && loading === true && styles.keybindButtonDangerous,
             )}
             layout
             onClick={() => {
@@ -136,10 +152,12 @@ export const KeybindButton = ({
 
             {loadingText && typeof loading === "boolean" && (
               <Spinner
-                id={`keybind-${keybinds.join("-")}`}
+                id={`keybind-${keybinds.join("-")}-${forcetheme}`}
                 loading={loading}
                 size={24}
+                forcetheme={forcetheme}
                 preload={!icon && preload}
+                dangerous={dangerous}
               />
             )}
 
@@ -149,7 +167,7 @@ export const KeybindButton = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                key={`keybind_${keybinds.join("_")}_text`}
+                key={`keybind_${keybinds.join("_")}_${forcetheme}_text`}
                 transition={{
                   type: "spring",
                   stiffness: 120,
@@ -193,10 +211,12 @@ export const KeybindButton = ({
               {keybinds.length > 0 && (
                 <Keybind
                   keybinds={keybinds}
+                  dangerous={dangerous}
                   onPress={onPress}
                   disabled={disabled}
                   loading={loading}
                   loadingText={loadingText}
+                  forcetheme={forcetheme}
                   magnetic={magnetic}
                 />
               )}
@@ -212,8 +232,10 @@ export default function Keybind({
   keybinds,
   className,
   parentClass,
+  dangerous,
   onPress,
   disabled,
+  forcetheme,
   loadingText,
   loading,
   magnetic = true,
@@ -221,14 +243,31 @@ export default function Keybind({
   keybinds: T_Keybind[];
   className?: string;
   parentClass?: string;
+  dangerous?: boolean;
   onPress?: () => void;
   disabled?: boolean;
+  forcetheme?: "light" | "dark";
   loadingText?: string;
   loading?: boolean;
   magnetic?: boolean;
 }) {
+  let styles = stylesDynamic;
+
+  if (forcetheme === "light") {
+    styles = stylesLight;
+  } else if (forcetheme === "dark") {
+    styles = stylesDark;
+  }
+
+  // Set of currently held keys
   const [heldKeys, setHeldKeys] = useState<Set<string>>(new Set());
   const [animatedKeys, setAnimatedKeys] = useState<Set<string>>(new Set());
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setAnimatedKeys(new Set(heldKeys));
+  //   }, 200);
+  // }, [heldKeys]);
 
   useEffect(() => {
     const addToAnimatedKeys = (key: string) => {
@@ -275,19 +314,17 @@ export default function Keybind({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // e.preventDefault();
-      // e.stopPropagation();
-
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.tagName === "BUTTON" ||
-        target.isContentEditable
-      ) {
-        if (e.key.toLowerCase() !== "escape") {
-          return;
-        }
-      }
+      // e.stopPropagation();      // const target = e.target as HTMLElement;
+      //       // if (
+      //       //   target.tagName === "INPUT" ||
+      //       //   target.tagName === "TEXTAREA" ||
+      //       //   target.tagName === "BUTTON" ||
+      //       //   target.isContentEditable
+      //       // ) {
+      //       //   if (e.key.toLowerCase() !== "escape") {
+      //       //     return;
+      //       //   }
+      //       // }
 
       if (disabled) return;
 
@@ -308,6 +345,10 @@ export default function Keybind({
       const keyeventId = `(${keybinds.join(",")}) + ${key}`;
 
       console.log(keyeventId, "pressed");
+
+      // check if key is in keybinds (keybinds type is T_Keybind[])
+      // if (keybinds.includes(key as T_Keybind)) {
+      // If it alr contain key then abort!
 
       setHeldKeys((prev) => new Set(prev).add(key));
 
@@ -361,7 +402,7 @@ export default function Keybind({
 
   return (
     <motion.div
-      key={`keybind_${keybinds.join("_")}_magnet`}
+      key={`keybind_${keybinds.join("_")}_${forcetheme}_magnet`}
       className={styles.keybindContainerMagnet}
       layout
     >
@@ -371,6 +412,7 @@ export default function Keybind({
         actionArea="global"
         range={disabled ? 0 : magnetic ? 75 : 0}
         className={styles.keybindContainerMagnet}
+        data-theme={forcetheme}
       >
         {keybinds.map((keybind, index) => (
           <div
