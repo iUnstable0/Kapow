@@ -266,3 +266,16 @@
     background-color: var(--sp-dangerous-color-dark);
   }
 }
+
+// When <Keybind is used independent of KeybindButton (not nested)
+
+.keybindContainer_active {
+  box-shadow: 0 0 10px #4d4d4d8e;
+  background-color: rgba(148, 148, 148, 0.41);
+  transform: scale(1.1);
+}
+
+.keybindContainer_activeall {
+  box-shadow: 0 0 10px #4d4d4d8e;
+  background-color: rgba(148, 148, 148, 0.41);
+}

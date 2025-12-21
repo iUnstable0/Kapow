@@ -305,3 +305,31 @@
     background-color: var(--sp-dangerous-color);
   }
 }
+
+// When <Keybind is used independent of KeybindButton (not nested)
+
+.keybindContainer_active {
+  box-shadow: 0 0 5px #30303097;
+  background-color: #00000029;
+
+  transform: scale(1.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .keybindContainer_active {
+    box-shadow: 0 0 10px #4d4d4d8e;
+    background-color: rgba(148, 148, 148, 0.41);
+  }
+}
+
+.keybindContainer_activeall {
+  box-shadow: 0 0 5px #30303097;
+  background-color: #00000029;
+}
+
+@media (prefers-color-scheme: dark) {
+  .keybindContainer_activeall {
+    box-shadow: 0 0 10px #4d4d4d8e;
+    background-color: rgba(148, 148, 148, 0.41);
+  }
+}

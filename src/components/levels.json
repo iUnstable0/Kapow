@@ -32,6 +32,11 @@
         "question": "รั้ว",
         "voice": "fence.mp3",
         "answer": "fence.jpg"
+      },
+      {
+        "question": "ขม",
+        "voice": "bitter.mp3",
+        "answer": "bitter.jpg"
       }
     ]
   },

@@ -20,6 +20,26 @@ import useSound from "use-sound";
 
 const MotionImage = motion.create(Image);
 
+const leftKeys = [
+  T_Keybind.q,
+  T_Keybind.w,
+  T_Keybind.e,
+  T_Keybind.r,
+  T_Keybind.t,
+  T_Keybind.y,
+  T_Keybind.u,
+];
+
+const rightKeys = [
+  T_Keybind.one,
+  T_Keybind.two,
+  T_Keybind.three,
+  T_Keybind.four,
+  T_Keybind.five,
+  T_Keybind.six,
+  T_Keybind.seven,
+];
+
 export default function Page({
   params,
 }: {
@@ -202,7 +222,7 @@ export default function Page({
               <AnimatePresence mode={"popLayout"}>
                 {gameData.questions
                   .filter((q) => !answered.includes(q.question))
-                  .map((q) => (
+                  .map((q, i) => (
                     <motion.div
                       key={`q_${q.question}`}
                       className={clsx(
@@ -240,6 +260,19 @@ export default function Page({
                       layout
                     >
                       {q.question}
+
+                      <Keybind
+                        keybinds={[leftKeys[i]]}
+                        dangerous={false}
+                        onPress={() => {
+                          playSound(q.voice);
+                          setSelectedQuestion(q.question);
+                        }}
+                        disabled={false}
+                        loading={false}
+                        loadingText={"loadingText"}
+                        forcetheme={"dark"}
+                      />
                     </motion.div>
                   ))}
               </AnimatePresence>
