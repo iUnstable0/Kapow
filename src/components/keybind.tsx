@@ -3,7 +3,13 @@ import React, { useEffect, useState } from "react";
 
 import clsx from "clsx";
 
-import { ArrowBigUp, CornerDownLeft, Delete } from "lucide-react";
+import {
+  ArrowBigUp,
+  CornerDownLeft,
+  Delete,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
 
 import { AnimatePresence, motion } from "motion/react";
 
@@ -28,6 +34,8 @@ export enum T_Keybind {
   s = "s",
   period = ".",
   tab = "tab",
+  right_arrow = "arrowright",
+  left_arrow = "arrowleft",
 }
 
 export const KeybindButton = ({
@@ -44,6 +52,7 @@ export const KeybindButton = ({
   className,
   preload = true,
   loadingTextEnabled = true,
+  reversed = false,
 }: {
   keybinds: T_Keybind[];
   onPress?: () => void;
@@ -58,6 +67,7 @@ export const KeybindButton = ({
   className?: string;
   preload?: boolean;
   loadingTextEnabled?: boolean;
+  reversed?: boolean;
 }) => {
   return (
     <motion.div
@@ -84,14 +94,19 @@ export const KeybindButton = ({
       >
         <AnimatePresence>
           <motion.button
-            className={styles.keybindButton}
+            className={clsx(
+              styles.keybindButton,
+              reversed && styles.keybindButton_reversed,
+            )}
             layout
             onClick={() => {
               if (!disabled && !loading) {
                 onPress?.();
               }
             }}
+            onMouseDown={(e) => e.preventDefault()}
             disabled={disabled}
+            tabIndex={-1}
           >
             <AnimatePresence mode="popLayout">
               {!loadingText && icon && (
@@ -262,6 +277,18 @@ export default function Keybind({
       // e.preventDefault();
       // e.stopPropagation();
 
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "BUTTON" ||
+        target.isContentEditable
+      ) {
+        if (e.key.toLowerCase() !== "escape") {
+          return;
+        }
+      }
+
       if (disabled) return;
 
       const key = e.key.toLowerCase();
@@ -376,6 +403,16 @@ export default function Keybind({
             )}
             {keybind === T_Keybind.backspace && (
               <Delete className={clsx(styles.keybindIcon, className)} />
+            )}
+            {keybind === T_Keybind.right_arrow && (
+              <span className={clsx(styles.keybindText, className)}>
+                <ArrowRight className={clsx(styles.keybindIcon, className)} />
+              </span>
+            )}
+            {keybind === T_Keybind.left_arrow && (
+              <span className={clsx(styles.keybindText, className)}>
+                <ArrowLeft className={clsx(styles.keybindIcon, className)} />
+              </span>
             )}
             {letters.includes(keybind) && (
               <span className={clsx(styles.keybindText, className)}>

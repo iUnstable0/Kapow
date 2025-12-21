@@ -16,6 +16,7 @@ export type MagneticProps = {
   range?: number;
   actionArea?: "self" | "parent" | "global";
   springOptions?: SpringOptions;
+  className?: any;
 };
 
 export function Magnetic({
@@ -24,9 +25,10 @@ export function Magnetic({
   range = 100,
   actionArea = "self",
   springOptions = SPRING_CONFIG,
+  className,
 }: MagneticProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -61,6 +63,7 @@ export function Magnetic({
     return () => {
       document.removeEventListener("mousemove", calculateDistance);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, isHovered, intensity, range]);
 
   useEffect(() => {
@@ -105,6 +108,7 @@ export function Magnetic({
         x: springX,
         y: springY,
       }}
+      className={className}
     >
       {children}
     </motion.div>
