@@ -1,0 +1,264 @@
+.keybindContainerMagnet {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+
+  /* background: red; */
+
+  color: #f9f9f9;
+}
+
+.keybindContainer {
+  padding: 4px 8px;
+
+  border-radius: 4px;
+
+  /* background-color: #70707056; */
+  background-color: #0000001a;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* background: blue; */
+
+  transition: all 0.2s ease-in-out;
+}
+
+.keybindIcon {
+  width: clamp(18px, 2vw, 20px);
+  height: clamp(18px, 2vw, 20px);
+
+  /* display: none !important; */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s ease-in-out;
+}
+
+.keybindText {
+  font-size: clamp(14px, 2vw, 16px);
+  /* font-size: 14px; */
+  font-weight: 500;
+
+  /* display: none !important; */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s ease-in-out;
+}
+
+.keybindButton {
+  color: #f9f9f9;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 8px;
+
+  /* background: green; */
+
+  transition:
+    scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    opacity 0.2s ease-in-out;
+}
+
+.keybindButtonIcon {
+  width: clamp(22px, 2vw, 24px);
+  height: clamp(22px, 2vw, 24px);
+
+  /* background: red; */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    color 0.2s ease-in-out,
+    filter 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
+}
+
+.keybindButtonText {
+  font-size: clamp(16px, 2vw, 18px) !important;
+  /* display: none !important; */
+
+  transition:
+    color 0.2s ease-in-out,
+    text-shadow 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
+}
+
+/* keybindButton.hover If Keybinds is not disabled */
+.keybindButton:hover:not(:disabled) {
+  /* transform: scale(1.1); */
+  scale: 1.1;
+}
+
+/* keybindButton.active If Keybinds is not disabled */
+.keybindButton:active:not(:disabled) {
+  transform: scale(1.05);
+}
+
+/* If Keybinds is disabled */
+.keybindButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* beybindButton:hover If Keybinds is not disabled and not dangerous */
+.keybindButton:hover:not(:disabled):not(.keybindButtonDangerous) {
+  .keybindButtonIcon {
+    filter: drop-shadow(0 0 10px #c9c9c98e);
+  }
+
+  .keybindButtonText {
+    text-shadow: 0 0 5px #c9c9c98e;
+  }
+
+  .keybindContainer {
+    box-shadow: 0 0 10px #4d4d4d8e;
+    background-color: rgba(148, 148, 148, 0.41);
+  }
+}
+
+/* keybindButtonDangerous.hover If Keybinds is not disabled and dangerous */
+.keybindButtonDangerous:hover:not(:disabled) {
+  .keybindButtonIcon {
+    color: var(--sp-dangerous-color-dark);
+    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-dark-shadow));
+  }
+
+  .keybindButtonText {
+    color: var(--sp-dangerous-color-dark);
+    text-shadow: 0 0 10px var(--sp-dangerous-color-dark-shadow);
+  }
+
+  .keybindContainer {
+    box-shadow: 0 0 10px var(--sp-dangerous-color-dark-box-shadow);
+    background-color: var(--sp-dangerous-color-dark);
+  }
+}
+
+/* If Keybinds is not disabled and not dangerous and has keybind pressed down */
+.keybindButton:not(:disabled):not(.keybindButtonDangerous):has(
+    .keybindContainer_active
+  ) {
+  .keybindButton:not(:hover) {
+    .keybindContainer_active {
+      transform: scale(1.1);
+    }
+  }
+
+  .keybindContainer_active {
+    box-shadow: 0 0 10px #4d4d4d8e;
+    background-color: rgba(148, 148, 148, 0.41);
+  }
+}
+
+/* if Keybinds is not disabled and is dangerous and has keybind pressed down */
+.keybindButtonDangerous:not(:disabled):has(.keybindContainer_active) {
+  .keybindContainer_active {
+    box-shadow: 0 0 10px var(--sp-dangerous-color-dark-box-shadow);
+    background-color: var(--sp-dangerous-color-dark);
+  }
+
+  .keybindButtonDangerous:not(:hover) {
+    .keybindContainer_active {
+      transform: scale(1.1);
+    }
+  }
+}
+
+/* If Keybinds is not disabled and is not dangerous and has all keybinds pressed down */
+.keybindButton:not(:disabled):not(.keybindButtonDangerous):has(
+    .keybindContainer_activeall
+  ) {
+  & {
+    transform: scale(1.1);
+  }
+
+  .keybindButtonIcon {
+    filter: drop-shadow(0 0 10px #c9c9c98e);
+  }
+
+  .keybindButtonText {
+    text-shadow: 0 0 5px #c9c9c98e;
+  }
+
+  .keybindContainer {
+    box-shadow: 0 0 10px #4d4d4d8e;
+    background-color: rgba(148, 148, 148, 0.41);
+  }
+}
+
+/* If Keybinds is not disabled and is dangerous and has all keybinds pressed down */
+.keybindButtonDangerous:not(:disabled):has(.keybindContainer_activeall) {
+  & {
+    transform: scale(1.1);
+  }
+
+  .keybindButtonIcon {
+    color: var(--sp-dangerous-color-dark);
+    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-dark-shadow));
+  }
+
+  .keybindButtonText {
+    color: var(--sp-dangerous-color-dark);
+    text-shadow: 0 0 10px var(--sp-dangerous-color-dark-shadow);
+  }
+}
+
+/* If Keybinds is not dangerous and is loading */
+.keybindButton:not(.keybindButtonDangerous):has(.keybindContainer_loading) {
+  & {
+    transform: scale(1.1);
+  }
+
+  .keybindButtonIcon {
+    filter: drop-shadow(0 0 10px #c9c9c98e);
+  }
+
+  .keybindButtonText {
+    text-shadow: 0 0 5px #c9c9c98e;
+  }
+
+  .keybindContainer {
+    box-shadow: 0 0 10px #4d4d4d8e;
+    background-color: rgba(148, 148, 148, 0.41);
+  }
+
+  .keybindContainer {
+    box-shadow: 0 0 10px #4d4d4d8e;
+    background-color: rgba(148, 148, 148, 0.41);
+  }
+}
+
+/* If Keybinds is dangerous and is loading */
+.keybindButtonDangerous:has(.keybindContainer_loading) {
+  & {
+    transform: scale(1.1);
+  }
+
+  .keybindButtonIcon {
+    color: var(--sp-dangerous-color-dark);
+    filter: drop-shadow(0 0 10px var(--sp-dangerous-color-dark-shadow));
+  }
+
+  .keybindButtonText {
+    color: var(--sp-dangerous-color-dark);
+    text-shadow: 0 0 10px var(--sp-dangerous-color-dark-shadow);
+  }
+
+  .keybindContainer {
+    box-shadow: 0 0 10px var(--sp-dangerous-color-dark-box-shadow);
+    background-color: var(--sp-dangerous-color-dark);
+  }
+}

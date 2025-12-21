@@ -5,17 +5,22 @@ import React, { useState } from "react";
 import Image from "next/image";
 
 import { AnimatePresence, motion } from "framer-motion";
+import tinycolor from "tinycolor2";
 
 import styles from "./page.module.scss";
+
+import { KeybindButton, T_Keybind } from "@/components/keybind";
 
 import { SlidingNumber } from "@/components/mp/sliding-number";
 
 import levels from "@/components/levels.json";
+import { start } from "node:repl";
 
 const MotionImage = motion(Image);
 
 export default function Home() {
   const [selectedLevel, setSelectedLevel] = useState<number>(1);
+  const [startLoading, setStartLoading] = useState<boolean>(false);
 
   return (
     <div>
@@ -29,12 +34,12 @@ export default function Home() {
                 className={styles.select}
                 initial={{ opacity: 0 }}
                 animate={{
-                  opacity: selectedLevel > 1 ? 1 : 0,
+                  opacity: selectedLevel > 1 ? (startLoading ? 0.8 : 1) : 0,
                   scale: selectedLevel > 1 ? 1 : 0.8,
                   filter: selectedLevel > 1 ? "blur(0px)" : "blur(4px)",
                 }}
                 whileHover={{
-                  scale: 1.1,
+                  scale: startLoading ? 1 : 1.1,
                 }}
                 whileTap={{
                   scale: 1,
@@ -44,6 +49,7 @@ export default function Home() {
                     setSelectedLevel(selectedLevel - 1);
                   }
                 }}
+                disabled={startLoading}
               >
                 {"<"}
               </motion.button>
@@ -51,13 +57,18 @@ export default function Home() {
                 className={styles.select}
                 initial={{ opacity: 0 }}
                 animate={{
-                  opacity: selectedLevel < levels.length ? 1 : 0,
+                  opacity:
+                    selectedLevel < levels.length
+                      ? startLoading
+                        ? 0.8
+                        : 1
+                      : 0,
                   scale: selectedLevel < levels.length ? 1 : 0.8,
                   filter:
                     selectedLevel < levels.length ? "blur(0px)" : "blur(4px)",
                 }}
                 whileHover={{
-                  scale: 1.1,
+                  scale: startLoading ? 1 : 1.1,
                 }}
                 whileTap={{
                   scale: 1,
@@ -67,6 +78,7 @@ export default function Home() {
                     setSelectedLevel(selectedLevel + 1);
                   }
                 }}
+                disabled={startLoading}
               >
                 {">"}
               </motion.button>
@@ -102,12 +114,29 @@ export default function Home() {
           <div
             className={styles.levelNumber}
             style={{
-              color: `hsl(${(1 - (selectedLevel - 1) / (levels.length - 1)) * 120}, 100%, 50%)`,
+              color: tinycolor({ h: 120, s: 1, l: 0.5 })
+                .spin((-120 * (selectedLevel - 1)) / (levels.length - 1))
+                .toHexString(),
             }}
           >
             <SlidingNumber value={selectedLevel} />
           </div>
         </div>
+
+        <KeybindButton
+          keybinds={[T_Keybind.enter]}
+          onPress={() => {
+            console.log("d");
+            setStartLoading(true);
+          }}
+          textClassName={styles.overlayButtonText}
+          disabled={startLoading}
+          iconClassName={styles.overlayButtonIcon}
+          loading={startLoading}
+          loadingText={"Please wait..."}
+        >
+          Start
+        </KeybindButton>
 
         {/*<div>*/}
         {/*  <h1>Choose your level:</h1>*/}
