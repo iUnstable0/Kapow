@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { AnimatePresence, motion } from "framer-motion";
 import useSound from "use-sound";
@@ -21,12 +22,19 @@ import levels from "@/components/levels.json";
 
 const MotionImage = motion(Image);
 
+let hasUserInteractedGlobal = false;
+
 export default function Home() {
   const [selectedLevel, setSelectedLevel] = useState<number>(1);
   const [startLoading, setStartLoading] = useState<boolean>(false);
 
-  const [siteEntered, setSiteEntered] = useState<boolean>(false);
+  const [siteEntered, setSiteEntered] = useState<boolean>(
+    hasUserInteractedGlobal,
+  );
+
   const [kapowLoaded, setKapowLoaded] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const [playMain, { stop: stopMain }] = useSound("/main.mp3", {
     volume: 0.5,
@@ -36,6 +44,14 @@ export default function Home() {
       setKapowLoaded(true);
     },
   });
+
+  useEffect(() => {
+    if (siteEntered && kapowLoaded) {
+      playMain();
+    }
+
+    return () => stopMain();
+  }, [siteEntered, kapowLoaded, playMain, stopMain]);
 
   return (
     <div className={styles.container}>
@@ -53,6 +69,7 @@ export default function Home() {
 
               if (!siteEntered) {
                 setSiteEntered(true);
+                hasUserInteractedGlobal = true;
 
                 playMain();
               }
@@ -204,8 +221,11 @@ export default function Home() {
       <KeybindButton
         keybinds={[T_Keybind.enter]}
         onPress={() => {
-          console.log("d");
           setStartLoading(true);
+
+          setTimeout(() => {
+            router.push(`/level/${selectedLevel}`);
+          }, 1000);
         }}
         disabled={startLoading}
         loading={startLoading}
