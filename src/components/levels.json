@@ -3,17 +3,36 @@
     "level": 1,
     "timer": 0,
     "quiz": [
-      [
-        {
-          "a": "า".
-          "b": "aa.mp3"
-        },
-        {
-          "a": "ำ".
-          "b": "am.mp3"
-        }
-
-      ]
+      {
+        "question": "หมา",
+        "voice": "dog.mp3",
+        "answer": "dog.jpg"
+      },
+      {
+        "question": "ปลา",
+        "voice": "fish.mp3",
+        "answer": "fish.jpg"
+      },
+      {
+        "question": "คม",
+        "voice": "sharp.mp3",
+        "answer": "sharp.jpg"
+      },
+      {
+        "question": "นม",
+        "voice": "milk.mp3",
+        "answer": "milk.jpg"
+      },
+      {
+        "question": "วัว",
+        "voice": "cow.mp3",
+        "answer": "cow.jpg"
+      },
+      {
+        "question": "รั้ว",
+        "voice": "fence.mp3",
+        "answer": "fence.jpg"
+      }
     ]
   },
   {

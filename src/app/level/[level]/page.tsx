@@ -1,16 +1,19 @@
 "use client";
 
-import React, { use, useState } from "react";
+import React, { use, useState, useRef, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 
 import { motion, AnimatePresence } from "motion/react";
 import { DateTime } from "luxon";
+import { Howl } from "howler";
 
 import { KeybindButton, T_Keybind } from "@/components/keybind";
 
 import styles from "./page.module.scss";
 import levels from "@/components/levels.json";
+
+// import useSound from "use-sound";
 
 export default function Page({
   params,
@@ -22,17 +25,57 @@ export default function Page({
   const router = useRouter();
 
   const [gameStarted, setGameStarted] = useState(false);
+  const [stage, setStage] = useState<number>(0);
+
+  const voicesRef = useRef<{ [key: string]: Howl }>({});
 
   const myLevel = levels.find((lvl) => lvl.level === parseInt(level, 10));
 
-  if (!myLevel) {
-    router.push("/");
-    return null;
-  }
+  useEffect(() => {
+    if (!myLevel) {
+      router.push("/");
+    }
+  }, [myLevel, router]);
+
+  // const [playMain, { stop: stopMain }] = useSound("/main.mp3", {
+  //   volume: 0.5,
+  //   interrupt: true,
+  //   loop: true,
+  //   onload: () => {
+  //     setKapowLoaded(true);
+  //   },
+  // });
+
+  useEffect(() => {
+    if (!myLevel?.quiz) return;
+
+    const currentVoices = voicesRef.current;
+
+    myLevel.quiz.forEach((q) => {
+      currentVoices[q.voice] = new Howl({
+        src: [`/level${level}/${q.voice}`],
+        volume: 0.7,
+      });
+    });
+
+    return () => {
+      Object.values(currentVoices).forEach((sound) => sound.unload());
+    };
+  }, [myLevel, level]);
+
+  if (!myLevel) return null;
+
+  const playSound = (sound: string) => {
+    const voice = voicesRef.current[sound];
+
+    if (voice) {
+      voice.play();
+    }
+  };
 
   return (
     <div className={styles.container}>
-      <AnimatePresence>
+      <AnimatePresence mode={"wait"}>
         {!gameStarted && (
           <motion.div
             className={styles.titleCtn}
@@ -86,6 +129,19 @@ export default function Page({
             >
               Play
             </KeybindButton>
+          </motion.div>
+        )}
+
+        {gameStarted && (
+          <motion.div
+            className={styles.gameCtn}
+            initial={{ opacity: 0, filter: "blur(10px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, filter: "blur(10px)" }}
+            transition={{ duration: 0.5 }}
+            key={`game-ctn-${stage}`}
+          >
+            z
           </motion.div>
         )}
       </AnimatePresence>
