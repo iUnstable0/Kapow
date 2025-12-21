@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  gap: 48px;
+}
+
+.title {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.kapow {
+  border-radius: 48px;
+  width: 256px;
+  height: 326px;
+  object-fit: cover;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
