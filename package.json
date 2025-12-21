@@ -12,6 +12,7 @@
     "@types/tinycolor2": "^1.4.6",
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
+    "luxon": "^3.7.2",
     "motion": "^12.23.26",
     "next": "16.1.0",
     "react": "19.2.3",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/luxon": "^3.7.1",
     "@types/node": "^20.19.27",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

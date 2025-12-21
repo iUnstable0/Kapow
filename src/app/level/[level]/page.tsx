@@ -1,8 +1,11 @@
 "use client";
 
-import { use } from "react";
+import React, { use, useState } from "react";
 
-import React from "react";
+import { useRouter } from "next/navigation";
+
+import { motion, AnimatePresence } from "motion/react";
+import { DateTime } from "luxon";
 
 import { KeybindButton, T_Keybind } from "@/components/keybind";
 
@@ -16,46 +19,76 @@ export default function Page({
 }) {
   const { level } = use(params);
 
+  const router = useRouter();
+
+  const [gameStarted, setGameStarted] = useState(false);
+
+  const myLevel = levels.find((lvl) => lvl.level === parseInt(level, 10));
+
+  if (!myLevel) {
+    router.push("/");
+    return null;
+  }
+
   return (
     <div className={styles.container}>
-      <div className={styles.titleCtn}>
-        <h1 className={styles.title}>Level {level}</h1>
-        <p className={styles.desc}>You have 2 minutes!</p>
-      </div>
+      <AnimatePresence>
+        {!gameStarted && (
+          <motion.div
+            className={styles.titleCtn}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"title-ctn"}
+          >
+            <h1 className={styles.title}>Level {level}</h1>
+            <p className={styles.desc}>
+              {myLevel.timer > 0
+                ? `
+          Timer: ${DateTime.fromSeconds(myLevel.timer).toFormat("mm:ss")} minutes`
+                : `Timer: no timer`}
+            </p>
+          </motion.div>
+        )}
 
-      <div className={styles.toolrow}>
-        <KeybindButton
-          forcetheme={"dark"}
-          keybinds={[T_Keybind.escape]}
-          onPress={() => {
-            // if (selectedLevel < levels.length) {
-            //   setSelectedLevel(selectedLevel + 1);
-            // }
-          }}
-          // disabled={startLoading || selectedLevel >= levels.length}
-          // loading={startLoading}
-          loadingTextEnabled={false}
-          reversed={true}
-          dangerous={true}
-        >
-          Back
-        </KeybindButton>
+        {!gameStarted && (
+          <motion.div
+            className={styles.toolrow}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"toolbar"}
+          >
+            <KeybindButton
+              forcetheme={"dark"}
+              keybinds={[T_Keybind.escape]}
+              onPress={() => {
+                router.back();
+              }}
+              disabled={gameStarted}
+              loadingTextEnabled={false}
+              reversed={true}
+              dangerous={true}
+            >
+              Back
+            </KeybindButton>
 
-        <KeybindButton
-          forcetheme={"dark"}
-          keybinds={[T_Keybind.enter]}
-          onPress={() => {
-            // if (selectedLevel < levels.length) {
-            //   setSelectedLevel(selectedLevel + 1);
-            // }
-          }}
-          // disabled={startLoading || selectedLevel >= levels.length}
-          // loading={startLoading}
-          loadingTextEnabled={false}
-        >
-          Play
-        </KeybindButton>
-      </div>
+            <KeybindButton
+              forcetheme={"dark"}
+              keybinds={[T_Keybind.enter]}
+              onPress={() => {
+                setGameStarted(true);
+              }}
+              disabled={gameStarted}
+              loadingTextEnabled={false}
+            >
+              Play
+            </KeybindButton>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

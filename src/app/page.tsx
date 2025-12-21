@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import useSound from "use-sound";
 
 import tinycolor from "tinycolor2";
@@ -23,9 +23,11 @@ import levels from "@/components/levels.json";
 const MotionImage = motion.create(Image);
 
 let hasUserInteractedGlobal = false;
+let currentLevelGlobal = 1;
 
 export default function Home() {
-  const [selectedLevel, setSelectedLevel] = useState<number>(1);
+  const [selectedLevel, setSelectedLevel] =
+    useState<number>(currentLevelGlobal);
   const [startLoading, setStartLoading] = useState<boolean>(false);
 
   const [siteEntered, setSiteEntered] = useState<boolean>(
@@ -225,6 +227,8 @@ export default function Home() {
         keybinds={[T_Keybind.enter]}
         onPress={() => {
           setStartLoading(true);
+
+          currentLevelGlobal = selectedLevel;
 
           setTimeout(() => {
             router.push(`/level/${selectedLevel}`);

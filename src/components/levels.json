@@ -1,17 +1,35 @@
 [
   {
-    "level": 1
+    "level": 1,
+    "timer": 0,
+    "quiz": [
+      [
+        {
+          "a": "า".
+          "b": "aa.mp3"
+        },
+        {
+          "a": "ำ".
+          "b": "am.mp3"
+        }
+
+      ]
+    ]
   },
   {
-    "level": 2
+    "level": 2,
+    "timer": 120
   },
   {
-    "level": 3
+    "level": 3,
+    "timer": 120
   },
   {
-    "level": 4
+    "level": 4,
+    "timer": 120
   },
   {
-    "level": 5
+    "level": 5,
+    "timer": 120
   }
 ]
