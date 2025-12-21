@@ -37,18 +37,22 @@
   },
   {
     "level": 2,
-    "timer": 120
+    "timer": 120,
+    "quiz": []
   },
   {
     "level": 3,
-    "timer": 120
+    "timer": 120,
+    "quiz": []
   },
   {
     "level": 4,
-    "timer": 120
+    "timer": 120,
+    "quiz": []
   },
   {
     "level": 5,
-    "timer": 120
+    "timer": 120,
+    "quiz": []
   }
 ]

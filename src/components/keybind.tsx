@@ -314,17 +314,19 @@ export default function Keybind({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // e.preventDefault();
-      // e.stopPropagation();      // const target = e.target as HTMLElement;
-      //       // if (
-      //       //   target.tagName === "INPUT" ||
-      //       //   target.tagName === "TEXTAREA" ||
-      //       //   target.tagName === "BUTTON" ||
-      //       //   target.isContentEditable
-      //       // ) {
-      //       //   if (e.key.toLowerCase() !== "escape") {
-      //       //     return;
-      //       //   }
-      //       // }
+      // e.stopPropagation();
+
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "BUTTON" ||
+        target.isContentEditable
+      ) {
+        if (e.key.toLowerCase() !== "escape") {
+          return;
+        }
+      }
 
       if (disabled) return;
 
