@@ -48,6 +48,12 @@ const rightKeys = [
   T_Keybind.seven,
 ];
 
+type T_Question = {
+  question: string;
+  answer: string;
+  voice: string;
+};
+
 export default function Page({
   params,
 }: {
@@ -77,12 +83,6 @@ export default function Page({
       }
     | undefined = levels.find((lvl) => lvl.level === parseInt(level, 10));
 
-  useEffect(() => {
-    if (!myLevel) {
-      router.push("/");
-    }
-  }, [myLevel, router]);
-
   const [playDing] = useSound("/ding.mp3", {
     volume: 0.5,
   });
@@ -104,7 +104,7 @@ export default function Page({
   });
 
   useEffect(() => {
-    if (!myLevel?.quiz) return;
+    if (!myLevel) return;
 
     const currentVoices = voicesRef.current;
 
@@ -119,19 +119,6 @@ export default function Page({
       Object.values(currentVoices).forEach((sound) => sound.unload());
     };
   }, [myLevel, level]);
-
-  useEffect(() => {
-    if (!myLevel) return;
-
-    if (answered.length >= myLevel.quiz.length) {
-      if (stage < 5) {
-        setAnswered([]);
-        setStage((prev) => prev + 1);
-      } else {
-        setWin(true);
-      }
-    }
-  }, [answered, myLevel, stage, win]);
 
   const fireWinConfetti = useCallback(() => {
     if (!confettiRef.current) return;
@@ -156,16 +143,6 @@ export default function Page({
     fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
     fire(0.1, { spread: 120, startVelocity: 45 });
   }, []);
-
-  useEffect(() => {
-    if (win) {
-      fireWinConfetti();
-      playBoop();
-      playPop();
-      playSpeakCon();
-      playYay();
-    }
-  }, [win, fireWinConfetti]);
 
   const playSound = (sound: string) => {
     const voice = voicesRef.current[sound];
@@ -194,7 +171,41 @@ export default function Page({
     return { questions, images };
   }, [stage]);
 
-  if (!myLevel) return null;
+  const handleAnswer = (q: T_Question) => {
+    if (!myLevel) return;
+
+    if (selectedQuestion === q.question) {
+      playDing();
+      setSelectedQuestion("");
+
+      const newAnswered = [...answered, q.question];
+
+      setAnswered(newAnswered);
+
+      if (newAnswered.length >= myLevel.quiz.length) {
+        if (stage < 5) {
+          setAnswered([]);
+          setStage((prev) => prev + 1);
+        } else {
+          setWin(true);
+
+          fireWinConfetti();
+          playBoop();
+          playPop();
+          playSpeakCon();
+          playYay();
+        }
+      }
+    } else if (selectedQuestion !== "") {
+      playAlert();
+    }
+  };
+
+  if (!myLevel) {
+    router.push("/");
+
+    return null;
+  }
 
   return (
     <div className={styles.container}>
@@ -419,28 +430,30 @@ export default function Page({
                       }}
                       layout
                       className={styles.imageCtn}
-                      onClick={() => {
-                        if (selectedQuestion === q.question) {
-                          playDing();
-                          setSelectedQuestion("");
-                          setAnswered((prev) => [...prev, q.question]);
-                        } else {
-                          if (selectedQuestion !== "") playAlert();
-                        }
-                      }}
+                      onClick={() => handleAnswer(q)}
+                      // onClick={() => {
+                      //   if (selectedQuestion === q.question) {
+                      //     playDing();
+                      //     setSelectedQuestion("");
+                      //     setAnswered((prev) => [...prev, q.question]);
+                      //   } else {
+                      //     if (selectedQuestion !== "") playAlert();
+                      //   }
+                      // }}
                     >
                       <Keybind
                         keybinds={[rightKeys[i]]}
                         dangerous={false}
-                        onPress={() => {
-                          if (selectedQuestion === q.question) {
-                            playDing();
-                            setSelectedQuestion("");
-                            setAnswered((prev) => [...prev, q.question]);
-                          } else {
-                            if (selectedQuestion !== "") playAlert();
-                          }
-                        }}
+                        onPress={() => handleAnswer(q)}
+                        // onPress={() => {
+                        //   if (selectedQuestion === q.question) {
+                        //     playDing();
+                        //     setSelectedQuestion("");
+                        //     setAnswered((prev) => [...prev, q.question]);
+                        //   } else {
+                        //     if (selectedQuestion !== "") playAlert();
+                        //   }
+                        // }}
                         parentClass={styles.keybindBtn}
                         disabled={false}
                         loading={false}

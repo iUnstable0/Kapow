@@ -47,13 +47,12 @@ export default function Home() {
     },
   });
 
-  useEffect(() => {
-    if (siteEntered && kapowLoaded) {
-      playMain();
-    }
-
-    return () => stopMain();
-  }, [siteEntered, kapowLoaded, playMain, stopMain]);
+  // useEffect(() => {
+  //   // if (siteEntered && kapowLoaded) {
+  //   playMain();
+  //   // }
+  // }, []);
+  // }, [siteEntered, kapowLoaded, playMain]);
 
   return (
     <div className={styles.container}>
@@ -71,6 +70,7 @@ export default function Home() {
 
               if (!siteEntered) {
                 setSiteEntered(true);
+
                 hasUserInteractedGlobal = true;
 
                 playMain();
