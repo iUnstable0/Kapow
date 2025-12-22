@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { AnimatePresence, motion } from "motion/react";
-import useSound from "use-sound";
+// import useSound from "use-sound";
 
 import tinycolor from "tinycolor2";
 
 import styles from "./page.module.scss";
 
 import { KeybindButton, T_Keybind } from "@/components/keybind";
+import { useGlobalMusic } from "@/components/music";
 
 import { SlidingNumber } from "@/components/mp/sliding-number";
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
@@ -22,7 +23,7 @@ import levels from "@/components/levels.json";
 
 const MotionImage = motion.create(Image);
 
-let hasUserInteractedGlobal = false;
+let hasUserInteractedGlobal = true;
 let currentLevelGlobal = 1;
 
 export default function Home() {
@@ -34,18 +35,20 @@ export default function Home() {
     hasUserInteractedGlobal,
   );
 
-  const [kapowLoaded, setKapowLoaded] = useState<boolean>(false);
+  // const [kapowLoaded, setKapowLoaded] = useState<boolean>(false);
 
   const router = useRouter();
 
-  const [playMain, { stop: stopMain }] = useSound("/main.mp3", {
-    volume: 0.5,
-    interrupt: true,
-    loop: true,
-    onload: () => {
-      setKapowLoaded(true);
-    },
-  });
+  const { play, isLoaded } = useGlobalMusic();
+
+  // const [playMain, { stop: stopMain }] = useSound("/main.mp3", {
+  //   volume: 0.5,
+  //   interrupt: true,
+  //   loop: true,
+  //   onload: () => {
+  //     setKapowLoaded(true);
+  //   },
+  // });
 
   // useEffect(() => {
   //   // if (siteEntered && kapowLoaded) {
@@ -66,21 +69,23 @@ export default function Home() {
             exit={{ opacity: 0, scale: 1.1, filter: "blur(12px)" }}
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
             onClick={() => {
-              if (!kapowLoaded) return;
+              if (!isLoaded) return;
 
               if (!siteEntered) {
                 setSiteEntered(true);
 
                 hasUserInteractedGlobal = true;
 
-                playMain();
+                play();
+
+                // playMain();
               }
             }}
           >
             <h1 className={styles.welcomeTitle}>Welcome!</h1>
             <div className={styles.welcomeMessage}>
               <TextMorph>
-                {kapowLoaded
+                {isLoaded
                   ? "Click anywhere to start!"
                   : "Loading, please wait..."}
               </TextMorph>

@@ -43,7 +43,43 @@
   {
     "level": 2,
     "timer": 120,
-    "quiz": []
+    "quiz": [
+      {
+        "question": "กา",
+        "voice": "crow.mp3",
+        "answer": "crow.jpg"
+      },
+      {
+        "question": "ตา",
+        "voice": "eye.mp3",
+        "answer": "eye.jpg"
+      },
+      {
+        "question": "นา",
+        "voice": "field.mp3",
+        "answer": "field.jpg"
+      },
+      {
+        "question": "ขา",
+        "voice": "leg.mp3",
+        "answer": "leg.jpg"
+      },
+      {
+        "question": "ไก่",
+        "voice": "chicken.mp3",
+        "answer": "chicken jocky.jpg"
+      },
+      {
+        "question": "ไข่",
+        "voice": "egg.mp3",
+        "answer": "egg.jpg"
+      },
+      {
+        "question": "ไฟ",
+        "voice": "fire.mp3",
+        "answer": "fire.gif"
+      }
+    ]
   },
   {
     "level": 3,

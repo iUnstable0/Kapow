@@ -65,7 +65,7 @@ export default function Page({
 
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("");
-  const [stage, setStage] = useState<number>(5);
+  const [stage, setStage] = useState<number>(1);
 
   const [win, setWin] = useState<boolean>(false);
 
@@ -176,6 +176,15 @@ export default function Page({
 
     if (selectedQuestion === q.question) {
       playDing();
+
+      const utterance = new SpeechSynthesisUtterance(q.answer.split(".")[0]);
+
+      utterance.pitch = 0.1;
+      utterance.rate = 0.1;
+      utterance.volume = 1;
+
+      window.speechSynthesis.speak(utterance);
+
       setSelectedQuestion("");
 
       const newAnswered = [...answered, q.question];
