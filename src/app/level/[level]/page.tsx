@@ -100,7 +100,11 @@ export default function Page({
     if (!myLevel) return;
 
     if (answered.length >= myLevel.quiz.length) {
-      setStage((prev) => prev + 1);
+      if (stage < 5) {
+        setStage((prev) => prev + 1);
+      } else {
+        setWin(true);
+      }
     }
   }, [answered, myLevel]);
 
@@ -205,7 +209,7 @@ export default function Page({
             transition={{ duration: 0.5 }}
             key={`stagelabel-${stage}`}
           >
-            Stage: {stage}
+            Stage: {stage}/5
           </motion.div>
         )}
 
@@ -282,14 +286,9 @@ export default function Page({
               <AnimatePresence mode={"popLayout"}>
                 {gameData.images
                   .filter((q) => !answered.includes(q.question))
-                  .map((q) => (
-                    <MotionImage
-                      src={`/level${level}/${q.answer}`}
-                      alt={"answer image"}
+                  .map((q, i) => (
+                    <motion.div
                       key={`m_${q.question}`}
-                      width={200}
-                      height={200}
-                      className={styles.image}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -308,15 +307,43 @@ export default function Page({
                         scale: 0.98,
                       }}
                       layout
+                      className={styles.imageCtn}
                       onClick={() => {
                         if (selectedQuestion === q.question) {
                           playDing();
+                          setSelectedQuestion("");
                           setAnswered((prev) => [...prev, q.question]);
                         } else {
-                          playAlert();
+                          if (selectedQuestion !== "") playAlert();
                         }
                       }}
-                    />
+                    >
+                      <Keybind
+                        keybinds={[rightKeys[i]]}
+                        dangerous={false}
+                        onPress={() => {
+                          if (selectedQuestion === q.question) {
+                            playDing();
+                            setSelectedQuestion("");
+                            setAnswered((prev) => [...prev, q.question]);
+                          } else {
+                            if (selectedQuestion !== "") playAlert();
+                          }
+                        }}
+                        parentClass={styles.keybindBtn}
+                        disabled={false}
+                        loading={false}
+                        loadingText={"loadingText"}
+                        forcetheme={"dark"}
+                      />
+                      <Image
+                        src={`/level${level}/${q.answer}`}
+                        alt={"answer image"}
+                        width={200}
+                        height={200}
+                        className={styles.image}
+                      />
+                    </motion.div>
                   ))}
               </AnimatePresence>
             </div>
