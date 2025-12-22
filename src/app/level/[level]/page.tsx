@@ -68,11 +68,13 @@ export default function Page({
   const [stage, setStage] = useState<number>(1);
 
   const [win, setWin] = useState<boolean>(false);
+  const [lost, setLost] = useState<boolean>(false);
 
   const confettiRef = useRef<TCanvasConfettiInstance | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [answered, setAnswered] = useState<Array<string>>([]);
+  const [timer, setTimer] = useState<string>("");
 
   const voicesRef = useRef<{ [key: string]: Howl }>({});
 
@@ -296,7 +298,18 @@ export default function Page({
                 });
 
                 timerRef.current = setInterval(() => {
-                  console.log(future.diffNow().toFormat("mm:ss"));
+                  if (!timerRef.current) return;
+
+                  if (DateTime.now() > future) {
+                    clearInterval(timerRef.current);
+                    timerRef.current = null;
+
+                    setLost(true);
+
+                    return;
+                  }
+
+                  setTimer(future.diffNow().toFormat("mm:ss"));
                 }, 500);
               }}
               disabled={gameStarted}
@@ -307,7 +320,7 @@ export default function Page({
           </motion.div>
         )}
 
-        {gameStarted && !win && (
+        {gameStarted && !win && !lost && (
           <motion.div
             className={styles.stageLabel}
             initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -317,6 +330,49 @@ export default function Page({
             key={`stagelabel-${stage}`}
           >
             Stage: {stage}/5
+            <br />
+            Timer: {timer}
+          </motion.div>
+        )}
+
+        {gameStarted && lost && (
+          <motion.div
+            className={styles.titleCtn}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"title-ctn-win"}
+          >
+            <h1 className={styles.title}>You failed Level {level}!</h1>
+            {/*  <p className={styles.desc}>*/}
+            {/*    {myLevel.timer > 0*/}
+            {/*      ? `*/}
+            {/*Timer: ${DateTime.fromSeconds(myLevel.timer).toFormat("mm:ss")} minutes`*/}
+            {/*      : `Timer: no timer`}*/}
+            {/*  </p>*/}
+          </motion.div>
+        )}
+
+        {gameStarted && lost && (
+          <motion.div
+            className={styles.toolrow}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"toolbar-lost"}
+          >
+            <KeybindButton
+              forcetheme={"dark"}
+              keybinds={[T_Keybind.enter]}
+              onPress={() => {
+                router.back();
+              }}
+              loadingTextEnabled={false}
+            >
+              Return
+            </KeybindButton>
           </motion.div>
         )}
 
@@ -327,7 +383,7 @@ export default function Page({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            key={"title-ctn"}
+            key={"title-ctn-win"}
           >
             <h1 className={styles.title}>You completed Level {level}!</h1>
             {/*  <p className={styles.desc}>*/}
@@ -346,7 +402,7 @@ export default function Page({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            key={"toolbar"}
+            key={"toolbar-win"}
           >
             <KeybindButton
               forcetheme={"dark"}
@@ -361,7 +417,7 @@ export default function Page({
           </motion.div>
         )}
 
-        {gameStarted && (
+        {gameStarted && !win && !lost && (
           <motion.div
             className={styles.gameCtn}
             initial={{ opacity: 0, filter: "blur(10px)" }}

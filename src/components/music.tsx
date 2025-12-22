@@ -21,8 +21,13 @@ import { TextMorph } from "@/components/mp/text-morph";
 //   (_, i) => `/adhd/song ${i + 1}.mp3`,
 // );
 
+const coffee_songs = Array.from(
+  { length: 10 },
+  (_, i) => `/blueberry/coffee ${i + 1}.mp3`,
+);
+
 const blueberry_songs = Array.from(
-  { length: 26 },
+  { length: 13 },
   (_, i) => `/blueberry/blueberry ${i + 1}.mp3`,
 );
 
@@ -96,7 +101,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       src: [src],
       html5: true,
       volume: 0.5,
-      autoplay: false,
+      autoplay: true,
       onload: () => setIsLoaded(true),
       onplay: () => setIsPlaying(true),
       onpause: () => setIsPlaying(false),
