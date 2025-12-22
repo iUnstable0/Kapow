@@ -1,6 +1,13 @@
 "use client";
 
-import React, { use, useState, useRef, useEffect, useMemo } from "react";
+import React, {
+  use,
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 
 import Image from "next/image";
 
@@ -13,12 +20,13 @@ import clsx from "clsx";
 
 import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
 
+import ReactCanvasConfetti from "react-canvas-confetti";
+import type { TCanvasConfettiInstance } from "react-canvas-confetti/dist/types";
+
 import styles from "./page.module.scss";
 import levels from "@/components/levels.json";
 
 import useSound from "use-sound";
-
-const MotionImage = motion.create(Image);
 
 const leftKeys = [
   T_Keybind.q,
@@ -51,7 +59,11 @@ export default function Page({
 
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("");
-  const [stage, setStage] = useState<number>(1);
+  const [stage, setStage] = useState<number>(5);
+
+  const [win, setWin] = useState<boolean>(false);
+
+  const confettiRef = useRef<TCanvasConfettiInstance | null>(null);
 
   const [answered, setAnswered] = useState<Array<string>>([]);
 
@@ -78,6 +90,18 @@ export default function Page({
   const [playAlert] = useSound("/alert.mp3", {
     volume: 0.5,
   });
+  const [playPop] = useSound("/pop.mp3", {
+    volume: 5,
+  });
+  const [playBoop] = useSound("/boop.mp3", {
+    volume: 0.5,
+  });
+  const [playSpeakCon] = useSound("/speakcon.mp3", {
+    volume: 0.5,
+  });
+  const [playYay] = useSound("/yay.mp3", {
+    volume: 0.5,
+  });
 
   useEffect(() => {
     if (!myLevel?.quiz) return;
@@ -101,16 +125,47 @@ export default function Page({
 
     if (answered.length >= myLevel.quiz.length) {
       if (stage < 5) {
+        setAnswered([]);
         setStage((prev) => prev + 1);
       } else {
         setWin(true);
       }
     }
-  }, [answered, myLevel]);
+  }, [answered, myLevel, stage, win]);
+
+  const fireWinConfetti = useCallback(() => {
+    if (!confettiRef.current) return;
+
+    const count = 200;
+    const defaults = {
+      origin: { y: 0.7 },
+      zIndex: 9999,
+    };
+
+    const fire = (particleRatio: number, opts: any) => {
+      confettiRef.current!({
+        ...defaults,
+        ...opts,
+        particleCount: Math.floor(count * particleRatio),
+      });
+    };
+
+    fire(0.25, { spread: 26, startVelocity: 55 });
+    fire(0.2, { spread: 60 });
+    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+    fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+    fire(0.1, { spread: 120, startVelocity: 45 });
+  }, []);
 
   useEffect(() => {
-    setAnswered([]);
-  }, [stage]);
+    if (win) {
+      fireWinConfetti();
+      playBoop();
+      playPop();
+      playSpeakCon();
+      playYay();
+    }
+  }, [win, fireWinConfetti]);
 
   const playSound = (sound: string) => {
     const voice = voicesRef.current[sound];
@@ -143,6 +198,21 @@ export default function Page({
 
   return (
     <div className={styles.container}>
+      <ReactCanvasConfetti
+        onInit={({ confetti }: { confetti: TCanvasConfettiInstance }) => {
+          confettiRef.current = confetti;
+        }}
+        style={{
+          position: "fixed",
+          pointerEvents: "none",
+          width: "100%",
+          height: "100%",
+          top: 0,
+          left: 0,
+          zIndex: 9999,
+        }}
+      />
+
       <AnimatePresence mode={"wait"}>
         {!gameStarted && (
           <motion.div
@@ -200,7 +270,7 @@ export default function Page({
           </motion.div>
         )}
 
-        {gameStarted && (
+        {gameStarted && !win && (
           <motion.div
             className={styles.stageLabel}
             initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -210,6 +280,47 @@ export default function Page({
             key={`stagelabel-${stage}`}
           >
             Stage: {stage}/5
+          </motion.div>
+        )}
+
+        {gameStarted && win && (
+          <motion.div
+            className={styles.titleCtn}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"title-ctn"}
+          >
+            <h1 className={styles.title}>You completed Level {level}!</h1>
+            {/*  <p className={styles.desc}>*/}
+            {/*    {myLevel.timer > 0*/}
+            {/*      ? `*/}
+            {/*Timer: ${DateTime.fromSeconds(myLevel.timer).toFormat("mm:ss")} minutes`*/}
+            {/*      : `Timer: no timer`}*/}
+            {/*  </p>*/}
+          </motion.div>
+        )}
+
+        {gameStarted && win && (
+          <motion.div
+            className={styles.toolrow}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"toolbar"}
+          >
+            <KeybindButton
+              forcetheme={"dark"}
+              keybinds={[T_Keybind.enter]}
+              onPress={() => {
+                router.back();
+              }}
+              loadingTextEnabled={false}
+            >
+              Return
+            </KeybindButton>
           </motion.div>
         )}
 
