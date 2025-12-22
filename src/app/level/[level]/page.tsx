@@ -70,6 +70,7 @@ export default function Page({
   const [win, setWin] = useState<boolean>(false);
 
   const confettiRef = useRef<TCanvasConfettiInstance | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [answered, setAnswered] = useState<Array<string>>([]);
 
@@ -210,6 +211,14 @@ export default function Page({
     }
   };
 
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //
+  //   }, 1000);
+  //
+  //   return () => clearInterval(interval);
+  // }, []);
+
   if (!myLevel) {
     router.push("/");
 
@@ -233,7 +242,7 @@ export default function Page({
         }}
       />
 
-      <AnimatePresence mode={"wait"}>
+      <AnimatePresence mode={"popLayout"}>
         {!gameStarted && (
           <motion.div
             className={styles.titleCtn}
@@ -281,6 +290,14 @@ export default function Page({
               keybinds={[T_Keybind.enter]}
               onPress={() => {
                 setGameStarted(true);
+
+                const future = DateTime.now().plus({
+                  seconds: myLevel.timer,
+                });
+
+                timerRef.current = setInterval(() => {
+                  console.log(future.diffNow().toFormat("mm:ss"));
+                }, 500);
               }}
               disabled={gameStarted}
               loadingTextEnabled={false}

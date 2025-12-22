@@ -10,6 +10,11 @@ import React, {
 } from "react";
 
 import { Howl } from "howler";
+import { AnimatePresence, motion } from "motion/react";
+
+import styles from "./music.module.scss";
+
+import { TextMorph } from "@/components/mp/text-morph";
 
 // const adhd_songs = Array.from(
 //   { length: 15 },
@@ -35,6 +40,8 @@ interface T_MusicContext {
   currentTrack: string;
 }
 
+let hasUserInteractedGlobal = false;
+
 const MusicContext = createContext<T_MusicContext | null>(null);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
@@ -47,6 +54,10 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const [queue, setQueue] = useState<string[]>([]);
   const [queueIndex, setQueueIndex] = useState<number>(0);
+
+  const [siteEntered, setSiteEntered] = useState<boolean>(
+    hasUserInteractedGlobal,
+  );
 
   useEffect(() => {
     const newPlaylist = [...playlist];
@@ -85,7 +96,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       src: [src],
       html5: true,
       volume: 0.5,
-      autoplay: true,
+      autoplay: false,
       onload: () => setIsLoaded(true),
       onplay: () => setIsPlaying(true),
       onpause: () => setIsPlaying(false),
@@ -141,6 +152,41 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         currentTrack: queue[queueIndex],
       }}
     >
+      <AnimatePresence mode="wait">
+        {!siteEntered && (
+          <motion.div
+            key="welcome"
+            className={styles.welcome}
+            initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, scale: 1.1, filter: "blur(12px)" }}
+            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            onClick={() => {
+              if (!isLoaded) return;
+
+              if (!siteEntered) {
+                setSiteEntered(true);
+
+                hasUserInteractedGlobal = true;
+
+                play();
+
+                // playMain();
+              }
+            }}
+          >
+            <h1 className={styles.welcomeTitle}>Welcome!</h1>
+            <div className={styles.welcomeMessage}>
+              <TextMorph>
+                {isLoaded
+                  ? "Click anywhere to start!"
+                  : "Loading, please wait..."}
+              </TextMorph>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {children}
     </MusicContext.Provider>
   );
@@ -148,8 +194,10 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
 export function useGlobalMusic() {
   const context = useContext(MusicContext);
+
   if (!context) {
     throw new Error("useGlobalMusic must be used within an MusicContext");
   }
+
   return context;
 }

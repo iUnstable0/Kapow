@@ -23,7 +23,7 @@ import levels from "@/components/levels.json";
 
 const MotionImage = motion.create(Image);
 
-let hasUserInteractedGlobal = true;
+// let hasUserInteractedGlobal = false;
 let currentLevelGlobal = 1;
 
 export default function Home() {
@@ -31,9 +31,9 @@ export default function Home() {
     useState<number>(currentLevelGlobal);
   const [startLoading, setStartLoading] = useState<boolean>(false);
 
-  const [siteEntered, setSiteEntered] = useState<boolean>(
-    hasUserInteractedGlobal,
-  );
+  // const [siteEntered, setSiteEntered] = useState<boolean>(
+  //   hasUserInteractedGlobal,
+  // );
 
   // const [kapowLoaded, setKapowLoaded] = useState<boolean>(false);
 
@@ -59,40 +59,40 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <AnimatePresence mode="wait">
-        {!siteEntered && (
-          <motion.div
-            key="welcome"
-            className={styles.welcome}
-            initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 1.1, filter: "blur(12px)" }}
-            transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            onClick={() => {
-              if (!isLoaded) return;
+      {/*<AnimatePresence mode="wait">*/}
+      {/*  {!siteEntered && (*/}
+      {/*    <motion.div*/}
+      {/*      key="welcome"*/}
+      {/*      className={styles.welcome}*/}
+      {/*      initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}*/}
+      {/*      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}*/}
+      {/*      exit={{ opacity: 0, scale: 1.1, filter: "blur(12px)" }}*/}
+      {/*      transition={{ type: "spring", stiffness: 100, damping: 20 }}*/}
+      {/*      onClick={() => {*/}
+      {/*        if (!isLoaded) return;*/}
 
-              if (!siteEntered) {
-                setSiteEntered(true);
+      {/*        if (!siteEntered) {*/}
+      {/*          setSiteEntered(true);*/}
 
-                hasUserInteractedGlobal = true;
+      {/*          hasUserInteractedGlobal = true;*/}
 
-                play();
+      {/*          play();*/}
 
-                // playMain();
-              }
-            }}
-          >
-            <h1 className={styles.welcomeTitle}>Welcome!</h1>
-            <div className={styles.welcomeMessage}>
-              <TextMorph>
-                {isLoaded
-                  ? "Click anywhere to start!"
-                  : "Loading, please wait..."}
-              </TextMorph>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/*          // playMain();*/}
+      {/*        }*/}
+      {/*      }}*/}
+      {/*    >*/}
+      {/*      <h1 className={styles.welcomeTitle}>Welcome!</h1>*/}
+      {/*      <div className={styles.welcomeMessage}>*/}
+      {/*        <TextMorph>*/}
+      {/*          {isLoaded*/}
+      {/*            ? "Click anywhere to start!"*/}
+      {/*            : "Loading, please wait..."}*/}
+      {/*        </TextMorph>*/}
+      {/*      </div>*/}
+      {/*    </motion.div>*/}
+      {/*  )}*/}
+      {/*</AnimatePresence>*/}
 
       <div className={styles.header}>
         <h1 className={styles.title}>welcome to kapow</h1>
