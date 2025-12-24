@@ -17,7 +17,6 @@ import { useGlobalMusic } from "@/components/music";
 
 import { SlidingNumber } from "@/components/mp/sliding-number";
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
-import { TextMorph } from "@/components/mp/text-morph";
 
 import levels from "@/components/levels.json";
 

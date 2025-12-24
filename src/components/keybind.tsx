@@ -8,6 +8,7 @@ import {
   Delete,
   ArrowRight,
   ArrowLeft,
+  Space,
 } from "lucide-react";
 
 import stylesDynamic from "./keybind-dyn.module.scss";
@@ -26,6 +27,8 @@ export enum T_Keybind {
   enter = "enter",
   escape = "escape",
   backspace = "backspace",
+
+  space = " ",
 
   q = "q",
   w = "w",
@@ -479,7 +482,7 @@ export default function Keybind({
             {keybind === T_Keybind.tab && (
               <span className={clsx(styles.keybindText, className)}>esc</span>
             )}
-            {keybind === T_Keybind.backspace && (
+            {keybind === T_Keybind.backspacez && (
               <Delete className={clsx(styles.keybindIcon, className)} />
             )}
             {keybind === T_Keybind.right_arrow && (
@@ -490,6 +493,11 @@ export default function Keybind({
             {keybind === T_Keybind.left_arrow && (
               <span className={clsx(styles.keybindText, className)}>
                 <ArrowLeft className={clsx(styles.keybindIcon, className)} />
+              </span>
+            )}
+            {keybind === T_Keybind.space && (
+              <span className={clsx(styles.keybindText, className)}>
+                <Space className={clsx(styles.keybindIcon, className)} />
               </span>
             )}
             {letters.includes(keybind) && (
