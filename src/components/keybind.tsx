@@ -123,6 +123,7 @@ export const KeybindButton = ({
   return (
     <motion.div
       layout
+      key={`keybindbutton_${keybinds.join("_")}_${forcetheme}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
