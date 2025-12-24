@@ -23,7 +23,7 @@ import { TextMorph } from "@/components/mp/text-morph";
 
 const coffee_songs = Array.from(
   { length: 10 },
-  (_, i) => `/blueberry/coffee ${i + 1}.mp3`,
+  (_, i) => `/coffee/coffee ${i + 1}.mp3`,
 );
 
 const blueberry_songs = Array.from(

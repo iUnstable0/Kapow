@@ -84,7 +84,43 @@
   {
     "level": 3,
     "timer": 120,
-    "quiz": []
+    "quiz": [
+      {
+        "question": "งู",
+        "voice": "snake.mp3",
+        "answer": "snake.jpg"
+      },
+      {
+        "question": "ปู",
+        "voice": "crab.mp3",
+        "answer": "crab.jpg"
+      },
+      {
+        "question": "หมู",
+        "voice": "pig.mp3",
+        "answer": "pig.jpg"
+      },
+      {
+        "question": "หู",
+        "voice": "ear.mp3",
+        "answer": "ear.jpg"
+      },
+      {
+        "question": "สี",
+        "voice": "color.mp3",
+        "answer": "color.jpg"
+      },
+      {
+        "question": "หมี",
+        "voice": "bear.mp3",
+        "answer": "bear.jpg"
+      },
+      {
+        "question": "หวี",
+        "voice": "comb.mp3",
+        "answer": "comb.jpg"
+      }
+    ]
   },
   {
     "level": 4,
