@@ -309,9 +309,28 @@ export default function Page() {
             transition={{ duration: 0.5 }}
             key={`stagelabel-${stage}`}
           >
-            Stage: {stage}/5
-            <br />
-            Timer: {currentTimer}
+            <div>Stage: {stage}/5</div>
+            <div> Timer: {currentTimer}</div>
+            <KeybindButton
+              keybinds={[T_Keybind.shift, T_Keybind.escape]}
+              forcetheme={"dark"}
+              onPress={() => {
+                setGameStarted(false);
+
+                if (timerRef.current) {
+                  clearInterval(timerRef.current);
+                  setCurrentTimer("infinite");
+                }
+              }}
+              disabled={false}
+              loading={false}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
+              reversed={true}
+              dangerous={true}
+            >
+              Quit
+            </KeybindButton>
           </motion.div>
         )}
 

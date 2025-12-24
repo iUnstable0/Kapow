@@ -19,8 +19,7 @@ export default async function LevelLayout({
 
   if (!myLevel) {
     redirect("/");
-    // return null;
   }
 
-  return <LevelProvider value={myLevel}>{children}</LevelProvider>;
+  return <LevelProvider data={myLevel}>{children}</LevelProvider>;
 }

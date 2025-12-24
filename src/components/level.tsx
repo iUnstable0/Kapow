@@ -17,7 +17,7 @@ type T_LevelData = {
   quiz: { question: string; answer: string; voice: string }[];
 };
 
-type T_LevelContext = LevelData & {
+type T_LevelContext = T_LevelData & {
   playSound: (voiceFile: string) => void;
 };
 
@@ -27,12 +27,14 @@ export function LevelProvider({
   data,
   children,
 }: {
-  data: T_LevelData;
+  data: T_LevelData | undefined;
   children: ReactNode;
 }) {
   const voicesRef = useRef<{ [key: string]: Howl }>({});
 
   useEffect(() => {
+    if (!data) return;
+
     const currentVoices = voicesRef.current;
 
     data.quiz.forEach((q) => {
@@ -46,32 +48,34 @@ export function LevelProvider({
 
     return () => {
       Object.values(currentVoices).forEach((sound) => sound.unload());
-
       voicesRef.current = {};
     };
   }, [data]);
 
   const playSound = useCallback((voiceFile: string) => {
     const voice = voicesRef.current[voiceFile];
-
     if (voice) {
       voice.play();
     }
   }, []);
 
-  const value = { ...data, playSound };
+  // const value = useMemo(() => {
+  //   return data ? { ...data, playSound } : null;
+  // }, [data, playSound]);
+
+  // if (!value) return null;
 
   return (
-    <LevelContext.Provider value={value}>{children}</LevelContext.Provider>
+    <LevelContext.Provider value={{ ...data, playSound }}>
+      {children}
+    </LevelContext.Provider>
   );
 }
 
 export function useLevel() {
   const context = useContext(LevelContext);
-
   if (!context) {
     throw new Error("useLevel must be used within a LevelProvider");
   }
-
   return context;
 }
