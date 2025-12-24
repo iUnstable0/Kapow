@@ -237,7 +237,7 @@ export default function Home() {
 
           setTimeout(() => {
             router.push(`/level/${selectedLevel}`);
-          }, 1000);
+          }, 750);
         }}
         disabled={startLoading}
         loading={startLoading}

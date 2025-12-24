@@ -1,7 +1,6 @@
 "use client";
 
 import React, {
-  use,
   useState,
   useRef,
   useEffect,
@@ -13,20 +12,20 @@ import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 
-import { motion, AnimatePresence } from "motion/react";
-import { DateTime } from "luxon";
-import { Howl } from "howler";
 import clsx from "clsx";
-
-import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
+import useSound from "use-sound";
 
 import ReactCanvasConfetti from "react-canvas-confetti";
 import type { TCanvasConfettiInstance } from "react-canvas-confetti/dist/types";
 
-import styles from "./page.module.scss";
-import levels from "@/components/levels.json";
+import { motion, AnimatePresence } from "motion/react";
+import { DateTime } from "luxon";
 
-import useSound from "use-sound";
+import { useLevel } from "@/components/level";
+
+import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
+
+import styles from "./page.module.scss";
 
 const leftKeys = [
   T_Keybind.q,
@@ -54,15 +53,13 @@ type T_Question = {
   voice: string;
 };
 
-export default function Page({
-  params,
-}: {
-  params: Promise<{ level: string }>;
-}) {
-  const { level } = use(params);
-
+export default function Page() {
   const router = useRouter();
 
+  const { level, timer, quiz, playSound } = useLevel();
+
+  const [returnLoading, setReturnLoading] = useState<boolean>(false);
+  const [reviewLoading, setReviewLoading] = useState<boolean>(false);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("");
   const [stage, setStage] = useState<number>(1);
@@ -74,17 +71,7 @@ export default function Page({
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [answered, setAnswered] = useState<Array<string>>([]);
-  const [timer, setTimer] = useState<string>("");
-
-  const voicesRef = useRef<{ [key: string]: Howl }>({});
-
-  const myLevel:
-    | {
-        level: number;
-        timer: number;
-        quiz: { question: string; answer: string; voice: string }[];
-      }
-    | undefined = levels.find((lvl) => lvl.level === parseInt(level, 10));
+  const [currentTimer, setCurrentTimer] = useState<string>("infinite");
 
   const [playDing] = useSound("/ding.mp3", {
     volume: 0.5,
@@ -105,23 +92,6 @@ export default function Page({
   const [playYay] = useSound("/yay.mp3", {
     volume: 0.5,
   });
-
-  useEffect(() => {
-    if (!myLevel) return;
-
-    const currentVoices = voicesRef.current;
-
-    myLevel.quiz.forEach((q) => {
-      currentVoices[q.voice] = new Howl({
-        src: [`/level${level}/${q.voice}`],
-        volume: 0.7,
-      });
-    });
-
-    return () => {
-      Object.values(currentVoices).forEach((sound) => sound.unload());
-    };
-  }, [myLevel, level]);
 
   const fireWinConfetti = useCallback(() => {
     if (!confettiRef.current) return;
@@ -147,36 +117,30 @@ export default function Page({
     fire(0.1, { spread: 120, startVelocity: 45 });
   }, []);
 
-  const playSound = (sound: string) => {
-    const voice = voicesRef.current[sound];
-
-    if (voice) {
-      voice.play();
-    }
-  };
-
   const gameData = useMemo(() => {
-    if (!myLevel?.quiz) return { questions: [], images: [] };
+    if (!quiz) return { questions: [], images: [] };
 
-    const questions = [...myLevel.quiz];
-    const images = [...myLevel.quiz];
+    const questions = [...quiz];
+    const images = [...quiz];
 
     for (let i = questions.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
+
       [questions[i], questions[j]] = [questions[j], questions[i]];
     }
 
     for (let i = images.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
+
       [images[i], images[j]] = [images[j], images[i]];
     }
 
     return { questions, images };
-  }, [stage]);
+    //   Everytime stage is changed shuffle the gameData
+    //   eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quiz, stage]);
 
   const handleAnswer = (q: T_Question) => {
-    if (!myLevel) return;
-
     if (selectedQuestion === q.question) {
       playDing();
 
@@ -194,7 +158,7 @@ export default function Page({
 
       setAnswered(newAnswered);
 
-      if (newAnswered.length >= myLevel.quiz.length) {
+      if (newAnswered.length >= quiz.length) {
         if (stage < 5) {
           setAnswered([]);
           setStage((prev) => prev + 1);
@@ -212,20 +176,6 @@ export default function Page({
       playAlert();
     }
   };
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //
-  //   }, 1000);
-  //
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  if (!myLevel) {
-    router.push("/");
-
-    return null;
-  }
 
   return (
     <div className={styles.container}>
@@ -256,9 +206,9 @@ export default function Page({
           >
             <h1 className={styles.title}>Level {level}</h1>
             <p className={styles.desc}>
-              {myLevel.timer > 0
+              {timer > 0
                 ? `
-          Timer: ${DateTime.fromSeconds(myLevel.timer).toFormat("mm:ss")} minutes`
+          Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`
                 : `Timer: no timer`}
             </p>
           </motion.div>
@@ -273,50 +223,80 @@ export default function Page({
             transition={{ duration: 0.5 }}
             key={"toolbar"}
           >
-            <KeybindButton
-              forcetheme={"dark"}
-              keybinds={[T_Keybind.escape]}
-              onPress={() => {
-                router.back();
-              }}
-              disabled={gameStarted}
-              loadingTextEnabled={false}
-              reversed={true}
-              dangerous={true}
-            >
-              Back
-            </KeybindButton>
+            <div className={styles.toolrowitm}>
+              <KeybindButton
+                forcetheme={"dark"}
+                keybinds={[T_Keybind.escape]}
+                onPress={() => {
+                  setReturnLoading(true);
 
-            <KeybindButton
-              forcetheme={"dark"}
-              keybinds={[T_Keybind.enter]}
-              onPress={() => {
-                setGameStarted(true);
+                  setTimeout(() => {
+                    router.back();
+                  }, 750);
+                }}
+                disabled={reviewLoading || returnLoading}
+                loading={returnLoading}
+                loadingText={"Please wait..."}
+                loadingTextEnabled={true}
+                reversed={true}
+                dangerous={true}
+              >
+                Back
+              </KeybindButton>
+            </div>
 
-                const future = DateTime.now().plus({
-                  seconds: myLevel.timer,
-                });
+            <div className={styles.toolrowitm}>
+              <KeybindButton
+                forcetheme={"dark"}
+                keybinds={[T_Keybind.shift, T_Keybind.enter]}
+                onPress={() => {
+                  setReviewLoading(true);
 
-                timerRef.current = setInterval(() => {
-                  if (!timerRef.current) return;
+                  setTimeout(() => {
+                    router.push(`/level/${level}/review`);
+                  }, 750);
+                }}
+                loading={reviewLoading}
+                disabled={reviewLoading || returnLoading}
+                loadingText={"Please wait..."}
+                loadingTextEnabled={true}
+              >
+                Review
+              </KeybindButton>
 
-                  if (DateTime.now() > future) {
-                    clearInterval(timerRef.current);
-                    timerRef.current = null;
+              <KeybindButton
+                forcetheme={"dark"}
+                keybinds={[T_Keybind.enter]}
+                onPress={() => {
+                  setGameStarted(true);
 
-                    setLost(true);
+                  if (timer <= 0) return;
 
-                    return;
-                  }
+                  const future = DateTime.now().plus({
+                    seconds: timer,
+                  });
 
-                  setTimer(future.diffNow().toFormat("mm:ss"));
-                }, 500);
-              }}
-              disabled={gameStarted}
-              loadingTextEnabled={false}
-            >
-              Play
-            </KeybindButton>
+                  timerRef.current = setInterval(() => {
+                    if (!timerRef.current) return;
+
+                    if (DateTime.now() > future) {
+                      clearInterval(timerRef.current);
+                      timerRef.current = null;
+
+                      setLost(true);
+
+                      return;
+                    }
+
+                    setCurrentTimer(future.diffNow().toFormat("mm:ss"));
+                  }, 500);
+                }}
+                disabled={reviewLoading || returnLoading}
+                loadingTextEnabled={false}
+              >
+                Play
+              </KeybindButton>
+            </div>
           </motion.div>
         )}
 
@@ -331,7 +311,7 @@ export default function Page({
           >
             Stage: {stage}/5
             <br />
-            Timer: {timer}
+            Timer: {currentTimer}
           </motion.div>
         )}
 
@@ -346,9 +326,9 @@ export default function Page({
           >
             <h1 className={styles.title}>You failed Level {level}!</h1>
             {/*  <p className={styles.desc}>*/}
-            {/*    {myLevel.timer > 0*/}
+            {/*    {timer > 0*/}
             {/*      ? `*/}
-            {/*Timer: ${DateTime.fromSeconds(myLevel.timer).toFormat("mm:ss")} minutes`*/}
+            {/*Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`*/}
             {/*      : `Timer: no timer`}*/}
             {/*  </p>*/}
           </motion.div>
@@ -367,9 +347,16 @@ export default function Page({
               forcetheme={"dark"}
               keybinds={[T_Keybind.enter]}
               onPress={() => {
-                router.back();
+                setReturnLoading(true);
+
+                setTimeout(() => {
+                  router.back();
+                }, 750);
               }}
-              loadingTextEnabled={false}
+              loading={returnLoading}
+              disabled={returnLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
             >
               Return
             </KeybindButton>
@@ -387,9 +374,9 @@ export default function Page({
           >
             <h1 className={styles.title}>You completed Level {level}!</h1>
             {/*  <p className={styles.desc}>*/}
-            {/*    {myLevel.timer > 0*/}
+            {/*    {timer > 0*/}
             {/*      ? `*/}
-            {/*Timer: ${DateTime.fromSeconds(myLevel.timer).toFormat("mm:ss")} minutes`*/}
+            {/*Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`*/}
             {/*      : `Timer: no timer`}*/}
             {/*  </p>*/}
           </motion.div>
@@ -408,9 +395,16 @@ export default function Page({
               forcetheme={"dark"}
               keybinds={[T_Keybind.enter]}
               onPress={() => {
-                router.back();
+                setReturnLoading(true);
+
+                setTimeout(() => {
+                  router.back();
+                }, 750);
               }}
-              loadingTextEnabled={false}
+              loading={returnLoading}
+              disabled={returnLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
             >
               Return
             </KeybindButton>
