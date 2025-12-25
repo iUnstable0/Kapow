@@ -50,21 +50,51 @@ export default function Page() {
     volume: 1,
   });
 
+  const [playBen1] = useSound("/ben/ben 1.mp3", {
+    volume: 1,
+  });
+
+  const [playBen2] = useSound("/ben/ben 2.mp3", {
+    volume: 1,
+  });
+
+  const [playBen3] = useSound("/ben/ben 3.mp3", {
+    volume: 1,
+  });
+
+  const [playBen4] = useSound("/ben/ben 4.mp3", {
+    volume: 1,
+  });
+
+  const [playBen5] = useSound("/ben/ben 5.mp3", {
+    volume: 1,
+  });
+
+  const playBen = useCallback(() => {
+    const benSounds = [playBen1, playBen2, playBen3, playBen4, playBen5];
+    const randomIndex = Math.floor(Math.random() * benSounds.length);
+    benSounds[randomIndex]();
+  }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
+
   const playCardSound = useCallback(() => {
     pause();
 
     if (flipState === "question") {
       playSound(queue[reviewIndex].voice);
     } else {
-      window.speechSynthesis.speak(
-        new SpeechSynthesisUtterance(queue[reviewIndex].answer.split(".")[0]),
-      );
+      if (queue[reviewIndex].answer.split(".")[0] === "dog") {
+        playBen();
+      } else {
+        window.speechSynthesis.speak(
+          new SpeechSynthesisUtterance(queue[reviewIndex].answer.split(".")[0]),
+        );
+      }
     }
 
     setTimeout(() => {
       play();
     }, 1000);
-  }, [flipState, playSound, queue, reviewIndex, pause, play]);
+  }, [flipState, playSound, queue, reviewIndex, pause, play, playBen]);
 
   const markForReview = useCallback(
     (item: (typeof quiz)[number]) => {

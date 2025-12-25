@@ -88,17 +88,17 @@
       {
         "question": "งู",
         "voice": "snake.mp3",
-        "answer": "snake.jpg"
+        "answer": "snake.png"
       },
       {
         "question": "ปู",
         "voice": "crab.mp3",
-        "answer": "crab.jpg"
+        "answer": "crab.png"
       },
       {
         "question": "หมู",
         "voice": "pig.mp3",
-        "answer": "pig.jpg"
+        "answer": "pig.png"
       },
       {
         "question": "หู",
@@ -108,7 +108,7 @@
       {
         "question": "สี",
         "voice": "color.mp3",
-        "answer": "color.jpg"
+        "answer": "color.png"
       },
       {
         "question": "หมี",
@@ -125,7 +125,43 @@
   {
     "level": 4,
     "timer": 120,
-    "quiz": []
+    "quiz": [
+      {
+        "question": "นก",
+        "voice": "bird.mp3",
+        "answer": "bird.jpg"
+      },
+      {
+        "question": "แมว",
+        "voice": "cat.mp3",
+        "answer": "cat.jpg"
+      },
+      {
+        "question": "เป็ด",
+        "voice": "duck.mp3",
+        "answer": "duck.jpg"
+      },
+      {
+        "question": "ลิง",
+        "voice": "monkey.mp3",
+        "answer": "monkey.jpg"
+      },
+      {
+        "question": "ช้าง",
+        "voice": "elephant.mp3",
+        "answer": "school bus.jpg"
+      },
+      {
+        "question": "เสือ",
+        "voice": "tiger.mp3",
+        "answer": "tiger.jpg"
+      },
+      {
+        "question": "กุ้ง",
+        "voice": "shrimp.mp3",
+        "answer": "shrimp.jpg"
+      }
+    ]
   },
   {
     "level": 5,

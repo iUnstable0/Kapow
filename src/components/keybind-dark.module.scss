@@ -1,9 +1,8 @@
 .keybindContainerMagnet {
   display: flex;
   flex-direction: row;
-  gap: 8px;
 
-  /* background: red; */
+  gap: 8px;
 
   color: #f9f9f9;
 }
@@ -61,8 +60,6 @@
   justify-content: flex-start;
 
   gap: 8px;
-
-  /* background: green; */
 
   transition:
     scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),

@@ -73,6 +73,33 @@ export default function Page() {
     volume: 0.5,
   });
 
+  const [playBen1] = useSound("/ben/ben 1.mp3", {
+    volume: 1,
+  });
+
+  const [playBen2] = useSound("/ben/ben 2.mp3", {
+    volume: 1,
+  });
+
+  const [playBen3] = useSound("/ben/ben 3.mp3", {
+    volume: 1,
+  });
+
+  const [playBen4] = useSound("/ben/ben 4.mp3", {
+    volume: 1,
+  });
+
+  const [playBen5] = useSound("/ben/ben 5.mp3", {
+    volume: 1,
+  });
+
+  const playBen = useCallback(() => {
+    const benSounds = [playBen1, playBen2, playBen3, playBen4, playBen5];
+    const randomIndex = Math.floor(Math.random() * benSounds.length);
+
+    benSounds[randomIndex]();
+  }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
+
   const startGame = useCallback(() => {
     setWin(false);
     setLost(false);
@@ -130,13 +157,19 @@ export default function Page() {
     if (selectedQuestion === q.question) {
       playDing();
 
-      const utterance = new SpeechSynthesisUtterance(q.answer.split(".")[0]);
+      if (q.answer.split(".")[0] === "dog") {
+        playBen();
+      }
 
-      utterance.pitch = 0.1;
-      utterance.rate = 0.1;
-      utterance.volume = 1;
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(q.answer.split(".")[0]);
 
-      window.speechSynthesis.speak(utterance);
+        // utterance.pitch = 0.1;
+        // utterance.rate = 0.1;
+        // utterance.volume = 1;
+
+        window.speechSynthesis.speak(utterance);
+      }, 1000);
 
       setSelectedQuestion("");
 
@@ -195,27 +228,25 @@ export default function Page() {
             transition={{ duration: 0.5 }}
             key={"toolbar"}
           >
-            <div className={styles.toolrowitm}>
-              <KeybindButton
-                forcetheme={"dark"}
-                keybinds={[T_Keybind.escape]}
-                onPress={() => {
-                  setReturnLoading(true);
+            <KeybindButton
+              forcetheme={"dark"}
+              keybinds={[T_Keybind.escape]}
+              onPress={() => {
+                setReturnLoading(true);
 
-                  setTimeout(() => {
-                    router.push(`/`);
-                  }, 750);
-                }}
-                disabled={reviewLoading || returnLoading}
-                loading={returnLoading}
-                loadingText={"Please wait..."}
-                loadingTextEnabled={true}
-                reversed={true}
-                dangerous={true}
-              >
-                Back
-              </KeybindButton>
-            </div>
+                setTimeout(() => {
+                  router.push(`/`);
+                }, 750);
+              }}
+              disabled={reviewLoading || returnLoading}
+              loading={returnLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
+              reversed={false}
+              dangerous={true}
+            >
+              Back
+            </KeybindButton>
 
             <div className={styles.toolrowitm}>
               <KeybindButton
