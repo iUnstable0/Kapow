@@ -97,10 +97,6 @@ export default function Page() {
           queue[reviewIndex].answer.split(".")[0],
         );
 
-        // utterance.pitch = 0.1;
-        // utterance.rate = 0.1;
-        // utterance.volume = 1;
-
         window.speechSynthesis.speak(utterance);
       }, 1000);
     }
@@ -108,7 +104,16 @@ export default function Page() {
     setTimeout(() => {
       play();
     }, 1000);
-  }, [flipState, playSound, queue, reviewIndex, pause, play, playBen]);
+  }, [
+    pause,
+    flipState,
+    playSound,
+    queue,
+    reviewIndex,
+    playBen,
+    playLeFishe,
+    play,
+  ]);
 
   const markForReview = useCallback(
     (item: (typeof quiz)[number]) => {
@@ -118,20 +123,6 @@ export default function Page() {
     },
     [reviews],
   );
-
-  // const handleWin = useCallback(() => {
-  //   if (reviews.length < quiz.length) {
-  //     fireConfetti(true);
-  //   } else {
-  //     playAlert();
-  //   }
-  //
-  //   console.log(reviews);
-  //   console.log(quiz);
-  //
-  //   setReviewStarted(false);
-  //   setReviewIndex(0);
-  // }, [fireConfetti, playAlert, reviews, quiz]);
 
   const handleNext = useCallback(
     (review: boolean) => {
