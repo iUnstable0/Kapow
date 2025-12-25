@@ -166,6 +166,42 @@
   {
     "level": 5,
     "timer": 120,
-    "quiz": []
+    "quiz": [
+      {
+        "question": "ข้าว",
+        "voice": "rice.mp3",
+        "answer": "rice.jpg"
+      },
+      {
+        "question": "น้ำ",
+        "voice": "water.mp3",
+        "answer": "water.jpg"
+      },
+      {
+        "question": "ส้ม",
+        "voice": "orange.mp3",
+        "answer": "orange.jpg"
+      },
+      {
+        "question": "กล้วย",
+        "voice": "banana.mp3",
+        "answer": "banana.jpg"
+      },
+      {
+        "question": "จาน",
+        "voice": "plate.mp3",
+        "answer": "plate.jpg"
+      },
+      {
+        "question": "ช้อน",
+        "voice": "spoon.mp3",
+        "answer": "spoon.jpg"
+      },
+      {
+        "question": "แก้ว",
+        "voice": "glass.mp3",
+        "answer": "glass.jpg"
+      }
+    ]
   }
 ]
