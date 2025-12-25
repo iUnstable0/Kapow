@@ -1,7 +1,6 @@
 "use client";
 
 import React, {
-  ReactNode,
   useRef,
   useEffect,
   useCallback,
@@ -27,8 +26,8 @@ export function LevelProvider({
   data,
   children,
 }: {
-  data: T_LevelData | undefined;
-  children: ReactNode;
+  data: T_LevelData;
+  children: React.ReactNode;
 }) {
   const voicesRef = useRef<{ [key: string]: Howl }>({});
 
@@ -65,6 +64,8 @@ export function LevelProvider({
 
   // if (!value) return null;
 
+  if (!data) return null;
+
   return (
     <LevelContext.Provider value={{ ...data, playSound }}>
       {children}
@@ -74,8 +75,10 @@ export function LevelProvider({
 
 export function useLevel() {
   const context = useContext(LevelContext);
+
   if (!context) {
     throw new Error("useLevel must be used within a LevelProvider");
   }
+
   return context;
 }

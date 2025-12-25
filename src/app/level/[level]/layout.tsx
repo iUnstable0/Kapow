@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import levels from "@/components/levels.json";
 
 import { LevelProvider } from "@/components/level";
+import { ConfettiProvider } from "@/components/confetti";
 
 export default async function LevelLayout({
   children,
@@ -21,5 +22,9 @@ export default async function LevelLayout({
     redirect("/");
   }
 
-  return <LevelProvider data={myLevel}>{children}</LevelProvider>;
+  return (
+    <ConfettiProvider>
+      <LevelProvider data={myLevel}>{children}</LevelProvider>{" "}
+    </ConfettiProvider>
+  );
 }

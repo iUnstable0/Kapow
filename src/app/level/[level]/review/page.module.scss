@@ -63,6 +63,16 @@
   background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.5));
 }
 
+.toolbarTopRight {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  padding: 42px;
+
+  z-index: 2;
+}
+
 .question {
   font-size: 32px;
   font-weight: 500;
@@ -100,6 +110,14 @@
 
   z-index: 2;
 
+  display: flex;
+  gap: 28px;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.reviewTools {
   display: flex;
   gap: 28px;
 

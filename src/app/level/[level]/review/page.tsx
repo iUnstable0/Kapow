@@ -1,71 +1,128 @@
 "use client";
 
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import Image from "next/image";
 
-import { useRouter } from "next/navigation";
-
-import clsx from "clsx";
-
 import { motion, AnimatePresence } from "motion/react";
-import { Howl } from "howler";
 
 import { useLevel } from "@/components/level";
 import { useGlobalMusic } from "@/components/music";
 
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
 
-import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
+import { KeybindButton, T_Keybind } from "@/components/keybind";
 
 import styles from "./page.module.scss";
+import { useConfetti } from "@/components/confetti";
+import useSound from "use-sound";
 
 const MotionImage = motion.create(Image);
 
 export default function Page() {
-  const { level, timer, quiz, playSound } = useLevel();
+  const { level, quiz, playSound } = useLevel();
+  const { fireConfetti } = useConfetti();
+
   const { pause, play } = useGlobalMusic();
+
+  const isProcessing = useRef(false);
 
   const [flipped, setFlipped] = useState<boolean>(false);
   const [flipState, setFlipState] = useState<"question" | "answer">("question");
+
+  const [queue, setQueue] = useState<typeof quiz>(quiz);
+  const [reviews, setReviews] = useState<typeof quiz>([]);
+
+  const [win, setWin] = useState<boolean>(false);
 
   const [reviewStarted, setReviewStarted] = useState<boolean>(false);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const [reviewIndex, setReviewIndex] = useState<number>(0);
 
+  const [playAlert] = useSound("/alert.mp3", {
+    volume: 1,
+  });
+
   const playCardSound = useCallback(() => {
     pause();
 
     if (flipState === "question") {
-      playSound(quiz[reviewIndex].voice);
+      playSound(queue[reviewIndex].voice);
     } else {
       window.speechSynthesis.speak(
-        new SpeechSynthesisUtterance(quiz[reviewIndex].answer.split(".")[0]),
+        new SpeechSynthesisUtterance(queue[reviewIndex].answer.split(".")[0]),
       );
     }
 
     setTimeout(() => {
       play();
     }, 1000);
-  }, [flipState, playSound, quiz, reviewIndex, pause, play]);
+  }, [flipState, playSound, queue, reviewIndex, pause, play]);
 
-  const handleNext = useCallback(() => {
-    setFlipped(false);
-    setFlipState("question");
+  const markForReview = useCallback(
+    (item: (typeof quiz)[number]) => {
+      if (reviews.find((rev) => rev.question === item.question)) return;
 
-    if (reviewIndex + 1 >= quiz.length) {
-      // TODO: Play win sound
-    } else {
-      setReviewIndex(reviewIndex + 1);
-    }
-  }, [reviewIndex, quiz]);
+      setReviews((prev) => [...prev, item]);
+    },
+    [reviews],
+  );
+
+  // const handleWin = useCallback(() => {
+  //   if (reviews.length < quiz.length) {
+  //     fireConfetti(true);
+  //   } else {
+  //     playAlert();
+  //   }
+  //
+  //   console.log(reviews);
+  //   console.log(quiz);
+  //
+  //   setReviewStarted(false);
+  //   setReviewIndex(0);
+  // }, [fireConfetti, playAlert, reviews, quiz]);
+
+  const handleNext = useCallback(
+    (review: boolean) => {
+      if (isProcessing.current) return;
+
+      isProcessing.current = true;
+
+      if (review) {
+        markForReview(queue[reviewIndex]);
+      } else {
+        if (
+          reviews.find((rev) => rev.question === queue[reviewIndex].question)
+        ) {
+          alert("Item was in review list, remove now");
+          setReviews((prev) =>
+            prev.filter((rev) => rev.question !== queue[reviewIndex].question),
+          );
+        }
+      }
+
+      setFlipped(false);
+      setFlipState("question");
+
+      if (reviewIndex + 1 >= queue.length) {
+        setWin(true);
+        setReviewStarted(false);
+        setReviewIndex(0);
+
+        isProcessing.current = false;
+      } else {
+        setReviewIndex((prev) => Math.min(prev + 1, queue.length - 1));
+        console.log("FC NEXT");
+
+        setTimeout(() => {
+          isProcessing.current = false;
+          console.log("FC UNLOCK");
+        }, 300);
+      }
+    },
+    [reviewIndex, queue, markForReview, reviews],
+  );
 
   const handleFlip = useCallback(() => {
     setFlipped(true);
@@ -78,10 +135,20 @@ export default function Page() {
   }, [flipState]);
 
   useEffect(() => {
-    if (firstLoad) return;
+    if (!reviewStarted) return;
 
     playCardSound();
-  }, [flipState, playCardSound, firstLoad]);
+  }, [flipState, playCardSound, reviewStarted]);
+
+  useEffect(() => {
+    if (!win) return;
+
+    if (reviews.length < quiz.length) {
+      fireConfetti(true);
+    } else {
+      playAlert();
+    }
+  }, [win, fireConfetti, playAlert, reviews, quiz]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -104,6 +171,98 @@ export default function Page() {
           >
             <h1 className={styles.title}>Level {level} Review</h1>
             {firstLoad && <p className={styles.desc}>Loading...</p>}
+            {!firstLoad && reviews.length === 0 && (
+              <p className={styles.desc}>Get ready to review!</p>
+            )}
+            {!firstLoad &&
+              reviews.length > 0 &&
+              reviews.length < quiz.length && (
+                <p className={styles.desc}>
+                  You have {reviews.length} item
+                  {reviews.length > 1 ? "s" : ""} left to review.
+                </p>
+              )}
+            {!firstLoad && !(reviews.length < quiz.length) && (
+              <p className={styles.desc}>You failed all reviews lol.</p>
+            )}
+          </motion.div>
+        )}
+
+        {!firstLoad && !reviewStarted && (
+          <motion.div
+            className={styles.reviewTools}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"reviewremaining"}
+          >
+            {reviews.length > 0 && reviews.length < quiz.length && (
+              <KeybindButton
+                keybinds={[T_Keybind.shift, T_Keybind.enter]}
+                forcetheme={"dark"}
+                onPress={() => {
+                  setQueue(reviews);
+                  setReviews([]);
+                  setWin(false);
+
+                  setReviewStarted(true);
+                }}
+                // disabled={reviewLoading || returnLoading}
+                // loading={returnLoading}
+                // loadingText={"Please wait..."}
+                // loadingTextEnabled={true}
+                // reversed={true}
+              >
+                Review remaining
+              </KeybindButton>
+            )}
+
+            <KeybindButton
+              keybinds={[T_Keybind.enter]}
+              forcetheme={"dark"}
+              onPress={() => {
+                setQueue(quiz);
+                setReviews([]);
+                setWin(false);
+
+                setReviewStarted(true);
+              }}
+              // disabled={reviewLoading || returnLoading}
+              // loading={returnLoading}
+              // loadingText={"Please wait..."}
+              // loadingTextEnabled={true}
+              // reversed={true}
+            >
+              {reviews.length > 0
+                ? reviews.length < quiz.length
+                  ? "Review all"
+                  : "Review again"
+                : "Review"}
+            </KeybindButton>
+          </motion.div>
+        )}
+
+        {reviewStarted && (
+          <motion.div
+            className={styles.toolbarTopRight}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"exitreview"}
+          >
+            <KeybindButton
+              keybinds={[T_Keybind.escape]}
+              onPress={() => {
+                setReviewStarted(false);
+                setReviewIndex(0);
+              }}
+              forcetheme={"dark"}
+              dangerous={true}
+            >
+              Exit Review
+            </KeybindButton>
           </motion.div>
         )}
 
@@ -142,13 +301,13 @@ export default function Page() {
                   transition={{ duration: 0.5 }}
                   key={`question-${reviewIndex}`}
                 >
-                  {quiz[reviewIndex].question}
+                  {queue[reviewIndex].question}
                 </motion.div>
               )}
 
               {flipState === "answer" && (
                 <MotionImage
-                  src={`/level${level}/${quiz[reviewIndex].answer}`}
+                  src={`/level${level}/${queue[reviewIndex].answer}`}
                   alt={"answer image"}
                   width={200}
                   height={200}
@@ -168,7 +327,7 @@ export default function Page() {
                   keybinds={[T_Keybind.x]}
                   forcetheme={"dark"}
                   onPress={() => {
-                    handleNext();
+                    handleNext(true);
                   }}
                   // disabled={reviewLoading || returnLoading}
                   // loading={returnLoading}
@@ -219,7 +378,7 @@ export default function Page() {
                   keybinds={[T_Keybind.enter]}
                   forcetheme={"dark"}
                   onPress={() => {
-                    handleNext();
+                    handleNext(false);
                   }}
                   // disabled={reviewLoading || returnLoading}
                   // loading={returnLoading}

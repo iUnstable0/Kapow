@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useState, useRef, useMemo } from "react";
 
 import Image from "next/image";
 
@@ -15,13 +9,11 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import useSound from "use-sound";
 
-import ReactCanvasConfetti from "react-canvas-confetti";
-import type { TCanvasConfettiInstance } from "react-canvas-confetti/dist/types";
-
 import { motion, AnimatePresence } from "motion/react";
 import { DateTime } from "luxon";
 
 import { useLevel } from "@/components/level";
+import { useConfetti } from "@/components/confetti";
 
 import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
 
@@ -57,6 +49,7 @@ export default function Page() {
   const router = useRouter();
 
   const { level, timer, quiz, playSound } = useLevel();
+  const { fireConfetti } = useConfetti();
 
   const [returnLoading, setReturnLoading] = useState<boolean>(false);
   const [reviewLoading, setReviewLoading] = useState<boolean>(false);
@@ -67,7 +60,6 @@ export default function Page() {
   const [win, setWin] = useState<boolean>(false);
   const [lost, setLost] = useState<boolean>(false);
 
-  const confettiRef = useRef<TCanvasConfettiInstance | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [answered, setAnswered] = useState<Array<string>>([]);
@@ -80,42 +72,6 @@ export default function Page() {
   const [playAlert] = useSound("/alert.mp3", {
     volume: 0.5,
   });
-  const [playPop] = useSound("/pop.mp3", {
-    volume: 5,
-  });
-  const [playBoop] = useSound("/boop.mp3", {
-    volume: 0.5,
-  });
-  const [playSpeakCon] = useSound("/speakcon.mp3", {
-    volume: 0.5,
-  });
-  const [playYay] = useSound("/yay.mp3", {
-    volume: 0.5,
-  });
-
-  const fireWinConfetti = useCallback(() => {
-    if (!confettiRef.current) return;
-
-    const count = 200;
-    const defaults = {
-      origin: { y: 0.7 },
-      zIndex: 9999,
-    };
-
-    const fire = (particleRatio: number, opts: any) => {
-      confettiRef.current!({
-        ...defaults,
-        ...opts,
-        particleCount: Math.floor(count * particleRatio),
-      });
-    };
-
-    fire(0.25, { spread: 26, startVelocity: 55 });
-    fire(0.2, { spread: 60 });
-    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-    fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-    fire(0.1, { spread: 120, startVelocity: 45 });
-  }, []);
 
   const gameData = useMemo(() => {
     if (!quiz) return { questions: [], images: [] };
@@ -165,11 +121,7 @@ export default function Page() {
         } else {
           setWin(true);
 
-          fireWinConfetti();
-          playBoop();
-          playPop();
-          playSpeakCon();
-          playYay();
+          fireConfetti(true);
         }
       }
     } else if (selectedQuestion !== "") {
@@ -179,21 +131,6 @@ export default function Page() {
 
   return (
     <div className={styles.container}>
-      <ReactCanvasConfetti
-        onInit={({ confetti }: { confetti: TCanvasConfettiInstance }) => {
-          confettiRef.current = confetti;
-        }}
-        style={{
-          position: "fixed",
-          pointerEvents: "none",
-          width: "100%",
-          height: "100%",
-          top: 0,
-          left: 0,
-          zIndex: 9999,
-        }}
-      />
-
       <AnimatePresence mode={"popLayout"}>
         {!gameStarted && (
           <motion.div
@@ -326,7 +263,7 @@ export default function Page() {
               loading={false}
               loadingText={"Please wait..."}
               loadingTextEnabled={true}
-              reversed={true}
+              reversed={false}
               dangerous={true}
             >
               Quit
