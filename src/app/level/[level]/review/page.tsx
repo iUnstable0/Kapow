@@ -70,6 +70,10 @@ export default function Page() {
     volume: 1,
   });
 
+  const [playLeFishe] = useSound("/lefishe.mp3", {
+    volume: 1,
+  });
+
   const playBen = useCallback(() => {
     const benSounds = [playBen1, playBen2, playBen3, playBen4, playBen5];
     const randomIndex = Math.floor(Math.random() * benSounds.length);
@@ -84,11 +88,21 @@ export default function Page() {
     } else {
       if (queue[reviewIndex].answer.split(".")[0] === "dog") {
         playBen();
-      } else {
-        window.speechSynthesis.speak(
-          new SpeechSynthesisUtterance(queue[reviewIndex].answer.split(".")[0]),
-        );
+      } else if (queue[reviewIndex].answer.split(".")[0] === "fish") {
+        playLeFishe();
       }
+
+      setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(
+          queue[reviewIndex].answer.split(".")[0],
+        );
+
+        // utterance.pitch = 0.1;
+        // utterance.rate = 0.1;
+        // utterance.volume = 1;
+
+        window.speechSynthesis.speak(utterance);
+      }, 1000);
     }
 
     setTimeout(() => {

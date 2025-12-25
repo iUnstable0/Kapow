@@ -93,6 +93,10 @@ export default function Page() {
     volume: 1,
   });
 
+  const [playLeFishe] = useSound("/lefishe.mp3", {
+    volume: 1,
+  });
+
   const playBen = useCallback(() => {
     const benSounds = [playBen1, playBen2, playBen3, playBen4, playBen5];
     const randomIndex = Math.floor(Math.random() * benSounds.length);
@@ -159,6 +163,8 @@ export default function Page() {
 
       if (q.answer.split(".")[0] === "dog") {
         playBen();
+      } else if (q.answer.split(".")[0] === "fish") {
+        playLeFishe();
       }
 
       setTimeout(() => {

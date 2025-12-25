@@ -6,14 +6,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { AnimatePresence, motion } from "motion/react";
-// import useSound from "use-sound";
 
 import tinycolor from "tinycolor2";
 
 import styles from "./page.module.scss";
 
 import { KeybindButton, T_Keybind } from "@/components/keybind";
-import { useGlobalMusic } from "@/components/music";
 
 import { SlidingNumber } from "@/components/mp/sliding-number";
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
@@ -22,7 +20,6 @@ import levels from "@/components/levels.json";
 
 const MotionImage = motion.create(Image);
 
-// let hasUserInteractedGlobal = false;
 let currentLevelGlobal = 1;
 
 export default function Home() {
@@ -30,69 +27,10 @@ export default function Home() {
     useState<number>(currentLevelGlobal);
   const [startLoading, setStartLoading] = useState<boolean>(false);
 
-  // const [siteEntered, setSiteEntered] = useState<boolean>(
-  //   hasUserInteractedGlobal,
-  // );
-
-  // const [kapowLoaded, setKapowLoaded] = useState<boolean>(false);
-
   const router = useRouter();
-
-  const { play, isLoaded } = useGlobalMusic();
-
-  // const [playMain, { stop: stopMain }] = useSound("/main.mp3", {
-  //   volume: 0.5,
-  //   interrupt: true,
-  //   loop: true,
-  //   onload: () => {
-  //     setKapowLoaded(true);
-  //   },
-  // });
-
-  // useEffect(() => {
-  //   // if (siteEntered && kapowLoaded) {
-  //   playMain();
-  //   // }
-  // }, []);
-  // }, [siteEntered, kapowLoaded, playMain]);
 
   return (
     <div className={styles.container}>
-      {/*<AnimatePresence mode="wait">*/}
-      {/*  {!siteEntered && (*/}
-      {/*    <motion.div*/}
-      {/*      key="welcome"*/}
-      {/*      className={styles.welcome}*/}
-      {/*      initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}*/}
-      {/*      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}*/}
-      {/*      exit={{ opacity: 0, scale: 1.1, filter: "blur(12px)" }}*/}
-      {/*      transition={{ type: "spring", stiffness: 100, damping: 20 }}*/}
-      {/*      onClick={() => {*/}
-      {/*        if (!isLoaded) return;*/}
-
-      {/*        if (!siteEntered) {*/}
-      {/*          setSiteEntered(true);*/}
-
-      {/*          hasUserInteractedGlobal = true;*/}
-
-      {/*          play();*/}
-
-      {/*          // playMain();*/}
-      {/*        }*/}
-      {/*      }}*/}
-      {/*    >*/}
-      {/*      <h1 className={styles.welcomeTitle}>Welcome!</h1>*/}
-      {/*      <div className={styles.welcomeMessage}>*/}
-      {/*        <TextMorph>*/}
-      {/*          {isLoaded*/}
-      {/*            ? "Click anywhere to start!"*/}
-      {/*            : "Loading, please wait..."}*/}
-      {/*        </TextMorph>*/}
-      {/*      </div>*/}
-      {/*    </motion.div>*/}
-      {/*  )}*/}
-      {/*</AnimatePresence>*/}
-
       <div className={styles.header}>
         <h1 className={styles.title}>welcome to kapow</h1>
 
@@ -131,60 +69,6 @@ export default function Home() {
             >
               Next
             </KeybindButton>
-
-            {/*<motion.button*/}
-            {/*  className={styles.select}*/}
-            {/*  initial={{ opacity: 0 }}*/}
-            {/*  animate={{*/}
-            {/*    opacity: selectedLevel > 1 ? (startLoading ? 0.8 : 1) : 0,*/}
-            {/*    scale: selectedLevel > 1 ? 1 : 0.8,*/}
-            {/*    filter: selectedLevel > 1 ? "blur(0px)" : "blur(4px)",*/}
-            {/*  }}*/}
-            {/*  whileHover={{*/}
-            {/*    scale: startLoading ? 1 : 1.1,*/}
-            {/*  }}*/}
-            {/*  whileTap={{*/}
-            {/*    scale: 1,*/}
-            {/*  }}*/}
-            {/*  onClick={() => {*/}
-            {/*    if (selectedLevel > 1) {*/}
-            {/*      setSelectedLevel(selectedLevel - 1);*/}
-            {/*    }*/}
-            {/*  }}*/}
-            {/*  disabled={startLoading}*/}
-            {/*>*/}
-            {/*  {"<"}*/}
-            {/*</motion.button>*/}
-
-            {/*<motion.button*/}
-            {/*  className={styles.select}*/}
-            {/*  initial={{ opacity: 0 }}*/}
-            {/*  animate={{*/}
-            {/*    opacity:*/}
-            {/*      selectedLevel < levels.length*/}
-            {/*        ? startLoading*/}
-            {/*          ? 0.8*/}
-            {/*          : 1*/}
-            {/*        : 0,*/}
-            {/*    scale: selectedLevel < levels.length ? 1 : 0.8,*/}
-            {/*    filter:*/}
-            {/*      selectedLevel < levels.length ? "blur(0px)" : "blur(4px)",*/}
-            {/*  }}*/}
-            {/*  whileHover={{*/}
-            {/*    scale: startLoading ? 1 : 1.1,*/}
-            {/*  }}*/}
-            {/*  whileTap={{*/}
-            {/*    scale: 1,*/}
-            {/*  }}*/}
-            {/*  onClick={() => {*/}
-            {/*    if (selectedLevel < levels.length) {*/}
-            {/*      setSelectedLevel(selectedLevel + 1);*/}
-            {/*    }*/}
-            {/*  }}*/}
-            {/*  disabled={startLoading}*/}
-            {/*>*/}
-            {/*  {">"}*/}
-            {/*</motion.button>*/}
           </div>
 
           <AnimatePresence mode="popLayout">
@@ -201,14 +85,6 @@ export default function Home() {
               transition={{ duration: 0.2 }}
             />
           </AnimatePresence>
-
-          {/*<Image*/}
-          {/*  src={`/${selectedLevel}.jpg`}*/}
-          {/*  alt={"dwa"}*/}
-          {/*  width={400}*/}
-          {/*  height={400}*/}
-          {/*  className={styles.kapow}*/}
-          {/*/>*/}
         </div>
       </div>
 
@@ -244,19 +120,6 @@ export default function Home() {
       >
         Start
       </KeybindButton>
-
-      {/*<div>*/}
-      {/*  <h1>Choose your level:</h1>*/}
-      {/*  <select>*/}
-      {/*    {levels.map((level) => (*/}
-      {/*      <option value={level.level} key={level.level}>*/}
-      {/*        {level.level}*/}
-      {/*      </option>*/}
-      {/*    ))}*/}
-      {/*  </select>*/}
-      {/*  <br />*/}
-      {/*  <button>Start!</button>*/}
-      {/*</div>*/}
     </div>
   );
 }
