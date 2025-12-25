@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useCallback } from "react";
 
 import Image from "next/image";
 
@@ -73,6 +73,36 @@ export default function Page() {
     volume: 0.5,
   });
 
+  const startGame = useCallback(() => {
+    setWin(false);
+    setLost(false);
+    setStage(1);
+
+    setGameStarted(true);
+
+    if (timer <= 0) return;
+
+    const future = DateTime.now().plus({
+      seconds: timer,
+    });
+
+    timerRef.current = setInterval(() => {
+      if (!timerRef.current) return;
+
+      if (DateTime.now() > future) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+
+        setLost(true);
+        playAlert();
+
+        return;
+      }
+
+      setCurrentTimer(future.diffNow().toFormat("mm:ss"));
+    }, 500);
+  }, [timer, playAlert]);
+
   const gameData = useMemo(() => {
     if (!quiz) return { questions: [], images: [] };
 
@@ -121,6 +151,11 @@ export default function Page() {
         } else {
           setWin(true);
 
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+            setCurrentTimer("infinite");
+          }
+
           fireConfetti(true);
         }
       }
@@ -168,7 +203,7 @@ export default function Page() {
                   setReturnLoading(true);
 
                   setTimeout(() => {
-                    router.back();
+                    router.push(`/`);
                   }, 750);
                 }}
                 disabled={reviewLoading || returnLoading}
@@ -205,28 +240,7 @@ export default function Page() {
                 forcetheme={"dark"}
                 keybinds={[T_Keybind.enter]}
                 onPress={() => {
-                  setGameStarted(true);
-
-                  if (timer <= 0) return;
-
-                  const future = DateTime.now().plus({
-                    seconds: timer,
-                  });
-
-                  timerRef.current = setInterval(() => {
-                    if (!timerRef.current) return;
-
-                    if (DateTime.now() > future) {
-                      clearInterval(timerRef.current);
-                      timerRef.current = null;
-
-                      setLost(true);
-
-                      return;
-                    }
-
-                    setCurrentTimer(future.diffNow().toFormat("mm:ss"));
-                  }, 500);
+                  startGame();
                 }}
                 disabled={reviewLoading || returnLoading}
                 loadingTextEnabled={false}
@@ -303,10 +317,22 @@ export default function Page() {
               forcetheme={"dark"}
               keybinds={[T_Keybind.enter]}
               onPress={() => {
+                startGame();
+              }}
+              disabled={returnLoading}
+              loadingTextEnabled={false}
+            >
+              Retry
+            </KeybindButton>
+
+            <KeybindButton
+              forcetheme={"dark"}
+              keybinds={[T_Keybind.enter]}
+              onPress={() => {
                 setReturnLoading(true);
 
                 setTimeout(() => {
-                  router.back();
+                  router.push(`/`);
                 }, 750);
               }}
               loading={returnLoading}
@@ -349,12 +375,25 @@ export default function Page() {
           >
             <KeybindButton
               forcetheme={"dark"}
+              keybinds={[T_Keybind.shift, T_Keybind.enter]}
+              onPress={() => {
+                startGame();
+              }}
+              // loading={returnLoading}
+              disabled={returnLoading}
+              loadingTextEnabled={false}
+            >
+              Play Again
+            </KeybindButton>
+
+            <KeybindButton
+              forcetheme={"dark"}
               keybinds={[T_Keybind.enter]}
               onPress={() => {
                 setReturnLoading(true);
 
                 setTimeout(() => {
-                  router.back();
+                  router.push(`/`);
                 }, 750);
               }}
               loading={returnLoading}

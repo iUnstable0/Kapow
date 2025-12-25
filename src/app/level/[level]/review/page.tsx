@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import Image from "next/image";
 
+import { useRouter } from "next/navigation";
+
 import { motion, AnimatePresence } from "motion/react";
 
 import { useLevel } from "@/components/level";
@@ -20,6 +22,8 @@ import useSound from "use-sound";
 const MotionImage = motion.create(Image);
 
 export default function Page() {
+  const router = useRouter();
+
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
 
@@ -29,6 +33,8 @@ export default function Page() {
 
   const [flipped, setFlipped] = useState<boolean>(false);
   const [flipState, setFlipState] = useState<"question" | "answer">("question");
+
+  const [exitReviewLoading, setExitReviewLoading] = useState<boolean>(false);
 
   const [queue, setQueue] = useState<typeof quiz>(quiz);
   const [reviews, setReviews] = useState<typeof quiz>([]);
@@ -239,6 +245,36 @@ export default function Page() {
                   ? "Review all"
                   : "Review again"
                 : "Review"}
+            </KeybindButton>
+          </motion.div>
+        )}
+
+        {!reviewStarted && (
+          <motion.div
+            className={styles.toolbarTopRight}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"exitreview"}
+          >
+            <KeybindButton
+              keybinds={[T_Keybind.escape]}
+              onPress={() => {
+                setExitReviewLoading(true);
+
+                setTimeout(() => {
+                  router.push(`/level/${level}`);
+                }, 750);
+              }}
+              forcetheme={"dark"}
+              dangerous={true}
+              loading={exitReviewLoading}
+              disabled={exitReviewLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
+            >
+              Exit Review
             </KeybindButton>
           </motion.div>
         )}
