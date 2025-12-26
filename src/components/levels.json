@@ -102,13 +102,13 @@
       {
         "question": "งู",
         "voice": "snake.mp3",
-        "answer": "snake.png",
+        "answer": "snake.troll.png",
         "realanswer": "snake"
       },
       {
         "question": "ปู",
         "voice": "crab.mp3",
-        "answer": "crab.png",
+        "answer": "crab.troll.png",
         "realanswer": "crab"
       },
       {
@@ -126,7 +126,7 @@
       {
         "question": "สี",
         "voice": "color.mp3",
-        "answer": "color.png",
+        "answer": "color.troll.png",
         "realanswer": "color"
       },
       {
@@ -204,7 +204,7 @@
       {
         "question": "น้ำ",
         "voice": "water.mp3",
-        "answer": "water.jpg",
+        "answer": "water.troll.jpg",
         "realanswer": "water"
       },
       {
@@ -222,19 +222,19 @@
       {
         "question": "จาน",
         "voice": "plate.mp3",
-        "answer": "plate.jpg",
+        "answer": "plate.troll.jpg",
         "realanswer": "plate"
       },
       {
         "question": "ช้อน",
         "voice": "spoon.mp3",
-        "answer": "spoon.jpg",
+        "answer": "spoon.troll.jpg",
         "realanswer": "spoon"
       },
       {
         "question": "แก้ว",
         "voice": "glass.mp3",
-        "answer": "glass.jpg",
+        "answer": "glass.troll.jpg",
         "realanswer": "glass"
       }
     ]

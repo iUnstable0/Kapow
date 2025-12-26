@@ -14,6 +14,8 @@ import { AnimatePresence, motion } from "motion/react";
 
 import styles from "./music.module.scss";
 
+import { useSettings } from "@/components/settings";
+
 import { TextMorph } from "@/components/mp/text-morph";
 
 // const adhd_songs = Array.from(
@@ -55,6 +57,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const soundRef = useRef<Howl | null>(null);
 
   const handleNextRef = useRef<() => void>(() => {});
+
+  const { musicEnabled } = useSettings();
 
   // const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -99,31 +103,39 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     handleNextRef.current = handleNext;
   }, [handleNext]);
 
-  const loadSong = useCallback((src: string) => {
-    if (soundRef.current) {
-      soundRef.current.unload();
-    }
+  const loadSong = useCallback(
+    (src: string) => {
+      if (soundRef.current) {
+        soundRef.current.unload();
+      }
 
-    soundRef.current = new Howl({
-      src: [src],
-      html5: true,
-      volume: 0,
-      autoplay: true,
-      onload: () => setIsLoaded(true),
-      onplay: () => {
-        setIsPlaying(true);
+      if (!musicEnabled) {
+        setIsLoaded(true);
+        return;
+      }
 
-        soundRef.current?.fade(0, volumeRef.current, 2000);
-      },
-      onpause: () => setIsPlaying(false),
-      onstop: () => setIsPlaying(false),
-      onend: () => {
-        if (handleNextRef.current) {
-          handleNextRef.current();
-        }
-      },
-    });
-  }, []);
+      soundRef.current = new Howl({
+        src: [src],
+        html5: true,
+        volume: 0,
+        autoplay: true,
+        onload: () => setIsLoaded(true),
+        onplay: () => {
+          setIsPlaying(true);
+
+          soundRef.current?.fade(0, volumeRef.current, 2000);
+        },
+        onpause: () => setIsPlaying(false),
+        onstop: () => setIsPlaying(false),
+        onend: () => {
+          if (handleNextRef.current) {
+            handleNextRef.current();
+          }
+        },
+      });
+    },
+    [musicEnabled],
+  );
 
   const setVolume = useCallback((newVolume: number) => {
     // const v = Math.max(0, Math.min(1, newVolume));

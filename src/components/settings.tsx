@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState, createContext, useContext, useEffect } from "react";
 
 import { Cog } from "lucide-react";
 
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 
 import { styled } from "@mui/material/styles";
-import Switch, { SwitchProps } from "@mui/material/Switch";
+import Switch from "@mui/material/Switch";
 
 import { Magnetic } from "./mp/magnetic";
 
@@ -66,59 +66,127 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-export default function Settings() {
+interface T_SettingsContext {
+  trollModeEnabled: boolean;
+  musicEnabled: boolean;
+}
+
+const SettingsContext = createContext<T_SettingsContext | null>(null);
+
+function SettingsProvider({ children }: { children: React.ReactNode }) {
+  const [trollModeEnabledState, setTrollModeEnabled] = useState<boolean>(false);
+  const [musicEnabledState, setMusicEnabled] = useState<boolean>(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const trollMode = localStorage.getItem("trollMode");
+    const music = localStorage.getItem("music");
+
+    if (trollMode === null) {
+      localStorage.setItem("trollMode", "true");
+    }
+
+    if (music === null) {
+      localStorage.setItem("music", "true");
+    }
+
+    setMounted(true);
+
+    setTrollModeEnabled(localStorage.getItem("trollMode") === "true");
+    setMusicEnabled(localStorage.getItem("music") === "true");
+  }, []);
+
   return (
-    <MorphingPopover
-      variants={{
-        initial: { opacity: 0, borderRadius: "100%" },
-        animate: { opacity: 1, borderRadius: "28px" },
-        exit: { opacity: 0, borderRadius: "100%" },
-      }}
-      transition={{
-        type: "spring",
-        bounce: 0.1,
-        duration: 0.4,
-        opacity: { duration: 0.2 },
+    <SettingsContext.Provider
+      value={{
+        trollModeEnabled: trollModeEnabledState,
+        musicEnabled: musicEnabledState,
       }}
     >
-      <MorphingPopoverTrigger asChild>
-        <div className={styles.settings}>
-          <Magnetic
-            intensity={0.1}
-            springOptions={{ bounce: 0.1, stiffness: 120 }}
-            actionArea="global"
-            range={125}
-            // range={disabled ? 0 : magnetic ? 75 : 0}
-            // className={className}// action={() => {
-            //   alert("Settings clicked!");
-            // }}
-            className={styles.settingsMagnet}
-          >
+      <MorphingPopover
+        variants={{
+          initial: { opacity: 0, borderRadius: "100%" },
+          animate: { opacity: 1, borderRadius: "28px" },
+          exit: { opacity: 0, borderRadius: "100%" },
+        }}
+        transition={{
+          type: "spring",
+          bounce: 0.1,
+          duration: 0.4,
+          opacity: { duration: 0.2 },
+        }}
+      >
+        <MorphingPopoverTrigger asChild>
+          <div className={styles.settings}>
+            <Magnetic
+              intensity={0.1}
+              springOptions={{ bounce: 0.1, stiffness: 120 }}
+              actionArea="global"
+              range={125}
+              // range={disabled ? 0 : magnetic ? 75 : 0}
+              // className={className}// action={() => {
+              //   alert("Settings clicked!");
+              // }}
+              className={styles.settingsMagnet}
+            >
+              <motion.span layoutId={"icon-settings"} layout={"position"}>
+                <Cog className={styles.icon} />
+              </motion.span>
+            </Magnetic>
+          </div>
+        </MorphingPopoverTrigger>
+
+        <MorphingPopoverContent className={styles.settingsPage}>
+          <div className={styles.settingsTitle}>
             <motion.span layoutId={"icon-settings"} layout={"position"}>
               <Cog className={styles.icon} />
             </motion.span>
-          </Magnetic>
-        </div>
-      </MorphingPopoverTrigger>
+            <span>Settings</span>
+          </div>
 
-      <MorphingPopoverContent className={styles.settingsPage}>
-        <div className={styles.settingsTitle}>
-          <motion.span layoutId={"icon-settings"} layout={"position"}>
-            <Cog className={styles.icon} />
-          </motion.span>
-          <span>Settings</span>
-        </div>
+          <div className={styles.section}>
+            Troll mode
+            <AntSwitch
+              checked={trollModeEnabledState}
+              onChange={() => {
+                const newState = !trollModeEnabledState;
 
-        <div className={styles.section}>
-          Troll mode
-          <AntSwitch defaultChecked />
-        </div>
+                localStorage.setItem("trollMode", newState.toString());
+                setTrollModeEnabled(newState);
+              }}
+            />
+          </div>
 
-        <div className={styles.section}>
-          Music
-          <AntSwitch defaultChecked />
-        </div>
-      </MorphingPopoverContent>
-    </MorphingPopover>
+          <div className={styles.section}>
+            Music
+            <AntSwitch
+              checked={musicEnabledState}
+              onChange={() => {
+                const newState = !musicEnabledState;
+
+                localStorage.setItem("music", newState.toString());
+                setMusicEnabled(newState);
+              }}
+            />
+          </div>
+        </MorphingPopoverContent>
+      </MorphingPopover>
+
+      {children}
+    </SettingsContext.Provider>
   );
+}
+
+export default SettingsProvider;
+
+export function useSettings() {
+  const context = useContext(SettingsContext);
+
+  if (!context) {
+    throw new Error(
+      "useSettings must be used within a SettingsContext provider",
+    );
+  }
+
+  return context;
 }

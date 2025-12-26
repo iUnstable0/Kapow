@@ -15,6 +15,7 @@ import { DateTime } from "luxon";
 import { useGlobalMusic } from "@/components/music";
 import { useLevel } from "@/components/level";
 import { useConfetti } from "@/components/confetti";
+import { useSettings } from "@/components/settings";
 
 import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
 
@@ -50,6 +51,7 @@ export default function Page() {
   const router = useRouter();
 
   const { play, pause, setVolume } = useGlobalMusic();
+  const { trollModeEnabled } = useSettings();
 
   const { level, timer, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -173,37 +175,72 @@ export default function Page() {
     //   eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quiz, stage]);
 
-  const handleAnswer = (q) => {
+  const playCardSound = useCallback(
+    (q: (typeof quiz)[number], tts: boolean = false) => {
+      // pause();
+      setVolume(0.07);
+
+      let fishPlayed = false;
+
+      if (!tts) {
+        playSound(q.voice);
+      } else {
+        let matchedSwitch = false;
+
+        if (trollModeEnabled) {
+          switch (q.answer.split(".")[0]) {
+            case "dog":
+              playBen();
+
+              matchedSwitch = true;
+              break;
+            case "fish":
+              playLeFishe();
+
+              fishPlayed = true;
+              matchedSwitch = true;
+              break;
+          }
+        }
+
+        setTimeout(
+          () => {
+            let spech = q.answer.split(".")[0];
+
+            if (!trollModeEnabled) {
+              if (spech === "school bus") {
+                spech = "elephant";
+              } else if (spech === "chicken jocky") {
+                spech = "chicken";
+              }
+            }
+
+            const utterance = new SpeechSynthesisUtterance(spech);
+
+            // utterance.pitch = 0.1;
+            // utterance.rate = 0.1;
+            // utterance.volume = 1;
+
+            window.speechSynthesis.speak(utterance);
+          },
+          matchedSwitch ? 1000 : 0,
+        );
+      }
+
+      if (!fishPlayed && !fish) {
+        setTimeout(() => {
+          setVolume(0.5);
+        }, 1000);
+      }
+    },
+    [setVolume, fish, playSound, trollModeEnabled, playBen, playLeFishe],
+  );
+
+  const handleAnswer = (q: (typeof quiz)[number]) => {
     if (selectedQuestion === q.question) {
       playDing();
 
-      let matchedSwitch = false;
-
-      switch (q.answer.split(".")[0]) {
-        case "dog":
-          playBen();
-          matchedSwitch = true;
-          break;
-        case "fish":
-          playLeFishe();
-          matchedSwitch = true;
-          break;
-      }
-
-      setTimeout(
-        () => {
-          const utterance = new SpeechSynthesisUtterance(
-            q.answer.split(".")[0],
-          );
-
-          // utterance.pitch = 0.1;
-          // utterance.rate = 0.1;
-          // utterance.volume = 1;
-
-          window.speechSynthesis.speak(utterance);
-        },
-        matchedSwitch ? 1000 : 0,
-      );
+      playCardSound(q, true);
 
       setSelectedQuestion("");
 
@@ -499,7 +536,7 @@ export default function Page() {
                   <div
                     className={styles.question}
                     onClick={() => {
-                      playSound(q.voice);
+                      playCardSound(q);
                     }}
                   >
                     {q.question} = {q.realanswer}
@@ -508,37 +545,20 @@ export default function Page() {
                     key={`awddasdaq_${q.question}`}
                     className={styles.imageCtn}
                     onClick={() => {
-                      let matchedSwitch = false;
-
-                      switch (q.answer.split(".")[0]) {
-                        case "dog":
-                          playBen();
-                          matchedSwitch = true;
-                          break;
-                        case "fish":
-                          playLeFishe();
-                          matchedSwitch = true;
-                          break;
-                      }
-
-                      setTimeout(
-                        () => {
-                          const utterance = new SpeechSynthesisUtterance(
-                            q.answer.split(".")[0],
-                          );
-
-                          // utterance.pitch = 0.1;
-                          // utterance.rate = 0.1;
-                          // utterance.volume = 1;
-
-                          window.speechSynthesis.speak(utterance);
-                        },
-                        matchedSwitch ? 1000 : 0,
-                      );
+                      playCardSound(q, true);
                     }}
                   >
                     <Image
-                      src={`/level${level}/${q.answer}`}
+                      key={`img_answer_${q.question}_${trollModeEnabled}`}
+                      src={`/level${level}/${
+                        trollModeEnabled
+                          ? q.answer
+                          : `${q.answer.split(".")[0]}.${
+                              q.answer.split(".")[
+                                q.answer.split(".").length - 1
+                              ]
+                            }`
+                      }`}
                       alt={"answer image"}
                       width={200}
                       height={200}
@@ -596,7 +616,7 @@ export default function Page() {
                         },
                       }}
                       onClick={() => {
-                        playSound(q.voice);
+                        playCardSound(q);
                         setSelectedQuestion(q.question);
                       }}
                       layout
@@ -607,7 +627,8 @@ export default function Page() {
                         keybinds={[leftKeys[i]]}
                         dangerous={false}
                         onPress={() => {
-                          playSound(q.voice);
+                          playCardSound(q);
+
                           setSelectedQuestion(q.question);
                         }}
                         disabled={false}
@@ -677,7 +698,16 @@ export default function Page() {
                         forcetheme={"dark"}
                       />
                       <Image
-                        src={`/level${level}/${q.answer}`}
+                        key={`img_option_${q.question}_${trollModeEnabled}`}
+                        src={`/level${level}/${
+                          trollModeEnabled
+                            ? q.answer
+                            : `${q.answer.split(".")[0]}.${
+                                q.answer.split(".")[
+                                  q.answer.split(".").length - 1
+                                ]
+                              }`
+                        }`}
                         alt={"answer image"}
                         width={200}
                         height={200}

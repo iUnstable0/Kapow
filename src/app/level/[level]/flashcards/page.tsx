@@ -8,16 +8,18 @@ import { useRouter } from "next/navigation";
 
 import { motion, AnimatePresence } from "motion/react";
 
+import useSound from "use-sound";
+
 import { useLevel } from "@/components/level";
 import { useGlobalMusic } from "@/components/music";
+import { useConfetti } from "@/components/confetti";
+import { useSettings } from "@/components/settings";
 
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
 
 import { KeybindButton, T_Keybind } from "@/components/keybind";
 
 import styles from "./page.module.scss";
-import { useConfetti } from "@/components/confetti";
-import useSound from "use-sound";
 
 const MotionImage = motion.create(Image);
 
@@ -26,6 +28,7 @@ export default function Page() {
 
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
+  const { trollModeEnabled } = useSettings();
 
   const { play, pause, setVolume } = useGlobalMusic();
 
@@ -104,24 +107,35 @@ export default function Page() {
     } else {
       let matchedSwitch = false;
 
-      switch (queue[reviewIndex].answer.split(".")[0]) {
-        case "dog":
-          playBen();
-          matchedSwitch = true;
-          break;
-        case "fish":
-          playLeFishe();
-          fishPlayed = true;
+      if (trollModeEnabled) {
+        switch (queue[reviewIndex].answer.split(".")[0]) {
+          case "dog":
+            playBen();
 
-          matchedSwitch = true;
-          break;
+            matchedSwitch = true;
+            break;
+          case "fish":
+            playLeFishe();
+
+            fishPlayed = true;
+            matchedSwitch = true;
+            break;
+        }
       }
 
       setTimeout(
         () => {
-          const utterance = new SpeechSynthesisUtterance(
-            queue[reviewIndex].answer.split(".")[0],
-          );
+          let spech = queue[reviewIndex].answer.split(".")[0];
+
+          if (!trollModeEnabled) {
+            if (spech === "school bus") {
+              spech = "elephant";
+            } else if (spech === "chicken jocky") {
+              spech = "chicken";
+            }
+          }
+
+          const utterance = new SpeechSynthesisUtterance(spech);
 
           // utterance.pitch = 0.1;
           // utterance.rate = 0.1;
@@ -147,6 +161,7 @@ export default function Page() {
     playLeFishe,
     fish,
     setVolume,
+    trollModeEnabled,
   ]);
 
   const markForReview = useCallback(
@@ -164,17 +179,14 @@ export default function Page() {
 
       isProcessing.current = true;
 
+      const currentCard = queue[reviewIndex];
+
       if (review) {
-        markForReview(queue[reviewIndex]);
+        markForReview(currentCard);
       } else {
-        if (
-          reviews.find((rev) => rev.question === queue[reviewIndex].question)
-        ) {
-          // alert("Item was in review list, remove now");
-          setReviews((prev) =>
-            prev.filter((rev) => rev.question !== queue[reviewIndex].question),
-          );
-        }
+        setReviews((prev) =>
+          prev.filter((rev) => rev.question !== currentCard.question),
+        );
       }
 
       setFlipped(false);
@@ -188,6 +200,7 @@ export default function Page() {
         isProcessing.current = false;
       } else {
         setReviewIndex((prev) => Math.min(prev + 1, queue.length - 1));
+
         console.log("FC NEXT");
 
         setTimeout(() => {
@@ -196,7 +209,7 @@ export default function Page() {
         }, 300);
       }
     },
-    [reviewIndex, queue, markForReview, reviews],
+    [queue, reviewIndex, markForReview, isProcessing],
   );
 
   const handleFlip = useCallback(() => {
@@ -402,7 +415,16 @@ export default function Page() {
 
               {flipState === "answer" && (
                 <MotionImage
-                  src={`/level${level}/${queue[reviewIndex].answer}`}
+                  key={`answer-${reviewIndex}_${trollModeEnabled}`}
+                  src={`/level${level}/${
+                    trollModeEnabled
+                      ? queue[reviewIndex].answer
+                      : `${queue[reviewIndex].answer.split(".")[0]}.${
+                          queue[reviewIndex].answer.split(".")[
+                            queue[reviewIndex].answer.split(".").length - 1
+                          ]
+                        }`
+                  }`}
                   alt={"answer image"}
                   width={200}
                   height={200}
@@ -411,7 +433,6 @@ export default function Page() {
                   animate={{ opacity: 1, filter: "blur(0px)" }}
                   exit={{ opacity: 0, filter: "blur(10px)" }}
                   transition={{ duration: 0.5 }}
-                  key={`answer-${reviewIndex}`}
                 />
               )}
             </AnimatePresence>
