@@ -53,6 +53,7 @@ export function LevelProvider({
 
   const playSound = useCallback((voiceFile: string) => {
     const voice = voicesRef.current[voiceFile];
+
     if (voice) {
       voice.play();
     }

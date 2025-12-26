@@ -12,6 +12,7 @@ import useSound from "use-sound";
 import { motion, AnimatePresence } from "motion/react";
 import { DateTime } from "luxon";
 
+import { useGlobalMusic } from "@/components/music";
 import { useLevel } from "@/components/level";
 import { useConfetti } from "@/components/confetti";
 
@@ -48,6 +49,8 @@ type T_Question = {
 export default function Page() {
   const router = useRouter();
 
+  const { pause, play } = useGlobalMusic();
+
   const { level, timer, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
 
@@ -56,6 +59,8 @@ export default function Page() {
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [selectedQuestion, setSelectedQuestion] = useState<string>("");
   const [stage, setStage] = useState<number>(1);
+  const [fish, setFish] = useState<boolean>(false);
+  const [answersVisible, setAnswersVisible] = useState<boolean>(false);
 
   const [win, setWin] = useState<boolean>(false);
   const [lost, setLost] = useState<boolean>(false);
@@ -94,7 +99,16 @@ export default function Page() {
   });
 
   const [playLeFishe] = useSound("/lefishe.mp3", {
-    volume: 1,
+    volume: 0.5,
+    interrupt: true,
+    onplay: () => {
+      setFish(true);
+      pause();
+    },
+    onend: () => {
+      setFish(false);
+      play();
+    },
   });
 
   const playBen = useCallback(() => {
@@ -161,21 +175,33 @@ export default function Page() {
     if (selectedQuestion === q.question) {
       playDing();
 
-      if (q.answer.split(".")[0] === "dog") {
-        playBen();
-      } else if (q.answer.split(".")[0] === "fish") {
-        playLeFishe();
+      let matchedSwitch = false;
+
+      switch (q.answer.split(".")[0]) {
+        case "dog":
+          playBen();
+          matchedSwitch = true;
+          break;
+        case "fish":
+          playLeFishe();
+          matchedSwitch = true;
+          break;
       }
 
-      setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(q.answer.split(".")[0]);
+      setTimeout(
+        () => {
+          const utterance = new SpeechSynthesisUtterance(
+            q.answer.split(".")[0],
+          );
 
-        // utterance.pitch = 0.1;
-        // utterance.rate = 0.1;
-        // utterance.volume = 1;
+          // utterance.pitch = 0.1;
+          // utterance.rate = 0.1;
+          // utterance.volume = 1;
 
-        window.speechSynthesis.speak(utterance);
-      }, 1000);
+          window.speechSynthesis.speak(utterance);
+        },
+        matchedSwitch ? 1000 : 0,
+      );
 
       setSelectedQuestion("");
 
@@ -204,7 +230,7 @@ export default function Page() {
   };
 
   return (
-    <div className={styles.container}>
+    <motion.div className={styles.container}>
       <AnimatePresence mode={"popLayout"}>
         {!gameStarted && (
           <motion.div
@@ -252,6 +278,19 @@ export default function Page() {
               dangerous={true}
             >
               Back
+            </KeybindButton>
+
+            <KeybindButton
+              forcetheme={"dark"}
+              keybinds={[T_Keybind.a]}
+              onPress={() => {
+                setAnswersVisible((prev) => !prev);
+              }}
+              disabled={reviewLoading || returnLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
+            >
+              Toggle answers
             </KeybindButton>
 
             <div className={styles.toolrowitm}>
@@ -443,6 +482,37 @@ export default function Page() {
           </motion.div>
         )}
 
+        {!gameStarted && answersVisible && (
+          <motion.div
+            className={styles.gameCtn}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            key={"answers"}
+          >
+            <div className={styles.option}>
+              {quiz.map((q) => (
+                <div key={`awdaq_${q.question}`} className={styles.answerRow}>
+                  <div className={styles.question}>{q.question}</div>
+                  <div
+                    key={`awddasdaq_${q.question}`}
+                    className={styles.imageCtn}
+                  >
+                    <Image
+                      src={`/level${level}/${q.answer}`}
+                      alt={"answer image"}
+                      width={200}
+                      height={200}
+                      className={styles.image}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {gameStarted && !win && !lost && (
           <motion.div
             className={styles.gameCtn}
@@ -582,6 +652,6 @@ export default function Page() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }

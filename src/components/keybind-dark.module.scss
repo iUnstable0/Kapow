@@ -98,14 +98,16 @@
 }
 
 /* keybindButton.hover If Keybinds is not disabled */
-.keybindButton:hover:not(:disabled) {
-  /* transform: scale(1.1); */
-  scale: 1.1;
-}
+//TODO: Investigation
+//.keybindButton:hover:not(:disabled) {
+//  transform: scale(1.1);
+//scale: 1.1;
+//}
 
 /* keybindButton.active If Keybinds is not disabled */
 .keybindButton:active:not(:disabled) {
   transform: scale(1.05);
+  //scale: 1.05;
 }
 
 /* If Keybinds is disabled */

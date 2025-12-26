@@ -121,7 +121,6 @@ export const KeybindButton = ({
 
   return (
     <motion.div
-      layout
       key={`keybindbutton_${keybinds.join("_")}_${forcetheme}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -135,6 +134,10 @@ export const KeybindButton = ({
           ease: "easeInOut",
         },
       }}
+      layout
+      // style={{
+      //   background: "red",
+      // }}
     >
       <Magnetic
         intensity={0.1}
@@ -151,15 +154,19 @@ export const KeybindButton = ({
               reversed && styles.keybindButtonReversed,
               // dangerous && loading === true && styles.keybindButtonDangerous,
             )}
-            layout
             onClick={() => {
               if (!disabled && !loading) {
                 onPress?.();
               }
             }}
+            {/*framer motion on hover*/}
+
+            whileHover={{ scale: disabled ? 1 : 1.1 }}
+
             onMouseDown={(e) => e.preventDefault()}
             disabled={disabled}
             tabIndex={-1}
+            layout
           >
             <AnimatePresence mode="popLayout">
               {!loadingText && icon && (
@@ -198,53 +205,53 @@ export const KeybindButton = ({
               />
             )}
 
+            <motion.div
+              key={`keybind_${keybinds.join("_")}_${forcetheme}_text`}
+              className={clsx(styles.keybindButtonText, textClassName)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 120,
+                damping: 20,
+                opacity: {
+                  duration: 0.2,
+                  ease: "easeInOut",
+                },
+              }}
+              style={{
+                // if loading and preload is false then set margin left to 32px
+                // ...(loading && !preload ? { paddingLeft: "32px" } : {}),
+                width: "auto",
+              }}
+              layout
+            >
+              {/* Temp fix sameline */}
+              {loadingTextEnabled ? (
+                <TextMorph
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {`${
+                    (loading &&
+                      loadingText &&
+                      loadingTextEnabled &&
+                      loadingText) ||
+                    ((!loading || !loadingTextEnabled) && children)
+                  }`}
+                </TextMorph>
+              ) : (
+                children
+              )}
+
+              {/* {children} */}
+            </motion.div>
+
             <AnimatePresence>
-              <motion.div
-                className={clsx(styles.keybindButtonText, textClassName)}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                key={`keybind_${keybinds.join("_")}_${forcetheme}_text`}
-                transition={{
-                  type: "spring",
-                  stiffness: 120,
-                  damping: 20,
-                  opacity: {
-                    duration: 0.2,
-                    ease: "easeInOut",
-                  },
-                }}
-                style={{
-                  // if loading and preload is false then set margin left to 32px
-                  // ...(loading && !preload ? { paddingLeft: "32px" } : {}),
-                  width: "auto",
-                }}
-                layout
-              >
-                {/* Temp fix sameline */}
-                {loadingTextEnabled ? (
-                  <TextMorph
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {`${
-                      (loading &&
-                        loadingText &&
-                        loadingTextEnabled &&
-                        loadingText) ||
-                      ((!loading || !loadingTextEnabled) && children)
-                    }`}
-                  </TextMorph>
-                ) : (
-                  children
-                )}
-
-                {/* {children} */}
-              </motion.div>
-
               {keybinds.length > 0 && (
                 <Keybind
                   keybinds={keybinds}
@@ -443,6 +450,15 @@ export default function Keybind({
     <motion.div
       key={`keybind_${keybinds.join("_")}_${forcetheme}_magnet`}
       className={clsx(styles.keybindContainerMagnet, parentClass)}
+      transition={{
+        type: "spring",
+        stiffness: 120,
+        damping: 20,
+        opacity: {
+          duration: 0.2,
+          ease: "easeInOut",
+        },
+      }}
       layout
     >
       <Magnetic
@@ -482,7 +498,7 @@ export default function Keybind({
             {keybind === T_Keybind.tab && (
               <span className={clsx(styles.keybindText, className)}>esc</span>
             )}
-            {keybind === T_Keybind.backspacez && (
+            {keybind === T_Keybind.backspace && (
               <Delete className={clsx(styles.keybindIcon, className)} />
             )}
             {keybind === T_Keybind.right_arrow && (

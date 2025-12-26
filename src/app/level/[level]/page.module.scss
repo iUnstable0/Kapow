@@ -48,13 +48,14 @@
 
   //background: red;
 
-  gap: 16px;
+  gap: 24px;
 
   position: sticky;
   bottom: 20px;
   z-index: 10;
 
   .toolrowitm {
+    margin-left: -24px;
     display: flex;
     gap: 32px;
   }
@@ -111,6 +112,17 @@
   //padding: 24px;
 
   //background: blue;
+}
+
+.answerRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+
+  width: 100%;
+
+  gap: 20px;
 }
 
 .question {

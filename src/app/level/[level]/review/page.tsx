@@ -31,6 +31,8 @@ export default function Page() {
 
   const isProcessing = useRef(false);
 
+  const [fish, setFish] = useState<boolean>(false);
+
   const [flipped, setFlipped] = useState<boolean>(false);
   const [flipState, setFlipState] = useState<"question" | "answer">("question");
 
@@ -47,7 +49,7 @@ export default function Page() {
   const [reviewIndex, setReviewIndex] = useState<number>(0);
 
   const [playAlert] = useSound("/alert.mp3", {
-    volume: 1,
+    volume: 2,
   });
 
   const [playBen1] = useSound("/ben/ben 1.mp3", {
@@ -71,7 +73,16 @@ export default function Page() {
   });
 
   const [playLeFishe] = useSound("/lefishe.mp3", {
-    volume: 1,
+    volume: 0.5,
+    interrupt: true,
+    onplay: () => {
+      setFish(true);
+      pause();
+    },
+    onend: () => {
+      setFish(false);
+      play();
+    },
   });
 
   const playBen = useCallback(() => {
@@ -83,27 +94,47 @@ export default function Page() {
   const playCardSound = useCallback(() => {
     pause();
 
+    let fishPlayed = false;
+
     if (flipState === "question") {
       playSound(queue[reviewIndex].voice);
     } else {
-      if (queue[reviewIndex].answer.split(".")[0] === "dog") {
-        playBen();
-      } else if (queue[reviewIndex].answer.split(".")[0] === "fish") {
-        playLeFishe();
+      let matchedSwitch = false;
+
+      switch (queue[reviewIndex].answer.split(".")[0]) {
+        case "dog":
+          playBen();
+          matchedSwitch = true;
+          break;
+        case "fish":
+          playLeFishe();
+          fishPlayed = true;
+
+          matchedSwitch = true;
+          break;
       }
 
-      setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(
-          queue[reviewIndex].answer.split(".")[0],
-        );
+      setTimeout(
+        () => {
+          const utterance = new SpeechSynthesisUtterance(
+            queue[reviewIndex].answer.split(".")[0],
+          );
 
-        window.speechSynthesis.speak(utterance);
-      }, 1000);
+          // utterance.pitch = 0.1;
+          // utterance.rate = 0.1;
+          // utterance.volume = 1;
+
+          window.speechSynthesis.speak(utterance);
+        },
+        matchedSwitch ? 1000 : 0,
+      );
     }
 
-    setTimeout(() => {
-      play();
-    }, 1000);
+    if (!fishPlayed && !fish) {
+      setTimeout(() => {
+        play();
+      }, 1000);
+    }
   }, [
     pause,
     flipState,
@@ -136,7 +167,7 @@ export default function Page() {
         if (
           reviews.find((rev) => rev.question === queue[reviewIndex].question)
         ) {
-          alert("Item was in review list, remove now");
+          // alert("Item was in review list, remove now");
           setReviews((prev) =>
             prev.filter((rev) => rev.question !== queue[reviewIndex].question),
           );
