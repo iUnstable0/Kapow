@@ -159,14 +159,24 @@ export const KeybindButton = ({
                 onPress?.();
               }
             }}
-            {/*framer motion on hover*/}
-
-            whileHover={{ scale: disabled ? 1 : 1.1 }}
-
+            // whileHover={{ scale: disabled ? 1 : 1.1 }}
+            // whileTap={{
+            //   scale: disabled ? 1 : 1.05,
+            // }}
+            // transition={{
+            //   type: "spring",
+            //   stiffness: 200,
+            //   damping: 20,
+            //   opacity: {
+            //     duration: 0.2,
+            //     ease: "easeInOut",
+            //   },
+            // }}
             onMouseDown={(e) => e.preventDefault()}
             disabled={disabled}
             tabIndex={-1}
-            layout
+            // THIS WAS THE CULPRIT
+            // layout
           >
             <AnimatePresence mode="popLayout">
               {!loadingText && icon && (

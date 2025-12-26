@@ -99,12 +99,13 @@
 
 /* keybindButton.hover If Keybinds is not disabled */
 //TODO: Investigation
-//.keybindButton:hover:not(:disabled) {
-//  transform: scale(1.1);
-//scale: 1.1;
-//}
+.keybindButton:hover:not(:disabled) {
+  transform: scale(1.1);
+  //scale: 1.1;
+}
 
 /* keybindButton.active If Keybinds is not disabled */
+//TODO: Investigation
 .keybindButton:active:not(:disabled) {
   transform: scale(1.05);
   //scale: 1.05;
@@ -156,6 +157,7 @@
   ) {
   .keybindButton:not(:hover) {
     .keybindContainer_active {
+      //scale: 1.1;
       transform: scale(1.1);
     }
   }
@@ -175,6 +177,7 @@
 
   .keybindButtonDangerous:not(:hover) {
     .keybindContainer_active {
+      //scale: 1.1;
       transform: scale(1.1);
     }
   }
