@@ -31,7 +31,7 @@ const blueberry_songs = Array.from(
   (_, i) => `/blueberry/blueberry ${i + 1}.mp3`,
 );
 
-const playlist = [...blueberry_songs];
+const playlist = [...coffee_songs, ...blueberry_songs];
 // const playlist = [...adhd_songs, ...blueberry_songs];
 
 interface T_MusicContext {
