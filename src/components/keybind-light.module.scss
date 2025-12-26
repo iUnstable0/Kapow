@@ -50,9 +50,11 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+
   gap: 8px;
 
   transition:
+    scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     opacity 0.2s ease-in-out;
 }
@@ -86,11 +88,13 @@
 
 /* keybindButton.hover If Keybinds is not disabled */
 .keybindButton:hover:not(:disabled) {
+  //scale: 1.1;
   transform: scale(1.1);
 }
 
 /* keybindButton.active If Keybinds is not disabled */
 .keybindButton:active:not(:disabled) {
+  //scale: 1.05;
   transform: scale(1.05);
 }
 
@@ -107,7 +111,6 @@
   }
 
   .keybindButtonText {
-    /* TODO: Test the color */
     text-shadow: 0 0 10px #30303097;
   }
 
@@ -146,6 +149,7 @@
 
   .keybindButton:not(:hover) {
     .keybindContainer_active {
+      //scale: 1.1;
       transform: scale(1.1);
     }
   }
@@ -160,6 +164,7 @@
 
   .keybindButtonDangerous:not(:hover) {
     .keybindContainer_active {
+      //scale: 1.1;
       transform: scale(1.1);
     }
   }
@@ -170,6 +175,7 @@
     .keybindContainer_activeall
   ) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -178,7 +184,6 @@
   }
 
   .keybindButtonText {
-    /* TODO: Test the color */
     text-shadow: 0 0 10px #30303097;
   }
 
@@ -191,6 +196,7 @@
 /* If Keybinds is not disabled and is dangerous and has all keybinds pressed down */
 .keybindButtonDangerous:not(:disabled):has(.keybindContainer_activeall) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -208,6 +214,7 @@
 /* If Keybinds is not dangerous and is loading */
 .keybindButton:not(.keybindButtonDangerous):has(.keybindContainer_loading) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -216,7 +223,6 @@
   }
 
   .keybindButtonText {
-    /* TODO: Test the color */
     text-shadow: 0 0 10px #30303097;
   }
 
@@ -234,6 +240,7 @@
 /* If Keybinds is dangerous and is loading */
 .keybindButtonDangerous:has(.keybindContainer_loading) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -258,6 +265,8 @@
 .keybindContainer_active {
   box-shadow: 0 0 5px #30303097;
   background-color: #00000029;
+
+  //scale: 1.1;
   transform: scale(1.1);
 }
 

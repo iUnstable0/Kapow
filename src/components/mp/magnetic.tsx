@@ -17,6 +17,7 @@ export type MagneticProps = {
   actionArea?: "self" | "parent" | "global";
   springOptions?: SpringOptions;
   className?: any;
+  action?: () => void;
 };
 
 export function Magnetic({
@@ -26,6 +27,7 @@ export function Magnetic({
   actionArea = "self",
   springOptions = SPRING_CONFIG,
   className,
+  action,
 }: MagneticProps) {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -109,6 +111,7 @@ export function Magnetic({
         y: springY,
       }}
       className={className}
+      onClick={action}
     >
       {children}
     </motion.div>

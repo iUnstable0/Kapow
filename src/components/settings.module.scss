@@ -1,0 +1,91 @@
+.settings {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 20px;
+  margin-bottom: 20px;
+
+  z-index: 99;
+}
+
+.settingsMagnet {
+  border-radius: 100%;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #2d2d2d;
+
+  transition:
+    scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.settingsMagnet:hover {
+  background-color: #3d3d3d;
+  box-shadow: 0 4px 12px #3d3d3d;
+
+  scale: 1.1;
+}
+
+.settingsMagnet:active {
+  scale: 0.95;
+}
+
+.settingsPage {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+
+  margin-right: 20px;
+  margin-bottom: 20px;
+
+  background-color: #2d2d2d;
+
+  outline: none;
+  border: none;
+
+  z-index: 99;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 200px;
+}
+
+.section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 15px;
+
+  border-bottom: 1px solid #3d3d3d;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+}
+
+.settingsTitle {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}

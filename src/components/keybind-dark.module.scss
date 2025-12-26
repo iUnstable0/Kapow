@@ -12,14 +12,11 @@
 
   border-radius: 4px;
 
-  /* background-color: #70707056; */
   background-color: #0000001a;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* background: blue; */
 
   transition: all 0.2s ease-in-out;
 }
@@ -27,8 +24,6 @@
 .keybindIcon {
   width: clamp(18px, 2vw, 20px);
   height: clamp(18px, 2vw, 20px);
-
-  /* display: none !important; */
 
   display: flex;
   align-items: center;
@@ -39,10 +34,7 @@
 
 .keybindText {
   font-size: clamp(14px, 2vw, 16px);
-  /* font-size: 14px; */
   font-weight: 500;
-
-  /* display: none !important; */
 
   display: flex;
   align-items: center;
@@ -75,8 +67,6 @@
   width: clamp(22px, 2vw, 24px);
   height: clamp(22px, 2vw, 24px);
 
-  /* background: red; */
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +79,6 @@
 
 .keybindButtonText {
   font-size: clamp(16px, 2vw, 18px) !important;
-  /* display: none !important; */
 
   transition:
     color 0.2s ease-in-out,
@@ -98,17 +87,15 @@
 }
 
 /* keybindButton.hover If Keybinds is not disabled */
-//TODO: Investigation
 .keybindButton:hover:not(:disabled) {
-  transform: scale(1.1);
   //scale: 1.1;
+  transform: scale(1.1);
 }
 
 /* keybindButton.active If Keybinds is not disabled */
-//TODO: Investigation
 .keybindButton:active:not(:disabled) {
-  transform: scale(1.05);
   //scale: 1.05;
+  transform: scale(1.05);
 }
 
 /* If Keybinds is disabled */
@@ -188,6 +175,7 @@
     .keybindContainer_activeall
   ) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -208,6 +196,7 @@
 /* If Keybinds is not disabled and is dangerous and has all keybinds pressed down */
 .keybindButtonDangerous:not(:disabled):has(.keybindContainer_activeall) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -225,6 +214,7 @@
 /* If Keybinds is not dangerous and is loading */
 .keybindButton:not(.keybindButtonDangerous):has(.keybindContainer_loading) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -250,6 +240,7 @@
 /* If Keybinds is dangerous and is loading */
 .keybindButtonDangerous:has(.keybindContainer_loading) {
   & {
+    //scale: 1.1;
     transform: scale(1.1);
   }
 
@@ -274,6 +265,8 @@
 .keybindContainer_active {
   box-shadow: 0 0 10px #4d4d4d8e;
   background-color: rgba(148, 148, 148, 0.41);
+
+  //scale: 1.1;
   transform: scale(1.1);
 }
 
