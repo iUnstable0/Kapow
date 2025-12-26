@@ -39,6 +39,8 @@ interface T_MusicContext {
   pause: () => void;
   stop: () => void;
   next: () => void;
+  setVolume: (volume: number) => void;
+  volume: number;
   isPlaying: boolean;
   isLoaded: boolean;
   toggle: () => void;
@@ -56,6 +58,9 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const volumeRef = useRef(0.5);
+  const [volume, setVolumeState] = useState(0.5);
 
   const [queue, setQueue] = useState<string[]>([]);
   const [queueIndex, setQueueIndex] = useState<number>(0);
@@ -100,7 +105,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     soundRef.current = new Howl({
       src: [src],
       html5: true,
-      volume: 0.5,
+      volume: volumeRef.current,
       autoplay: true,
       onload: () => setIsLoaded(true),
       onplay: () => setIsPlaying(true),
@@ -112,6 +117,19 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         }
       },
     });
+  }, []);
+
+  const setVolume = useCallback((newVolume: number) => {
+    // const v = Math.max(0, Math.min(1, newVolume));
+    const v = newVolume;
+    // muhehehe
+
+    setVolumeState(v);
+    volumeRef.current = v;
+
+    if (soundRef.current) {
+      soundRef.current.volume(v);
+    }
   }, []);
 
   useEffect(() => {
@@ -151,6 +169,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         pause,
         stop,
         next,
+        setVolume,
+        volume,
         isPlaying,
         isLoaded,
         toggle,

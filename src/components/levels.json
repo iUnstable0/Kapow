@@ -6,37 +6,44 @@
       {
         "question": "หมา",
         "voice": "dog.mp3",
-        "answer": "dog.jpg"
+        "answer": "dog.jpg",
+        "realanswer": "dog"
       },
       {
         "question": "ปลา",
         "voice": "fish.mp3",
-        "answer": "fish.jpg"
+        "answer": "fish.jpg",
+        "realanswer": "fish"
       },
       {
         "question": "คม",
         "voice": "sharp.mp3",
-        "answer": "sharp.jpg"
+        "answer": "sharp.jpg",
+        "realanswer": "sharp"
       },
       {
         "question": "นม",
         "voice": "milk.mp3",
-        "answer": "milk.jpg"
+        "answer": "milk.jpg",
+        "realanswer": "milk"
       },
       {
         "question": "วัว",
         "voice": "cow.mp3",
-        "answer": "cow.jpg"
+        "answer": "cow.jpg",
+        "realanswer": "cow"
       },
       {
         "question": "รั้ว",
         "voice": "fence.mp3",
-        "answer": "fence.jpg"
+        "answer": "fence.jpg",
+        "realanswer": "fence"
       },
       {
         "question": "ขม",
         "voice": "bitter.mp3",
-        "answer": "bitter.jpg"
+        "answer": "bitter.jpg",
+        "realanswer": "bitter"
       }
     ]
   },
@@ -47,37 +54,44 @@
       {
         "question": "กา",
         "voice": "crow.mp3",
-        "answer": "crow.jpg"
+        "answer": "crow.jpg",
+        "realanswer": "crow"
       },
       {
         "question": "ตา",
         "voice": "eye.mp3",
-        "answer": "eye.jpg"
+        "answer": "eye.jpg",
+        "realanswer": "eye"
       },
       {
         "question": "นา",
         "voice": "field.mp3",
-        "answer": "field.jpg"
+        "answer": "field.jpg",
+        "realanswer": "field"
       },
       {
         "question": "ขา",
         "voice": "leg.mp3",
-        "answer": "leg.jpg"
+        "answer": "leg.jpg",
+        "realanswer": "leg"
       },
       {
         "question": "ไก่",
         "voice": "chicken.mp3",
-        "answer": "chicken jocky.jpg"
+        "answer": "chicken jocky.jpg",
+        "realanswer": "chicken"
       },
       {
         "question": "ไข่",
         "voice": "egg.mp3",
-        "answer": "egg.jpg"
+        "answer": "egg.jpg",
+        "realanswer": "egg"
       },
       {
         "question": "ไฟ",
         "voice": "fire.mp3",
-        "answer": "fire.gif"
+        "answer": "fire.gif",
+        "realanswer": "fire"
       }
     ]
   },
@@ -88,37 +102,44 @@
       {
         "question": "งู",
         "voice": "snake.mp3",
-        "answer": "snake.png"
+        "answer": "snake.png",
+        "realanswer": "snake"
       },
       {
         "question": "ปู",
         "voice": "crab.mp3",
-        "answer": "crab.png"
+        "answer": "crab.png",
+        "realanswer": "crab"
       },
       {
         "question": "หมู",
         "voice": "pig.mp3",
-        "answer": "pig.png"
+        "answer": "pig.png",
+        "realanswer": "pig"
       },
       {
         "question": "หู",
         "voice": "ear.mp3",
-        "answer": "ear.jpg"
+        "answer": "ear.jpg",
+        "realanswer": "ear"
       },
       {
         "question": "สี",
         "voice": "color.mp3",
-        "answer": "color.png"
+        "answer": "color.png",
+        "realanswer": "color"
       },
       {
         "question": "หมี",
         "voice": "bear.mp3",
-        "answer": "bear.jpg"
+        "answer": "bear.jpg",
+        "realanswer": "bear"
       },
       {
         "question": "หวี",
         "voice": "comb.mp3",
-        "answer": "comb.jpg"
+        "answer": "comb.jpg",
+        "realanswer": "comb"
       }
     ]
   },
@@ -129,37 +150,44 @@
       {
         "question": "นก",
         "voice": "bird.mp3",
-        "answer": "bird.jpg"
+        "answer": "bird.jpg",
+        "realanswer": "bird"
       },
       {
         "question": "แมว",
         "voice": "cat.mp3",
-        "answer": "cat.jpg"
+        "answer": "cat.jpg",
+        "realanswer": "cat"
       },
       {
         "question": "เป็ด",
         "voice": "duck.mp3",
-        "answer": "duck.jpg"
+        "answer": "duck.jpg",
+        "realanswer": "duck"
       },
       {
         "question": "ลิง",
         "voice": "monkey.mp3",
-        "answer": "monkey.jpg"
+        "answer": "monkey.jpg",
+        "realanswer": "monkey"
       },
       {
         "question": "ช้าง",
         "voice": "elephant.mp3",
-        "answer": "school bus.jpg"
+        "answer": "school bus.jpg",
+        "realanswer": "elephant"
       },
       {
         "question": "เสือ",
         "voice": "tiger.mp3",
-        "answer": "tiger.jpg"
+        "answer": "tiger.jpg",
+        "realanswer": "tiger"
       },
       {
         "question": "กุ้ง",
         "voice": "shrimp.mp3",
-        "answer": "shrimp.jpg"
+        "answer": "shrimp.jpg",
+        "realanswer": "shrimp"
       }
     ]
   },
@@ -170,37 +198,44 @@
       {
         "question": "ข้าว",
         "voice": "rice.mp3",
-        "answer": "rice.jpg"
+        "answer": "rice.jpg",
+        "realanswer": "rice"
       },
       {
         "question": "น้ำ",
         "voice": "water.mp3",
-        "answer": "water.jpg"
+        "answer": "water.jpg",
+        "realanswer": "water"
       },
       {
         "question": "ส้ม",
         "voice": "orange.mp3",
-        "answer": "orange.jpg"
+        "answer": "orange.jpg",
+        "realanswer": "orange"
       },
       {
         "question": "กล้วย",
         "voice": "banana.mp3",
-        "answer": "banana.jpg"
+        "answer": "banana.jpg",
+        "realanswer": "banana"
       },
       {
         "question": "จาน",
         "voice": "plate.mp3",
-        "answer": "plate.jpg"
+        "answer": "plate.jpg",
+        "realanswer": "plate"
       },
       {
         "question": "ช้อน",
         "voice": "spoon.mp3",
-        "answer": "spoon.jpg"
+        "answer": "spoon.jpg",
+        "realanswer": "spoon"
       },
       {
         "question": "แก้ว",
         "voice": "glass.mp3",
-        "answer": "glass.jpg"
+        "answer": "glass.jpg",
+        "realanswer": "glass"
       }
     ]
   }

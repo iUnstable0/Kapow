@@ -13,7 +13,12 @@ import { Howl } from "howler";
 type T_LevelData = {
   level: number;
   timer: number;
-  quiz: { question: string; answer: string; voice: string }[];
+  quiz: {
+    question: string;
+    answer: string;
+    voice: string;
+    realanswer: string;
+  }[];
 };
 
 type T_LevelContext = T_LevelData & {

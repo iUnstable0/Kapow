@@ -40,16 +40,16 @@ const rightKeys = [
   T_Keybind.seven,
 ];
 
-type T_Question = {
-  question: string;
-  answer: string;
-  voice: string;
-};
+// type T_Question = {
+//   question: string;
+//   answer: string;
+//   voice: string;
+// };
 
 export default function Page() {
   const router = useRouter();
 
-  const { pause, play } = useGlobalMusic();
+  const { setVolume } = useGlobalMusic();
 
   const { level, timer, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -103,11 +103,13 @@ export default function Page() {
     interrupt: true,
     onplay: () => {
       setFish(true);
-      pause();
+      // pause();
+      setVolume(0.07);
     },
     onend: () => {
       setFish(false);
-      play();
+      // play();
+      setVolume(0.5);
     },
   });
 
@@ -171,7 +173,7 @@ export default function Page() {
     //   eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quiz, stage]);
 
-  const handleAnswer = (q: T_Question) => {
+  const handleAnswer = (q) => {
     if (selectedQuestion === q.question) {
       playDing();
 
@@ -494,10 +496,46 @@ export default function Page() {
             <div className={styles.option}>
               {quiz.map((q) => (
                 <div key={`awdaq_${q.question}`} className={styles.answerRow}>
-                  <div className={styles.question}>{q.question}</div>
+                  <div
+                    className={styles.question}
+                    onClick={() => {
+                      playSound(q.voice);
+                    }}
+                  >
+                    {q.question} = {q.realanswer}
+                  </div>
                   <div
                     key={`awddasdaq_${q.question}`}
                     className={styles.imageCtn}
+                    onClick={() => {
+                      let matchedSwitch = false;
+
+                      switch (q.answer.split(".")[0]) {
+                        case "dog":
+                          playBen();
+                          matchedSwitch = true;
+                          break;
+                        case "fish":
+                          playLeFishe();
+                          matchedSwitch = true;
+                          break;
+                      }
+
+                      setTimeout(
+                        () => {
+                          const utterance = new SpeechSynthesisUtterance(
+                            q.answer.split(".")[0],
+                          );
+
+                          // utterance.pitch = 0.1;
+                          // utterance.rate = 0.1;
+                          // utterance.volume = 1;
+
+                          window.speechSynthesis.speak(utterance);
+                        },
+                        matchedSwitch ? 1000 : 0,
+                      );
+                    }}
                   >
                     <Image
                       src={`/level${level}/${q.answer}`}

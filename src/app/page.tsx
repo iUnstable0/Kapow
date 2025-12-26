@@ -23,11 +23,15 @@ const MotionImage = motion.create(Image);
 let currentLevelGlobal = 1;
 
 export default function Home() {
+  const router = useRouter();
+
   const [selectedLevel, setSelectedLevel] =
     useState<number>(currentLevelGlobal);
   const [startLoading, setStartLoading] = useState<boolean>(false);
 
-  const router = useRouter();
+  const [maxLevel, setMaxLevel] = useState<number>(
+    parseInt(localStorage.getItem("max_level") || "1"),
+  );
 
   return (
     <div className={styles.container}>
@@ -59,9 +63,30 @@ export default function Home() {
               forcetheme={"dark"}
               keybinds={[T_Keybind.right_arrow]}
               onPress={() => {
-                if (selectedLevel < levels.length) {
-                  setSelectedLevel(selectedLevel + 1);
+                let currentMaxLevel = maxLevel;
+
+                if (selectedLevel >= maxLevel && maxLevel < levels.length) {
+                  let res = confirm("Unlock all levels?");
+
+                  if (!res) return;
+
+                  res = confirm("Are you sure? This will unlock all levels!");
+
+                  if (!res) return;
+
+                  res = confirm("This action cannot be undone !");
+
+                  if (!res) return;
+
+                  setMaxLevel(levels.length);
+                  currentMaxLevel = levels.length;
+
+                  localStorage.setItem("max_level", levels.length.toString());
                 }
+
+                setSelectedLevel((prev) =>
+                  Math.min(Math.min(prev + 1, levels.length), currentMaxLevel),
+                );
               }}
               disabled={startLoading || selectedLevel >= levels.length}
               loading={startLoading}

@@ -27,7 +27,7 @@ export default function Page() {
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
 
-  const { pause, play } = useGlobalMusic();
+  const { setVolume } = useGlobalMusic();
 
   const isProcessing = useRef(false);
 
@@ -77,11 +77,11 @@ export default function Page() {
     interrupt: true,
     onplay: () => {
       setFish(true);
-      pause();
+      setVolume(0.07);
     },
     onend: () => {
       setFish(false);
-      play();
+      setVolume(0.5);
     },
   });
 
@@ -92,7 +92,8 @@ export default function Page() {
   }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
 
   const playCardSound = useCallback(() => {
-    pause();
+    // pause();
+    setVolume(0.07);
 
     let fishPlayed = false;
 
@@ -132,18 +133,18 @@ export default function Page() {
 
     if (!fishPlayed && !fish) {
       setTimeout(() => {
-        play();
+        setVolume(0.5);
       }, 1000);
     }
   }, [
-    pause,
     flipState,
     playSound,
     queue,
     reviewIndex,
     playBen,
     playLeFishe,
-    play,
+    fish,
+    setVolume,
   ]);
 
   const markForReview = useCallback(
