@@ -301,7 +301,7 @@ export default function Page() {
                   setReviewLoading(true);
 
                   setTimeout(() => {
-                    router.push(`/level/${level}/review`);
+                    router.push(`/level/${level}/flashcards`);
                   }, 750);
                 }}
                 loading={reviewLoading}
@@ -309,7 +309,7 @@ export default function Page() {
                 loadingText={"Please wait..."}
                 loadingTextEnabled={true}
               >
-                Review
+                Flashcards
               </KeybindButton>
 
               <KeybindButton

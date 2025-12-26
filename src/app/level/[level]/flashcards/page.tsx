@@ -241,7 +241,7 @@ export default function Page() {
             transition={{ duration: 0.5 }}
             key={"title-ctn"}
           >
-            <h1 className={styles.title}>Level {level} Review</h1>
+            <h1 className={styles.title}>Level {level} Flashcards</h1>
             {firstLoad && <p className={styles.desc}>Loading...</p>}
             {!firstLoad && reviews.length === 0 && (
               <p className={styles.desc}>Get ready to review!</p>
@@ -269,6 +269,25 @@ export default function Page() {
             transition={{ duration: 0.5 }}
             key={"reviewremaining"}
           >
+            <KeybindButton
+              keybinds={[T_Keybind.escape]}
+              onPress={() => {
+                setExitReviewLoading(true);
+
+                setTimeout(() => {
+                  router.push(`/level/${level}`);
+                }, 750);
+              }}
+              forcetheme={"dark"}
+              dangerous={true}
+              loading={exitReviewLoading}
+              disabled={exitReviewLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
+            >
+              Exit Flashcards
+            </KeybindButton>
+
             {reviews.length > 0 && reviews.length < quiz.length && (
               <KeybindButton
                 keybinds={[T_Keybind.shift, T_Keybind.enter]}
@@ -310,37 +329,7 @@ export default function Page() {
                 ? reviews.length < quiz.length
                   ? "Review all"
                   : "Review again"
-                : "Review"}
-            </KeybindButton>
-          </motion.div>
-        )}
-
-        {!reviewStarted && (
-          <motion.div
-            className={styles.toolbarTopRight}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"exitreview"}
-          >
-            <KeybindButton
-              keybinds={[T_Keybind.escape]}
-              onPress={() => {
-                setExitReviewLoading(true);
-
-                setTimeout(() => {
-                  router.push(`/level/${level}`);
-                }, 750);
-              }}
-              forcetheme={"dark"}
-              dangerous={true}
-              loading={exitReviewLoading}
-              disabled={exitReviewLoading}
-              loadingText={"Please wait..."}
-              loadingTextEnabled={true}
-            >
-              Exit Review
+                : "Start"}
             </KeybindButton>
           </motion.div>
         )}
@@ -363,7 +352,7 @@ export default function Page() {
               forcetheme={"dark"}
               dangerous={true}
             >
-              Exit Review
+              Quit Session
             </KeybindButton>
           </motion.div>
         )}
