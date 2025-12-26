@@ -56,6 +56,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const handleNextRef = useRef<() => void>(() => {});
 
+  // const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -105,10 +107,14 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     soundRef.current = new Howl({
       src: [src],
       html5: true,
-      volume: volumeRef.current,
+      volume: 0,
       autoplay: true,
       onload: () => setIsLoaded(true),
-      onplay: () => setIsPlaying(true),
+      onplay: () => {
+        setIsPlaying(true);
+
+        soundRef.current?.fade(0, volumeRef.current, 2000);
+      },
       onpause: () => setIsPlaying(false),
       onstop: () => setIsPlaying(false),
       onend: () => {
@@ -127,8 +133,12 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setVolumeState(v);
     volumeRef.current = v;
 
-    if (soundRef.current) {
-      soundRef.current.volume(v);
+    const sound = soundRef.current;
+
+    if (sound) {
+      sound.off("fade");
+
+      sound.fade(sound.volume(), v, 100);
     }
   }, []);
 
@@ -139,20 +149,59 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   }, [queueIndex, queue, loadSong]);
 
   const play = () => {
-    if (!soundRef.current) {
+    const sound = soundRef.current;
+
+    if (!sound) {
       if (queue.length > 0) {
         loadSong(queue[queueIndex]);
       }
-    } else if (!soundRef.current.playing()) {
-      soundRef.current.play();
+
+      return;
+    }
+
+    if (!sound.playing()) {
+      sound.off("fade");
+
+      sound.volume(0);
+      sound.play();
+      sound.fade(0, volumeRef.current, 2000);
     }
   };
 
-  const pause = () => soundRef.current?.pause();
+  const pause = () => {
+    const sound = soundRef.current;
+
+    if (!sound || !sound.playing()) return;
+
+    sound.off("fade");
+
+    const currentVol = sound.volume();
+    sound.fade(currentVol, 0, 1000);
+
+    sound.once("fade", () => {
+      sound.pause();
+      sound.volume(volumeRef.current);
+    });
+  };
 
   const stop = () => {
-    soundRef.current?.stop();
-    setIsPlaying(false);
+    const sound = soundRef.current;
+
+    if (!sound || !sound.playing()) {
+      setIsPlaying(false);
+      return;
+    }
+
+    sound.off("fade");
+
+    const currentVol = sound.volume();
+    sound.fade(currentVol, 0, 1000);
+
+    sound.once("fade", () => {
+      sound.stop();
+      setIsPlaying(false);
+      sound.volume(volumeRef.current);
+    });
   };
 
   const next = () => handleNext();

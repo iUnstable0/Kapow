@@ -49,7 +49,7 @@ const rightKeys = [
 export default function Page() {
   const router = useRouter();
 
-  const { setVolume } = useGlobalMusic();
+  const { play, pause, setVolume } = useGlobalMusic();
 
   const { level, timer, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -103,13 +103,13 @@ export default function Page() {
     interrupt: true,
     onplay: () => {
       setFish(true);
-      // pause();
-      setVolume(0.07);
+      pause();
+      // setVolume(0.07);
     },
     onend: () => {
       setFish(false);
-      // play();
-      setVolume(0.5);
+      play();
+      // setVolume(0.5);
     },
   });
 

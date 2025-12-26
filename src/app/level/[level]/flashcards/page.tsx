@@ -27,7 +27,7 @@ export default function Page() {
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
 
-  const { setVolume } = useGlobalMusic();
+  const { play, pause, setVolume } = useGlobalMusic();
 
   const isProcessing = useRef(false);
 
@@ -77,11 +77,13 @@ export default function Page() {
     interrupt: true,
     onplay: () => {
       setFish(true);
-      setVolume(0.07);
+      // setVolume(0.07);
+      pause();
     },
     onend: () => {
       setFish(false);
-      setVolume(0.5);
+      // setVolume(0.5);
+      play();
     },
   });
 
@@ -297,6 +299,7 @@ export default function Page() {
                   setQueue(reviews);
                   setReviews([]);
                   setWin(false);
+                  setFlipped(false);
 
                   setReviewStarted(true);
                 }}
