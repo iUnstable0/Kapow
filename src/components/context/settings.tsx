@@ -2,17 +2,19 @@
 
 import React, { useState, createContext, useContext, useEffect } from "react";
 
-import * as z from "zod";
+// import * as z from "zod";
 
-import { PlaylistEnum, type T_Playlist } from "@/types";
+import { Z_PlaylistEnum, Z_MaxLevel, type T_Playlist } from "@/types";
 
 interface T_SettingsContext {
   trollModeEnabled: boolean;
   musicEnabled: boolean;
+  maxLevel: number;
   selectedPlaylist: T_Playlist;
 
   setTrollModeEnabled: (enabled: boolean) => void;
   setMusicEnabled: (enabled: boolean) => void;
+  setMaxLevel: (level: number) => void;
   setSelectedPlaylist: (playlist: T_Playlist) => void;
 }
 
@@ -22,6 +24,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [trollModeEnabledState, setTrollModeEnabled] = useState<boolean>(false);
   const [musicEnabledState, setMusicEnabled] = useState<boolean>(false);
 
+  const [maxLevel, setMaxLevel] = useState<number>(1);
+
   const [selectedPlaylist, setSelectedPlaylist] = useState<T_Playlist>("cisco");
 
   const [mounted, setMounted] = useState<boolean>(false);
@@ -29,6 +33,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let trollMode = localStorage.getItem("trollMode");
     let music = localStorage.getItem("music");
+    let maxLevel = localStorage.getItem("maxLevel");
     let selectedPlaylist = localStorage.getItem("selectedPlaylist");
 
     if (trollMode === null) {
@@ -41,9 +46,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       music = "true";
     }
 
+    if (maxLevel === null || !Z_MaxLevel.safeParse(maxLevel).success) {
+      localStorage.setItem("maxLevel", "1");
+      maxLevel = "1";
+    }
+
     if (
       selectedPlaylist === null ||
-      !PlaylistEnum.safeParse(selectedPlaylist).success
+      !Z_PlaylistEnum.safeParse(selectedPlaylist).success
     ) {
       localStorage.setItem("selectedPlaylist", "cisco");
       selectedPlaylist = "cisco" as T_Playlist;
@@ -51,6 +61,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     setTrollModeEnabled(trollMode === "true");
     setMusicEnabled(music === "true");
+    setMaxLevel(parseInt(maxLevel));
     setSelectedPlaylist(selectedPlaylist as T_Playlist);
 
     setMounted(true);
@@ -68,6 +79,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setMusicEnabled(enabled);
   };
 
+  const handleMaxLevelChange = (level: number) => {
+    if (!Z_MaxLevel.safeParse(level).success) return;
+
+    localStorage.setItem("maxLevel", level.toString());
+
+    setMaxLevel(level);
+  };
+
   const handlePlaylistChange = (playlist: T_Playlist) => {
     localStorage.setItem("selectedPlaylist", playlist);
 
@@ -83,10 +102,12 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       value={{
         trollModeEnabled: trollModeEnabledState,
         musicEnabled: musicEnabledState,
+        maxLevel: maxLevel,
         selectedPlaylist: selectedPlaylist,
 
         setTrollModeEnabled: handleTrollModeChange,
         setMusicEnabled: handleMusicChange,
+        setMaxLevel: handleMaxLevelChange,
         setSelectedPlaylist: handlePlaylistChange,
       }}
     >

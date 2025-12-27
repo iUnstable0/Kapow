@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 
-import { PlaylistEnum, type T_Playlist } from "@/types";
+import { Z_PlaylistEnum, type T_Playlist } from "@/types";
 
 import { useSettings } from "@/components/context/settings";
 
@@ -180,7 +180,7 @@ export default function SettingsWidget() {
                     }}
                     onOpenChange={(isOpen) => setSelectionOpen(isOpen)}
                   >
-                    {Object.values(PlaylistEnum.enum).map((playlist) => (
+                    {Object.values(Z_PlaylistEnum.enum).map((playlist) => (
                       <Selection.Item key={playlist} value={playlist}>
                         {playlist}
                       </Selection.Item>

@@ -51,7 +51,7 @@ export default function Page() {
   const router = useRouter();
 
   const { play, pause, setVolume } = useGlobalMusic();
-  const { trollModeEnabled } = useSettings();
+  const { trollModeEnabled, maxLevel, setMaxLevel } = useSettings();
 
   const { level, timer, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -260,6 +260,8 @@ export default function Page() {
           setStage((prev) => prev + 1);
         } else {
           setWin(true);
+
+          setMaxLevel(maxLevel + 1);
 
           if (timerRef.current) {
             clearInterval(timerRef.current);

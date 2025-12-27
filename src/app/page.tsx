@@ -9,14 +9,16 @@ import { AnimatePresence, motion } from "motion/react";
 
 import tinycolor from "tinycolor2";
 
-import styles from "./page.module.scss";
-
-import { KeybindButton, T_Keybind } from "@/components/keybind";
+import { useSettings } from "@/components/context/settings";
 
 import { SlidingNumber } from "@/components/mp/sliding-number";
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
 
+import { KeybindButton, T_Keybind } from "@/components/keybind";
+
 import levels from "@/components/levels.json";
+
+import styles from "./page.module.scss";
 
 const MotionImage = motion.create(Image);
 
@@ -25,24 +27,11 @@ let currentLevelGlobal = 1;
 export default function Home() {
   const router = useRouter();
 
+  const { maxLevel, setMaxLevel } = useSettings();
+
   const [selectedLevel, setSelectedLevel] =
     useState<number>(currentLevelGlobal);
   const [startLoading, setStartLoading] = useState<boolean>(false);
-
-  const [maxLevel, setMaxLevel] = useState<number>(1);
-  const [mounted, setMounted] = useState<boolean>(false);
-
-  useEffect(() => {
-    const storedMaxLevel = localStorage.getItem("max_level");
-
-    if (storedMaxLevel === null) {
-      localStorage.setItem("max_level", "1");
-    }
-
-    setMounted(true);
-
-    setMaxLevel(parseInt(localStorage.getItem("max_level") || "1"));
-  }, []);
 
   return (
     <div className={styles.container}>
@@ -90,9 +79,6 @@ export default function Home() {
                   if (!res) return;
 
                   setMaxLevel(levels.length);
-                  currentMaxLevel = levels.length;
-
-                  localStorage.setItem("max_level", levels.length.toString());
                 }
 
                 setSelectedLevel((prev) =>
