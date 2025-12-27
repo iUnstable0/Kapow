@@ -12,16 +12,20 @@ import React, {
 import { Howl } from "howler";
 import { AnimatePresence, motion } from "motion/react";
 
-import styles from "./music.module.scss";
+import { shuffleArray } from "@/lib/utils";
 
-import { useSettings } from "@/components/settings";
+import { useSettings } from "@/components/context/settings";
 
 import { TextMorph } from "@/components/mp/text-morph";
 
-// const adhd_songs = Array.from(
-//   { length: 15 },
-//   (_, i) => `/adhd/song ${i + 1}.mp3`,
-// );
+import styles from "./music.module.scss";
+
+import type { T_Playlist } from "@/types";
+
+const adhd_songs = Array.from(
+  { length: 15 },
+  (_, i) => `/adhd/song ${i + 1}.mp3`,
+);
 
 const coffee_songs = Array.from(
   { length: 10 },
@@ -33,8 +37,18 @@ const blueberry_songs = Array.from(
   (_, i) => `/blueberry/blueberry ${i + 1}.mp3`,
 );
 
-const playlist = [...coffee_songs, ...blueberry_songs];
-// const playlist = [...adhd_songs, ...blueberry_songs];
+const cisco_songs = Array.from(
+  { length: 1 },
+  (_, i) => `/cisco/cisco ${i + 1}.mp3`,
+);
+
+const playlists: Record<T_Playlist, string[]> = {
+  hiphop: adhd_songs,
+  coffee: coffee_songs,
+  blueberry: blueberry_songs,
+  cisco: cisco_songs,
+  mixed: [...adhd_songs, ...coffee_songs, ...blueberry_songs, ...cisco_songs],
+};
 
 interface T_MusicContext {
   play: () => void;
@@ -58,9 +72,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const handleNextRef = useRef<() => void>(() => {});
 
-  const { musicEnabled } = useSettings();
-
-  // const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { musicEnabled, selectedPlaylist } = useSettings();
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -75,18 +87,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     hasUserInteractedGlobal,
   );
 
-  useEffect(() => {
-    const newPlaylist = [...playlist];
-
-    for (let i = newPlaylist.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newPlaylist[i], newPlaylist[j]] = [newPlaylist[j], newPlaylist[i]];
-    }
-
-    setQueue(newPlaylist);
-    setQueueIndex(0);
-  }, []);
-
   const handleNext = useCallback(() => {
     setQueueIndex((prevIndex) => {
       let nextIndex = prevIndex + 1;
@@ -99,10 +99,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     });
   }, [queue]);
 
-  useEffect(() => {
-    handleNextRef.current = handleNext;
-  }, [handleNext]);
-
   const loadSong = useCallback(
     (src: string) => {
       if (soundRef.current) {
@@ -111,6 +107,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
       if (!musicEnabled) {
         setIsLoaded(true);
+
         return;
       }
 
@@ -153,12 +150,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       sound.fade(sound.volume(), v, 100);
     }
   }, []);
-
-  useEffect(() => {
-    if (queue.length > 0) {
-      loadSong(queue[queueIndex]);
-    }
-  }, [queueIndex, queue, loadSong]);
 
   const play = () => {
     const sound = soundRef.current;
@@ -222,6 +213,21 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     if (soundRef.current?.playing()) pause();
     else play();
   };
+
+  useEffect(() => {
+    setQueue(shuffleArray(playlists[selectedPlaylist]));
+    setQueueIndex(0);
+  }, [selectedPlaylist]);
+
+  useEffect(() => {
+    handleNextRef.current = handleNext;
+  }, [handleNext]);
+
+  useEffect(() => {
+    if (queue.length > 0) {
+      loadSong(queue[queueIndex]);
+    }
+  }, [queueIndex, queue, loadSong]);
 
   return (
     <MusicContext.Provider

@@ -12,10 +12,10 @@ import useSound from "use-sound";
 import { motion, AnimatePresence } from "motion/react";
 import { DateTime } from "luxon";
 
-import { useGlobalMusic } from "@/components/music";
+import { useGlobalMusic } from "@/components/context/music";
 import { useLevel } from "@/components/level";
 import { useConfetti } from "@/components/confetti";
-import { useSettings } from "@/components/settings";
+import { useSettings } from "@/components/context/settings";
 
 import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
 
@@ -105,13 +105,13 @@ export default function Page() {
     interrupt: true,
     onplay: () => {
       setFish(true);
-      pause();
-      // setVolume(0.07);
+      // pause();
+      setVolume(0.07);
     },
     onend: () => {
       setFish(false);
-      play();
-      // setVolume(0.5);
+      // play();
+      setVolume(0.5);
     },
   });
 
@@ -183,6 +183,8 @@ export default function Page() {
       let fishPlayed = false;
 
       if (!tts) {
+        // setVolume(0.07);
+
         playSound(q.voice);
       } else {
         let matchedSwitch = false;
@@ -202,6 +204,10 @@ export default function Page() {
               break;
           }
         }
+
+        // if (!fishPlayed && !fish) {
+        //   setVolume(0.07);
+        // }
 
         setTimeout(
           () => {

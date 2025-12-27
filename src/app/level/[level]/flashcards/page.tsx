@@ -11,9 +11,9 @@ import { motion, AnimatePresence } from "motion/react";
 import useSound from "use-sound";
 
 import { useLevel } from "@/components/level";
-import { useGlobalMusic } from "@/components/music";
+import { useGlobalMusic } from "@/components/context/music";
 import { useConfetti } from "@/components/confetti";
-import { useSettings } from "@/components/settings";
+import { useSettings } from "@/components/context/settings";
 
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
 
@@ -80,13 +80,13 @@ export default function Page() {
     interrupt: true,
     onplay: () => {
       setFish(true);
-      // setVolume(0.07);
-      pause();
+      setVolume(0.07);
+      // pause();
     },
     onend: () => {
       setFish(false);
-      // setVolume(0.5);
-      play();
+      setVolume(0.5);
+      // play();
     },
   });
 
