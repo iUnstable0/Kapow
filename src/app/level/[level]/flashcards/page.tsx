@@ -456,6 +456,27 @@ export default function Page() {
                 </KeybindButton>
               )}
 
+              {flipped && (
+                <KeybindButton
+                  keybinds={[T_Keybind.d]}
+                  forcetheme={"dark"}
+                  onPress={() => {
+                    window.open(
+                      `https://www.thai2english.com/?q=${encodeURIComponent(queue[reviewIndex].question)}`,
+                      "_blank",
+                    );
+                  }}
+                  // disabled={reviewLoading || returnLoading}
+                  // loading={returnLoading}
+                  // loadingText={"Please wait..."}
+                  // loadingTextEnabled={true}
+                  // reversed={true}
+                  // dangerous={true}
+                >
+                  Open Dictionary
+                </KeybindButton>
+              )}
+
               <KeybindButton
                 keybinds={[T_Keybind.s]}
                 forcetheme={"dark"}

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useMemo, useCallback } from "react";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 
@@ -548,6 +549,14 @@ export default function Page() {
                     }}
                   >
                     {q.question} = {q.realanswer}
+                    <span className={styles.dict}>
+                      <Link
+                        href={`https://www.thai2english.com/?q=${encodeURIComponent(q.realanswer)}`}
+                        target={"_blank"}
+                      >
+                        open in dictionary
+                      </Link>
+                    </span>
                   </div>
                   <div
                     key={`awddasdaq_${q.question}`}
