@@ -17,6 +17,8 @@ import {
   MorphingPopoverTrigger,
 } from "./mp/morphing-popover";
 
+import Selection from "./selection";
+
 import styles from "./settings.module.scss";
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
@@ -76,6 +78,9 @@ const SettingsContext = createContext<T_SettingsContext | null>(null);
 function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [trollModeEnabledState, setTrollModeEnabled] = useState<boolean>(false);
   const [musicEnabledState, setMusicEnabled] = useState<boolean>(false);
+
+  const [selectedMusicTrack, setSelectedMusicTrack] = useState<string>("lofi");
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -195,7 +200,7 @@ function SettingsProvider({ children }: { children: React.ReactNode }) {
                     duration: 0.5,
                   }}
                 >
-                  Music selection
+                  <Selection value={selectedMusicTrack}></Selection>
                 </motion.div>
               )}
             </AnimatePresence>

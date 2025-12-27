@@ -1,0 +1,115 @@
+.spinner {
+  --spinner-size: 24px;
+  --spinner-color: var(--sp-text-color);
+  --spinner-opacity: 0.75;
+  --speed: 2s;
+
+  --thickness: calc(var(--spinner-size) / 5);
+  --lat: calc((var(--spinner-size) - var(--thickness)) / 2);
+  --offset: calc(var(--lat) - var(--thickness));
+
+  --dimmed-color: color-mix(in srgb, var(--spinner-color), transparent 25%);
+
+  position: relative;
+
+  display: inherit;
+
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+
+  opacity: 0;
+
+  transform: rotate(165deg) scale(0.9);
+
+  transition:
+    transform 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
+}
+
+.spinner_loading {
+  opacity: 1;
+
+  transform: scale(1);
+}
+
+.spinner_animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  display: block;
+
+  width: var(--thickness);
+  height: var(--thickness);
+
+  border-radius: calc(var(--spinner-size) / 10);
+  animation-fill-mode: none;
+
+  transform: translate(-50%, -50%);
+}
+
+.before {
+  animation: spinner-before var(--speed) infinite;
+}
+
+.after {
+  animation: spinner-after var(--speed) infinite;
+}
+
+@keyframes spinner-before {
+  0% {
+    width: var(--thickness);
+    box-shadow:
+      var(--lat) calc(var(--offset) * -1) var(--dimmed-color),
+      calc(var(--lat) * -1) var(--offset) var(--dimmed-color);
+  }
+
+  35% {
+    width: var(--spinner-size);
+    box-shadow:
+      0 calc(var(--offset) * -1) var(--dimmed-color),
+      0 var(--offset) var(--dimmed-color);
+  }
+
+  70% {
+    width: var(--thickness);
+    box-shadow:
+      calc(var(--lat) * -1) calc(var(--offset) * -1) var(--dimmed-color),
+      var(--lat) var(--offset) var(--dimmed-color);
+  }
+
+  100% {
+    box-shadow:
+      var(--lat) calc(var(--offset) * -1) var(--dimmed-color),
+      calc(var(--lat) * -1) var(--offset) var(--dimmed-color);
+  }
+}
+
+@keyframes spinner-after {
+  0% {
+    height: var(--thickness);
+    box-shadow:
+      var(--offset) var(--lat) var(--spinner-color),
+      calc(var(--offset) * -1) calc(var(--lat) * -1) var(--spinner-color);
+  }
+
+  35% {
+    height: var(--spinner-size);
+    box-shadow:
+      var(--offset) 0 var(--spinner-color),
+      calc(var(--offset) * -1) 0 var(--spinner-color);
+  }
+
+  70% {
+    height: var(--thickness);
+    box-shadow:
+      var(--offset) calc(var(--lat) * -1) var(--spinner-color),
+      calc(var(--offset) * -1) var(--lat) var(--spinner-color);
+  }
+
+  100% {
+    box-shadow:
+      var(--offset) var(--lat) var(--spinner-color),
+      calc(var(--offset) * -1) calc(var(--lat) * -1) var(--spinner-color);
+  }
+}
