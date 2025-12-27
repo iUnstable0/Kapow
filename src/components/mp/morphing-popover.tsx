@@ -192,6 +192,7 @@ export type MorphingPopoverContentProps = {
   portal?: boolean;
   anchor?: PopoverAnchor;
   offset?: number;
+  dismissOnClickOutside?: boolean;
 } & React.ComponentProps<typeof motion.div>;
 
 function MorphingPopoverContent({
@@ -200,6 +201,7 @@ function MorphingPopoverContent({
   portal = false,
   anchor = "bottom-left",
   offset = 12,
+  dismissOnClickOutside = true,
   ...props
 }: MorphingPopoverContentProps) {
   const context = useContext(MorphingPopoverContext);
@@ -215,7 +217,11 @@ function MorphingPopoverContent({
     left: 0,
   });
 
-  useClickOutside(ref, context.close);
+  useClickOutside(ref, () => {
+    if (dismissOnClickOutside) {
+      context.close();
+    }
+  });
 
   useEffect(() => {
     if (!context.isOpen) return;

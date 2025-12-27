@@ -1,6 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+
+import clsx from "clsx";
 
 import { Cog } from "lucide-react";
 
@@ -9,7 +11,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 
-import { PlaylistEnum } from "@/types";
+import { PlaylistEnum, type T_Playlist } from "@/types";
 
 import { useSettings } from "@/components/context/settings";
 
@@ -82,6 +84,9 @@ export default function SettingsWidget() {
     setSelectedPlaylist,
   } = useSettings();
 
+  const [selectionOpen, setSelectionOpen] = useState<boolean>(false);
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+
   return (
     <MorphingPopover
       variants={{
@@ -95,6 +100,7 @@ export default function SettingsWidget() {
         duration: 0.4,
         opacity: { duration: 0.2 },
       }}
+      onOpenChange={(isOpen) => setSettingsOpen(isOpen)}
     >
       <MorphingPopoverTrigger asChild>
         <div className={styles.settings}>
@@ -103,11 +109,10 @@ export default function SettingsWidget() {
             springOptions={{ bounce: 0.1, stiffness: 120 }}
             actionArea="global"
             range={125}
-            // range={disabled ? 0 : magnetic ? 75 : 0}
-            // className={className}// action={() => {
-            //   alert("Settings clicked!");
-            // }}
-            className={styles.settingsMagnet}
+            className={clsx(
+              styles.settingsMagnet,
+              !settingsOpen && styles.settingsMagnetClosed,
+            )}
           >
             <motion.span layoutId={"icon-settings"} layout={"position"}>
               <Cog className={styles.icon} />
@@ -116,16 +121,15 @@ export default function SettingsWidget() {
         </div>
       </MorphingPopoverTrigger>
 
-      <MorphingPopoverContent className={styles.settingsPage}>
+      <MorphingPopoverContent
+        className={styles.settingsPage}
+        dismissOnClickOutside={!selectionOpen}
+      >
         <Magnetic
           intensity={0.1}
           springOptions={{ bounce: 0.1, stiffness: 120 }}
           actionArea="global"
           range={125}
-          // range={disabled ? 0 : magnetic ? 75 : 0}
-          // className={className}// action={() => {
-          //   alert("Settings clicked!");
-          // }}
           className={styles.settingsPageMag}
         >
           <motion.div className={styles.settingsTitle} layout>
@@ -167,9 +171,17 @@ export default function SettingsWidget() {
               >
                 <div className={styles.musicTrackSelection}>
                   Selected Track
-                  <Selection value={selectedPlaylist}>
+                  <Selection
+                    value={selectedPlaylist}
+                    onSelect={(value) => {
+                      setSelectedPlaylist(value as T_Playlist);
+                    }}
+                    onOpenChange={(isOpen) => setSelectionOpen(isOpen)}
+                  >
                     {Object.values(PlaylistEnum.enum).map((playlist) => (
-                      <Selection.Item key={playlist}>{playlist}</Selection.Item>
+                      <Selection.Item key={playlist} value={playlist}>
+                        {playlist}
+                      </Selection.Item>
                     ))}
                   </Selection>
                 </div>

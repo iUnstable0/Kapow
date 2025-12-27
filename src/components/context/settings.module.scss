@@ -26,8 +26,7 @@
   align-items: center;
   justify-content: center;
 
-  background-color: rgba(40, 40, 40, 0.56);
-  backdrop-filter: blur(10px);
+  background: transparent;
 
   transition:
     scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
@@ -35,15 +34,20 @@
     box-shadow 0.2s ease;
 }
 
-.settingsMagnet:hover {
-  background-color: #3d3d3d;
-  box-shadow: 0 4px 12px #3d3d3d;
+.settingsMagnetClosed {
+  background-color: rgba(40, 40, 40, 0.56);
+  backdrop-filter: blur(10px);
 
-  scale: 1.1;
-}
+  &:hover {
+    background-color: #3d3d3d;
+    box-shadow: 0 4px 12px #3d3d3d;
 
-.settingsMagnet:active {
-  scale: 0.95;
+    scale: 1.1;
+  }
+
+  &:active {
+    scale: 0.95;
+  }
 }
 
 .settingsPage {

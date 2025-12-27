@@ -8,6 +8,10 @@ import React, {
   useContext,
 } from "react";
 
+import { motion } from "motion/react";
+
+import clsx from "clsx";
+
 import { ChevronsUpDown } from "lucide-react";
 
 import {
@@ -18,13 +22,37 @@ import {
 
 import styles from "./selection.module.scss";
 
-interface SelectionProps {
-  children?: React.ReactNode;
-  value: string;
+interface SelectionContextType {
+  selectedValue: string;
+  onSelect: (value: string) => void;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
-export default function Selection({ children, value }: SelectionProps) {
+const SelectionContext = createContext<SelectionContextType | null>(null);
+
+interface SelectionProps {
+  children: React.ReactNode;
+  value: string;
+  onSelect?: (value: string) => void;
+  onOpenChange?: (isOpen: boolean) => void;
+  className?: string;
+}
+
+interface SelectionItemProps {
+  children: React.ReactNode;
+  value: string;
+  className?: string;
+}
+
+export default function Selection({
+  children,
+  value,
+  onSelect,
+  onOpenChange,
+}: SelectionProps) {
   const [isTextOverflow, setIsTextOverflow] = useState<boolean>(false);
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -47,46 +75,93 @@ export default function Selection({ children, value }: SelectionProps) {
   }, [value]);
 
   return (
-    <MorphingPopover
-      variants={{
-        initial: { opacity: 0 },
-        animate: { opacity: 1 },
-        exit: { opacity: 0 },
-      }}
-      transition={{
-        type: "spring",
-        bounce: 0.1,
-        duration: 0.4,
-        opacity: { duration: 0.2 },
+    <SelectionContext.Provider
+      value={{
+        selectedValue: value,
+        onSelect: (value) => {
+          onSelect?.(value);
+          setIsOpen(false);
+        },
+        setIsOpen,
       }}
     >
-      <MorphingPopoverTrigger asChild>
-        <div className={styles.selectionBox}>
-          <div
-            ref={containerRef}
-            className={`${styles.marqueeWindow} ${isTextOverflow ? styles.hasOverflow : ""}`}
-          >
-            <span
-              ref={textRef}
-              className={
-                isTextOverflow ? styles.marqueeContent : styles.staticContent
-              }
-            >
-              {value}
-            </span>
-          </div>
-
-          <ChevronsUpDown className={styles.icon} />
-        </div>
-      </MorphingPopoverTrigger>
-
-      <MorphingPopoverContent
-        className={styles.settingsPage}
-        portal={true}
-        anchor={"top-right"}
+      <MorphingPopover
+        variants={{
+          initial: { opacity: 0 },
+          animate: { opacity: 1 },
+          exit: { opacity: 0 },
+        }}
+        transition={{
+          type: "spring",
+          bounce: 0.1,
+          duration: 0.4,
+          opacity: { duration: 0.2 },
+        }}
+        onOpenChange={(isOpen) => {
+          setIsOpen(isOpen);
+          onOpenChange?.(isOpen);
+        }}
+        open={isOpen}
       >
-        <div>da</div>
-      </MorphingPopoverContent>
-    </MorphingPopover>
+        <MorphingPopoverTrigger asChild>
+          <div className={styles.selectionBox}>
+            <div
+              ref={containerRef}
+              className={`${styles.marqueeWindow} ${isTextOverflow ? styles.hasOverflow : ""}`}
+            >
+              <motion.span
+                ref={textRef}
+                className={
+                  isTextOverflow ? styles.marqueeContent : styles.staticContent
+                }
+                layoutId={`selection-item-${value}`}
+                layout={"position"}
+              >
+                {value}
+              </motion.span>
+            </div>
+
+            <ChevronsUpDown className={styles.icon} />
+          </div>
+        </MorphingPopoverTrigger>
+
+        <MorphingPopoverContent
+          className={styles.settingsPage}
+          portal={true}
+          anchor={"top-right"}
+        >
+          {children}
+        </MorphingPopoverContent>
+      </MorphingPopover>
+    </SelectionContext.Provider>
   );
 }
+
+function SelectionItem({ children, value, className }: SelectionItemProps) {
+  const context = useContext(SelectionContext);
+
+  if (!context) {
+    throw new Error("Selection.Item must be used within a Selection component");
+  }
+
+  return (
+    <div
+      className={clsx(styles.item, className)}
+      onClick={(e) => {
+        e.stopPropagation();
+
+        context.onSelect(value);
+      }}
+    >
+      <motion.span
+        className={styles.itemText}
+        layoutId={`selection-item-${value}`}
+        layout={"position"}
+      >
+        {children}
+      </motion.span>
+    </div>
+  );
+}
+
+Selection.Item = SelectionItem;
