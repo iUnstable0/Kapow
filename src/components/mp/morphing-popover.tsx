@@ -1,14 +1,18 @@
 "use client";
 
+import { createPortal } from "react-dom";
+
 import {
   useState,
   useId,
   useRef,
   useEffect,
+  useLayoutEffect,
   createContext,
   useContext,
   isValidElement,
 } from "react";
+
 import {
   AnimatePresence,
   MotionConfig,
@@ -16,6 +20,7 @@ import {
   Transition,
   Variants,
 } from "motion/react";
+
 import useClickOutside from "./useClickOutside";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +36,7 @@ type MorphingPopoverContextValue = {
   close: () => void;
   uniqueId: string;
   variants?: Variants;
+  triggerRef: React.RefObject<HTMLElement>;
 };
 
 const MorphingPopoverContext =
@@ -51,16 +57,14 @@ function usePopoverLogic({
   const isOpen = controlledOpen ?? uncontrolledOpen;
 
   const open = () => {
-    if (controlledOpen === undefined) {
-      setUncontrolledOpen(true);
-    }
+    if (controlledOpen === undefined) setUncontrolledOpen(true);
+
     onOpenChange?.(true);
   };
 
   const close = () => {
-    if (controlledOpen === undefined) {
-      setUncontrolledOpen(false);
-    }
+    if (controlledOpen === undefined) setUncontrolledOpen(false);
+
     onOpenChange?.(false);
   };
 
@@ -88,9 +92,12 @@ function MorphingPopover({
   ...props
 }: MorphingPopoverProps) {
   const popoverLogic = usePopoverLogic({ defaultOpen, open, onOpenChange });
+  const triggerRef = useRef<HTMLElement>(null);
 
   return (
-    <MorphingPopoverContext.Provider value={{ ...popoverLogic, variants }}>
+    <MorphingPopoverContext.Provider
+      value={{ ...popoverLogic, variants, triggerRef }}
+    >
       <MotionConfig transition={transition}>
         <div
           className={cn("relative flex items-center justify-center", className)}
@@ -117,21 +124,23 @@ function MorphingPopoverTrigger({
   ...props
 }: MorphingPopoverTriggerProps) {
   const context = useContext(MorphingPopoverContext);
-  if (!context) {
+
+  if (!context)
     throw new Error(
       "MorphingPopoverTrigger must be used within MorphingPopover",
     );
-  }
 
   if (asChild && isValidElement(children)) {
     const MotionComponent = motion.create(
       children.type as React.ForwardRefExoticComponent<any>,
     );
+
     const childProps = children.props as Record<string, unknown>;
 
     return (
       <MotionComponent
         {...childProps}
+        ref={context.triggerRef}
         onClick={context.open}
         layoutId={`popover-trigger-${context.uniqueId}`}
         className={childProps.className}
@@ -150,6 +159,7 @@ function MorphingPopoverTrigger({
     >
       <motion.button
         {...props}
+        ref={context.triggerRef as any}
         layoutId={`popover-label-${context.uniqueId}`}
         key={context.uniqueId}
         className={className}
@@ -162,23 +172,49 @@ function MorphingPopoverTrigger({
   );
 }
 
+export type PopoverAnchor =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right"
+  | "left-top"
+  | "left-center"
+  | "left-bottom"
+  | "right-top"
+  | "right-center"
+  | "right-bottom";
+
 export type MorphingPopoverContentProps = {
   children: React.ReactNode;
   className?: string;
+  portal?: boolean;
+  anchor?: PopoverAnchor;
+  offset?: number;
 } & React.ComponentProps<typeof motion.div>;
 
 function MorphingPopoverContent({
   children,
   className,
+  portal = false,
+  anchor = "bottom-left",
+  offset = 12,
   ...props
 }: MorphingPopoverContentProps) {
   const context = useContext(MorphingPopoverContext);
+
   if (!context)
     throw new Error(
       "MorphingPopoverContent must be used within MorphingPopover",
     );
 
   const ref = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState({
+    top: 0,
+    left: 0,
+  });
+
   useClickOutside(ref, context.close);
 
   useEffect(() => {
@@ -192,33 +228,110 @@ function MorphingPopoverContent({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [context.isOpen, context.close]);
 
-  return (
+  useLayoutEffect(() => {
+    if (context.isOpen && portal && context.triggerRef.current && ref.current) {
+      const updatePosition = () => {
+        const triggerRect = context.triggerRef.current?.getBoundingClientRect();
+        const contentRect = ref.current?.getBoundingClientRect();
+
+        if (triggerRect && contentRect) {
+          let top = 0;
+          let left = 0;
+
+          if (anchor.startsWith("bottom")) {
+            top = triggerRect.bottom + offset;
+          } else if (anchor.startsWith("top")) {
+            top = triggerRect.top - contentRect.height - offset;
+          } else if (anchor.startsWith("left") || anchor.startsWith("right")) {
+            if (anchor.includes("center")) {
+              top =
+                triggerRect.top +
+                triggerRect.height / 2 -
+                contentRect.height / 2;
+            } else if (anchor.includes("top")) {
+              top = triggerRect.top;
+            } else if (anchor.includes("bottom")) {
+              top = triggerRect.bottom - contentRect.height;
+            }
+          }
+
+          if (anchor.startsWith("right")) {
+            left = triggerRect.right + offset;
+          } else if (anchor.startsWith("left")) {
+            left = triggerRect.left - contentRect.width - offset;
+          } else if (anchor.startsWith("top") || anchor.startsWith("bottom")) {
+            if (anchor.includes("center")) {
+              left =
+                triggerRect.left +
+                triggerRect.width / 2 -
+                contentRect.width / 2;
+            } else if (anchor.includes("left")) {
+              left = triggerRect.left;
+            } else if (anchor.includes("right")) {
+              left = triggerRect.right - contentRect.width;
+            }
+          }
+
+          setCoords({
+            top: top + window.scrollY,
+            left: left + window.scrollX,
+          });
+        }
+      };
+
+      updatePosition();
+
+      window.addEventListener("resize", updatePosition);
+      window.addEventListener("scroll", updatePosition);
+
+      return () => {
+        window.removeEventListener("resize", updatePosition);
+        window.removeEventListener("scroll", updatePosition);
+      };
+    }
+  }, [context.isOpen, portal, anchor, offset]);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const content = (
     <AnimatePresence>
       {context.isOpen && (
-        <>
-          <motion.div
-            {...props}
-            ref={ref}
-            layoutId={`popover-trigger-${context.uniqueId}`}
-            key={context.uniqueId}
-            id={`popover-content-${context.uniqueId}`}
-            role="dialog"
-            aria-modal="true"
-            className={cn(
-              "absolute overflow-hidden rounded-md border border-zinc-950/10 bg-white p-2 text-zinc-950 shadow-md dark:border-zinc-50/10 dark:bg-zinc-700 dark:text-zinc-50",
-              className,
-            )}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            variants={context.variants}
-          >
-            {children}
-          </motion.div>
-        </>
+        <motion.div
+          {...props}
+          ref={ref}
+          layoutId={`popover-trigger-${context.uniqueId}`}
+          key={context.uniqueId}
+          id={`popover-content-${context.uniqueId}`}
+          role="dialog"
+          aria-modal="true"
+          className={cn(
+            portal ? "fixed z-[9999]" : "absolute",
+            "overflow-hidden rounded-md border border-zinc-950/10 bg-white p-2 text-zinc-950 shadow-md dark:border-zinc-50/10 dark:bg-zinc-700 dark:text-zinc-50",
+            className,
+          )}
+          style={{
+            ...(portal ? { top: coords.top, left: coords.left } : {}),
+            ...props.style,
+          }}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={context.variants}
+        >
+          {children}
+        </motion.div>
       )}
     </AnimatePresence>
   );
+
+  if (portal) {
+    if (!mounted) return null;
+    return createPortal(content, document.body);
+  }
+
+  return content;
 }
 
 export { MorphingPopover, MorphingPopoverTrigger, MorphingPopoverContent };

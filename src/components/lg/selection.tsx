@@ -43,9 +43,9 @@ export default function Selection({ children, value }: SelectionProps) {
   return (
     <MorphingPopover
       variants={{
-        initial: { opacity: 0, borderRadius: "100%" },
-        animate: { opacity: 1, borderRadius: "28px" },
-        exit: { opacity: 0, borderRadius: "100%" },
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
       }}
       transition={{
         type: "spring",
@@ -74,7 +74,11 @@ export default function Selection({ children, value }: SelectionProps) {
         </div>
       </MorphingPopoverTrigger>
 
-      <MorphingPopoverContent className={styles.settingsPage}>
+      <MorphingPopoverContent
+        className={styles.settingsPage}
+        portal={true}
+        anchor={"top-right"}
+      >
         <div>da</div>
       </MorphingPopoverContent>
     </MorphingPopover>
