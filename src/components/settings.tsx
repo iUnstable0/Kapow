@@ -81,7 +81,7 @@ function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const [selectedMusicTrack, setSelectedMusicTrack] = useState<string>("lofi");
 
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
     const trollMode = localStorage.getItem("trollMode");

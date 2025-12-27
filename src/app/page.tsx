@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -29,9 +29,20 @@ export default function Home() {
     useState<number>(currentLevelGlobal);
   const [startLoading, setStartLoading] = useState<boolean>(false);
 
-  const [maxLevel, setMaxLevel] = useState<number>(
-    parseInt(localStorage.getItem("max_level") || "1"),
-  );
+  const [maxLevel, setMaxLevel] = useState<number>(1);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    const storedMaxLevel = localStorage.getItem("max_level");
+
+    if (storedMaxLevel === null) {
+      localStorage.setItem("max_level", "1");
+    }
+
+    setMounted(true);
+
+    setMaxLevel(parseInt(localStorage.getItem("max_level") || "1"));
+  }, []);
 
   return (
     <div className={styles.container}>
