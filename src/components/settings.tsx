@@ -4,7 +4,7 @@ import React, { useState, createContext, useContext, useEffect } from "react";
 
 import { Cog } from "lucide-react";
 
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
@@ -137,38 +137,69 @@ function SettingsProvider({ children }: { children: React.ReactNode }) {
         </MorphingPopoverTrigger>
 
         <MorphingPopoverContent className={styles.settingsPage}>
-          <div className={styles.settingsTitle}>
-            <motion.span layoutId={"icon-settings"} layout={"position"}>
-              <Cog className={styles.icon} />
-            </motion.span>
-            <span>Settings</span>
-          </div>
+          <Magnetic
+            intensity={0.1}
+            springOptions={{ bounce: 0.1, stiffness: 120 }}
+            actionArea="global"
+            range={125}
+            // range={disabled ? 0 : magnetic ? 75 : 0}
+            // className={className}// action={() => {
+            //   alert("Settings clicked!");
+            // }}
+            className={styles.settingsPageMag}
+          >
+            <motion.div className={styles.settingsTitle} layout>
+              <motion.span layoutId={"icon-settings"} layout={"position"}>
+                <Cog className={styles.icon} />
+              </motion.span>
 
-          <div className={styles.section}>
-            Troll mode
-            <AntSwitch
-              checked={trollModeEnabledState}
-              onChange={() => {
-                const newState = !trollModeEnabledState;
+              <span>Settings</span>
+            </motion.div>
 
-                localStorage.setItem("trollMode", newState.toString());
-                setTrollModeEnabled(newState);
-              }}
-            />
-          </div>
+            <motion.div className={styles.section} layout>
+              Troll mode
+              <AntSwitch
+                checked={trollModeEnabledState}
+                onChange={() => {
+                  const newState = !trollModeEnabledState;
 
-          <div className={styles.section}>
-            Music
-            <AntSwitch
-              checked={musicEnabledState}
-              onChange={() => {
-                const newState = !musicEnabledState;
+                  localStorage.setItem("trollMode", newState.toString());
+                  setTrollModeEnabled(newState);
+                }}
+              />
+            </motion.div>
 
-                localStorage.setItem("music", newState.toString());
-                setMusicEnabled(newState);
-              }}
-            />
-          </div>
+            <motion.div className={styles.section} layout>
+              Music
+              <AntSwitch
+                checked={musicEnabledState}
+                onChange={() => {
+                  const newState = !musicEnabledState;
+
+                  localStorage.setItem("music", newState.toString());
+                  setMusicEnabled(newState);
+                }}
+              />
+            </motion.div>
+
+            <AnimatePresence mode={"popLayout"}>
+              {musicEnabledState && (
+                <motion.div
+                  className={styles.section}
+                  initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                  transition={{
+                    type: "spring",
+                    bounce: 0.1,
+                    duration: 0.5,
+                  }}
+                >
+                  Music selection
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Magnetic>
         </MorphingPopoverContent>
       </MorphingPopover>
 
