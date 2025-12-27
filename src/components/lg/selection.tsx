@@ -19,6 +19,7 @@ import {
   MorphingPopoverContent,
   MorphingPopoverTrigger,
 } from "@/components/mp/morphing-popover";
+import { Magnetic } from "@/components/mp/magnetic";
 
 import styles from "./selection.module.scss";
 
@@ -81,6 +82,7 @@ export default function Selection({
         onSelect: (value) => {
           onSelect?.(value);
           setIsOpen(false);
+          onOpenChange?.(false);
         },
         setIsOpen,
       }}
@@ -107,7 +109,10 @@ export default function Selection({
           <div className={styles.selectionBox}>
             <div
               ref={containerRef}
-              className={`${styles.marqueeWindow} ${isTextOverflow ? styles.hasOverflow : ""}`}
+              className={clsx(
+                styles.marqueeWindow,
+                isTextOverflow && styles.hasOverflow,
+              )}
             >
               <motion.span
                 ref={textRef}
@@ -121,16 +126,26 @@ export default function Selection({
               </motion.span>
             </div>
 
-            <ChevronsUpDown className={styles.icon} />
+            <motion.span layout={"position"}>
+              <ChevronsUpDown className={styles.icon} />
+            </motion.span>
           </div>
         </MorphingPopoverTrigger>
 
         <MorphingPopoverContent
-          className={styles.settingsPage}
+          className={styles.selectionPage}
           portal={true}
           anchor={"top-right"}
         >
-          {children}
+          <Magnetic
+            intensity={0.1}
+            springOptions={{ bounce: 0.1, stiffness: 120 }}
+            actionArea="global"
+            range={125}
+            className={styles.selectionPageMag}
+          >
+            {children}
+          </Magnetic>
         </MorphingPopoverContent>
       </MorphingPopover>
     </SelectionContext.Provider>
@@ -146,15 +161,20 @@ function SelectionItem({ children, value, className }: SelectionItemProps) {
 
   return (
     <div
-      className={clsx(styles.item, className)}
+      className={clsx(styles.selectionItem, className)}
       onClick={(e) => {
         e.stopPropagation();
+
+        if (context.selectedValue === value) return;
 
         context.onSelect(value);
       }}
     >
       <motion.span
-        className={styles.itemText}
+        className={clsx(
+          styles.itemText,
+          context.selectedValue === value && styles.itemTextSelected,
+        )}
         layoutId={`selection-item-${value}`}
         layout={"position"}
       >

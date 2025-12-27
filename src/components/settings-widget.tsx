@@ -25,7 +25,7 @@ import {
 
 import Selection from "@/components/lg/selection";
 
-import styles from "./context/settings.module.scss";
+import styles from "./settings-widget.module.scss";
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
   width: 28,
@@ -129,7 +129,7 @@ export default function SettingsWidget() {
           intensity={0.1}
           springOptions={{ bounce: 0.1, stiffness: 120 }}
           actionArea="global"
-          range={125}
+          range={selectionOpen ? 0 : 125}
           className={styles.settingsPageMag}
         >
           <motion.div className={styles.settingsTitle} layout>
