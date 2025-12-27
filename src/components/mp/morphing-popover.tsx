@@ -193,6 +193,8 @@ export type MorphingPopoverContentProps = {
   anchor?: PopoverAnchor;
   offset?: number;
   dismissOnClickOutside?: boolean;
+  strategy?: "absolute" | "fixed";
+  manualPositioning?: boolean;
 } & React.ComponentProps<typeof motion.div>;
 
 function MorphingPopoverContent({
@@ -202,6 +204,8 @@ function MorphingPopoverContent({
   anchor = "bottom-left",
   offset = 12,
   dismissOnClickOutside = true,
+  strategy = "absolute",
+  manualPositioning = false,
   ...props
 }: MorphingPopoverContentProps) {
   const context = useContext(MorphingPopoverContext);
@@ -278,9 +282,12 @@ function MorphingPopoverContent({
             }
           }
 
+          const scrollY = strategy === "absolute" ? window.scrollY : 0;
+          const scrollX = strategy === "absolute" ? window.scrollX : 0;
+
           setCoords({
-            top: top + window.scrollY,
-            left: left + window.scrollX,
+            top: top + scrollY,
+            left: left + scrollX,
           });
         }
       };
@@ -288,18 +295,31 @@ function MorphingPopoverContent({
       updatePosition();
 
       window.addEventListener("resize", updatePosition);
-      window.addEventListener("scroll", updatePosition);
+
+      if (strategy === "absolute") {
+        window.addEventListener("scroll", updatePosition);
+      }
 
       return () => {
         window.removeEventListener("resize", updatePosition);
-        window.removeEventListener("scroll", updatePosition);
+
+        if (strategy === "absolute") {
+          window.removeEventListener("scroll", updatePosition);
+        }
       };
     }
-  }, [context.isOpen, portal, anchor, offset]);
+  }, [context.isOpen, portal, anchor, offset, strategy, context.triggerRef]);
 
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  const style = manualPositioning
+    ? { ...props.style }
+    : {
+        ...(portal ? { top: coords.top, left: coords.left } : {}),
+        ...props.style,
+      };
 
   const content = (
     <AnimatePresence>
@@ -313,14 +333,11 @@ function MorphingPopoverContent({
           role="dialog"
           aria-modal="true"
           className={cn(
-            portal ? "fixed z-[9999]" : "absolute",
-            "overflow-hidden rounded-md border border-zinc-950/10 bg-white p-2 text-zinc-950 shadow-md dark:border-zinc-50/10 dark:bg-zinc-700 dark:text-zinc-50",
+            portal ? strategy : "absolute",
+            "z-[9999] overflow-hidden rounded-md border border-zinc-950/10 bg-white p-2 text-zinc-950 shadow-md dark:border-zinc-50/10 dark:bg-zinc-700 dark:text-zinc-50",
             className,
           )}
-          style={{
-            ...(portal ? { top: coords.top, left: coords.left } : {}),
-            ...props.style,
-          }}
+          style={style}
           initial="initial"
           animate="animate"
           exit="exit"

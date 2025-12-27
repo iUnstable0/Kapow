@@ -136,6 +136,7 @@ export default function Selection({
           className={styles.selectionPage}
           portal={true}
           anchor={"top-right"}
+          strategy="fixed"
         >
           <Magnetic
             intensity={0.1}

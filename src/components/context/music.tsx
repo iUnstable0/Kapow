@@ -47,7 +47,7 @@ const playlists: Record<T_Playlist, string[]> = {
   coffee: coffee_songs,
   blueberry: blueberry_songs,
   cisco: cisco_songs,
-  mixed: [...adhd_songs, ...coffee_songs, ...blueberry_songs, ...cisco_songs],
+  all: [...adhd_songs, ...coffee_songs, ...blueberry_songs, ...cisco_songs],
 };
 
 interface T_MusicContext {

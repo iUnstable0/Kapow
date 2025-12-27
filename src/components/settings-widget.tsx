@@ -124,6 +124,7 @@ export default function SettingsWidget() {
       <MorphingPopoverContent
         className={styles.settingsPage}
         dismissOnClickOutside={!selectionOpen}
+        strategy="fixed"
       >
         <Magnetic
           intensity={0.1}
@@ -162,12 +163,13 @@ export default function SettingsWidget() {
                 className={styles.section}
                 initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                exit={{ opacity: 0, filter: "blur(4px)" }}
                 transition={{
                   type: "spring",
                   bounce: 0.1,
                   duration: 0.5,
                 }}
+                layout
               >
                 <div className={styles.musicTrackSelection}>
                   Selected Track

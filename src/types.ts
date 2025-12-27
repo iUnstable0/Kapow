@@ -5,7 +5,7 @@ export const PlaylistEnum = z.enum([
   "coffee",
   "blueberry",
   "cisco",
-  "mixed",
+  "all",
 ]);
 
 export type T_Playlist = z.infer<typeof PlaylistEnum>;
