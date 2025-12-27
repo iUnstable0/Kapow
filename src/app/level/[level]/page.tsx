@@ -551,7 +551,7 @@ export default function Page() {
                     {q.question} = {q.realanswer}
                     <span className={styles.dict}>
                       <Link
-                        href={`https://www.thai2english.com/?q=${encodeURIComponent(q.realanswer)}`}
+                        href={`https://www.thai2english.com/?q=${encodeURIComponent(q.question)}`}
                         target={"_blank"}
                       >
                         open in dictionary
