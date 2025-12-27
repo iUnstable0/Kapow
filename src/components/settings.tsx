@@ -9,15 +9,15 @@ import { AnimatePresence, motion } from "motion/react";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 
-import { Magnetic } from "./mp/magnetic";
+import { Magnetic } from "@/components/mp/magnetic";
 
 import {
   MorphingPopover,
   MorphingPopoverContent,
   MorphingPopoverTrigger,
-} from "./mp/morphing-popover";
+} from "@/components/mp/morphing-popover";
 
-import Selection from "./selection";
+import Selection from "@/components/lg/selection";
 
 import styles from "./settings.module.scss";
 
@@ -79,7 +79,9 @@ function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [trollModeEnabledState, setTrollModeEnabled] = useState<boolean>(false);
   const [musicEnabledState, setMusicEnabled] = useState<boolean>(false);
 
-  const [selectedMusicTrack, setSelectedMusicTrack] = useState<string>("lofi");
+  const [selectedMusicTrack, setSelectedMusicTrack] = useState<string>(
+    "hello amongus poop sus baka impositpor test",
+  );
 
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -200,7 +202,12 @@ function SettingsProvider({ children }: { children: React.ReactNode }) {
                     duration: 0.5,
                   }}
                 >
-                  <Selection value={selectedMusicTrack}></Selection>
+                  <div className={styles.musicTrackSelection}>
+                    Selected Track
+                    <Selection value={selectedMusicTrack}>
+                      <div>hello</div>
+                    </Selection>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
