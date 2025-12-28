@@ -24,8 +24,18 @@ export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function calcImgSrc(answer: string): string {
+export function calcImgSrc(answer: string, opt: { old?: boolean, trollModeEnabled?: boolean, level: number }): string {
+  const prefix = `/level${opt.level}/`;
+
+  if (opt?.trollModeEnabled) {
+    return `${prefix}${answer}`;
+  }
+
   const srcSplit = answer.split(".");
 
-  return `${srcSplit[0]}.${srcSplit[srcSplit.length - 1]}`;
+  if (opt?.old) {
+    return `${prefix}${srcSplit[0]}.old.gif`;
+  }
+
+  return `${prefix}${srcSplit[0]}.${srcSplit[srcSplit.length - 1]}`;
 }

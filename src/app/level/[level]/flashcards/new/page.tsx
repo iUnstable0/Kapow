@@ -259,7 +259,11 @@ export default function Page() {
         return new Promise((resolve, reject) => {
           const img = new window.Image();
 
-          const filename = calcImgSrc(item.answer);
+          const filename = calcImgSrc(item.answer, {
+            trollModeEnabled,
+            level,
+          });
+
           img.src = filename;
 
           img.onload = () => resolve(true);
@@ -276,7 +280,7 @@ export default function Page() {
     };
 
     preloadImages();
-  }, [level, quiz]);
+  }, [level, quiz, trollModeEnabled]);
 
   useEffect(() => {
     if (!trollModeEnabled) {
@@ -475,7 +479,10 @@ export default function Page() {
               {flipState === "answer" && (
                 <MotionImage
                   key={`answer-${reviewIndex}_${trollModeEnabled}`}
-                  src={`/level${level}/${calcImgSrc(queue[reviewIndex].answer)}`}
+                  src={calcImgSrc(queue[reviewIndex].answer, {
+                    trollModeEnabled,
+                    level,
+                  })}
                   alt={"answer image"}
                   width={200}
                   height={200}

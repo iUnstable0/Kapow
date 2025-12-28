@@ -7,43 +7,50 @@
         "question": "หมา",
         "voice": "dog.mp3",
         "answer": "dog.jpg",
-        "realanswer": "dog"
+        "realanswer": "dog",
+        "old": true
       },
       {
         "question": "ปลา",
         "voice": "fish.mp3",
         "answer": "fish.jpg",
-        "realanswer": "fish"
+        "realanswer": "fish",
+        "old": true
       },
       {
         "question": "คม",
         "voice": "sharp.mp3",
         "answer": "sharp.jpg",
-        "realanswer": "sharp"
+        "realanswer": "sharp",
+        "old": true
       },
       {
         "question": "นม",
         "voice": "milk.mp3",
         "answer": "milk.jpg",
-        "realanswer": "milk"
+        "realanswer": "milk",
+        "old": true
       },
       {
         "question": "วัว",
         "voice": "cow.mp3",
         "answer": "cow.jpg",
-        "realanswer": "cow"
+        "realanswer": "cow",
+        "old": true
       },
       {
         "question": "รั้ว",
         "voice": "fence.mp3",
         "answer": "fence.jpg",
-        "realanswer": "fence"
+        "realanswer": "fence",
+        "old": true
       },
       {
         "question": "ขม",
         "voice": "bitter.mp3",
         "answer": "bitter.jpg",
-        "realanswer": "bitter"
+        "realanswer": "bitter",
+        "old": true
       }
     ]
   },
@@ -55,7 +62,8 @@
         "question": "กา",
         "voice": "crow.mp3",
         "answer": "crow.jpg",
-        "realanswer": "crow"
+        "realanswer": "crow",
+        "old": true
       },
       {
         "question": "ตา",
@@ -103,19 +111,22 @@
         "question": "งู",
         "voice": "snake.mp3",
         "answer": "snake.troll.png",
-        "realanswer": "snake"
+        "realanswer": "snake",
+        "old": true
       },
       {
         "question": "ปู",
         "voice": "crab.mp3",
         "answer": "crab.troll.png",
-        "realanswer": "crab"
+        "realanswer": "crab",
+        "old": true
       },
       {
         "question": "หมู",
         "voice": "pig.mp3",
         "answer": "pig.png",
-        "realanswer": "pig"
+        "realanswer": "pig",
+        "old": true
       },
       {
         "question": "หู",
@@ -139,7 +150,8 @@
         "question": "หวี",
         "voice": "comb.mp3",
         "answer": "comb.jpg",
-        "realanswer": "comb"
+        "realanswer": "comb",
+        "old": true
       }
     ]
   },
@@ -208,10 +220,11 @@
         "realanswer": "water"
       },
       {
-        "question": "ส้ม",
-        "voice": "orange.mp3",
-        "answer": "orange.jpg",
-        "realanswer": "orange"
+        "question": "บีเวอร์",
+        "voice": "beaver.mp3",
+        "answer": "beaver.jpg",
+        "realanswer": "beaver",
+        "old": true
       },
       {
         "question": "กล้วย",

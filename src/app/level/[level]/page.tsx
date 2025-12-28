@@ -835,7 +835,10 @@ export default function Page() {
                       >
                         <Image
                           draggable={false}
-                          src={`/level${level}/${calcImgSrc(q.answer)}`}
+                          src={calcImgSrc(q.answer, {
+                            level,
+                            trollModeEnabled,
+                          })}
                           alt={"answer image"}
                           width={200}
                           height={200}

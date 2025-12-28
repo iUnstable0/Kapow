@@ -16,6 +16,8 @@ import { useGlobalMusic } from "@/components/context/music";
 import { useConfetti } from "@/components/confetti";
 import { useSettings } from "@/components/context/settings";
 
+import { calcImgSrc } from "@/lib/utils";
+
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
 
 import ProjectorOverlay from "@/components/projector";
@@ -219,6 +221,24 @@ const customScript: {
     {
       title: "BOO!",
       time: 2000,
+    },
+  ],
+
+  snake: [
+    {
+      title: `
+while true:\nprint("SNAKE")
+`,
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 2500,
+    },
+    {
+      title:
+        "SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE SNAKE ",
+      time: 3500,
     },
   ],
 };
@@ -578,8 +598,15 @@ export default function Page() {
         return new Promise((resolve, reject) => {
           const img = new window.Image();
 
-          const filename = item.answer.split(".")[0];
-          img.src = `/level${level}/${filename}.old.gif`;
+          // const filename = item.answer.split(".")[0];
+          // img.src = `/level${level}/${filename}.old.gif`;
+
+          const filename = calcImgSrc(item.answer, {
+            level,
+            old: item.old,
+          });
+
+          img.src = filename;
 
           img.onload = () => resolve(true);
 
@@ -621,7 +648,7 @@ export default function Page() {
           {(activeText || "").toUpperCase()}
         </div>
 
-        <div className={styles.actionTextTools}>
+        {/* <div className={styles.actionTextTools}>
           <KeybindButton
             keybinds={[T_Keybind.escape]}
             onPress={() => {
@@ -635,7 +662,7 @@ export default function Page() {
           >
             Skip Text
           </KeybindButton>
-        </div>
+        </div> */}
       </div>
 
       <AnimatePresence mode={"popLayout"}>
@@ -916,9 +943,10 @@ export default function Page() {
                 <>
                   <MotionImage
                     key={`answer-glow-${reviewIndex}`}
-                    src={`/level${level}/${
-                      queue[reviewIndex].answer.split(".")[0]
-                    }.old.gif`}
+                    src={calcImgSrc(queue[reviewIndex].answer, {
+                      old: queue[reviewIndex].old,
+                      level,
+                    })}
                     alt={"glow background"}
                     width={200}
                     height={200}
@@ -932,9 +960,10 @@ export default function Page() {
 
                   <MotionImage
                     key={`answer-${reviewIndex}_${trollModeEnabled}`}
-                    src={`/level${level}/${
-                      queue[reviewIndex].answer.split(".")[0]
-                    }.old.gif`}
+                    src={calcImgSrc(queue[reviewIndex].answer, {
+                      old: queue[reviewIndex].old,
+                      level,
+                    })}
                     alt={"answer image"}
                     width={200}
                     height={200}

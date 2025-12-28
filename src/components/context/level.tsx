@@ -18,6 +18,7 @@ type T_LevelData = {
     answer: string;
     voice: string;
     realanswer: string;
+    old?: boolean;
   }[];
 };
 
