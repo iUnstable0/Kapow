@@ -56,8 +56,19 @@ const HairVariantC = () => (
   </svg>
 );
 
+interface Hair {
+  id: number;
+  variant: number;
+  top: string;
+  left: string;
+  rotation: string;
+  scale: number;
+  delay: string;
+  animation: string;
+}
+
 const VintageProjector = () => {
-  const [hairs, setHairs] = useState([]);
+  const [hairs, setHairs] = useState<Hair[]>([]);
 
   useEffect(() => {
     const hairCount = 6;

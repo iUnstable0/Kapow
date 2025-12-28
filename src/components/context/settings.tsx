@@ -38,7 +38,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [maxLevel, setMaxLevel] = useState<number>(1);
 
   const [selectedPlaylist, setSelectedPlaylist] = useState<T_Playlist>("cisco");
-  const [flashcardsMode, setFlashcardsMode] = useState<T_FlashcardsMode>("new");
+  const [flashcardsMode, setFlashcardsMode] = useState<T_FlashcardsMode>("old");
 
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -78,8 +78,8 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       flashcardsMode === null ||
       !Z_FlashcardsMode.safeParse(flashcardsMode).success
     ) {
-      localStorage.setItem("flashcardsMode", "new");
-      flashcardsMode = "new" as T_FlashcardsMode;
+      localStorage.setItem("flashcardsMode", "old");
+      flashcardsMode = "old" as T_FlashcardsMode;
     }
 
     setTrollModeEnabled(trollMode === "true");

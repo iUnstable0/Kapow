@@ -25,7 +25,130 @@ import ProjectorOverlay from "@/components/projector";
 
 const MotionImage = motion.create(Image);
 
-const customScript = {
+const customScript: {
+  [key: string]: { title: string; time: number }[];
+} = {
+  winAll: [
+    {
+      title: "A TRIUMPH!",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "THE CRITICS ARE WEEPING",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "A CINEMATIC MASTERPIECE",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "NO NOTES.",
+      time: 1500,
+    },
+    {
+      title: "PURE. CINEMA.",
+      time: 2000,
+    },
+  ],
+
+  winSome: [
+    {
+      title: "THE DAILIES ARE IN...",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 1000,
+    },
+    {
+      title: "VISUALLY STUNNING...",
+      time: 1500,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "BUT NARRATIVELY WEAK",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "YOU GOT $score$ OUT OF $total$",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "WE NEED RESHOOTS",
+      time: 2000,
+    },
+    {
+      title: "BACK TO THE STUDIO",
+      time: 1500,
+    },
+  ],
+
+  lostAll: [
+    {
+      title: "CUT! CUT!",
+      time: 1500,
+    },
+    {
+      title: "$wait$",
+      time: 200,
+    },
+    {
+      title: "WHO HIRED THIS GUY?",
+      time: 3000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "A BOX OFFICE BOMB",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "ZERO. ZILCH. NADA.",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 1000,
+    },
+    {
+      title: "MY CAREER IS RUINED",
+      time: 2000,
+    },
+    {
+      title: "GET OUT OF MY OFFICE",
+      time: 2000,
+    },
+  ],
+
   fish: [
     {
       title: "KILLER FISH FROM SAN DIEGO",
@@ -111,6 +234,21 @@ const customScript = {
       time: 2000,
     },
   ],
+
+  fence: [
+    {
+      title: "FENCE",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 4500,
+    },
+    {
+      title: "BOO!",
+      time: 2000,
+    },
+  ],
 };
 
 export default function Page() {
@@ -123,7 +261,7 @@ export default function Page() {
   const { fireConfetti } = useConfetti();
   const { trollModeEnabled, flashcardsMode } = useSettings();
 
-  const { setVolume, setOverride, siteEntered } = useGlobalMusic();
+  const { siteEntered } = useGlobalMusic();
 
   const isProcessing = useRef(false);
 
@@ -175,52 +313,44 @@ export default function Page() {
     },
   );
 
-  const [playBen1] = useSound("/ben/ben 1.mp3", {
-    volume: 1,
-  });
-
-  const [playBen2] = useSound("/ben/ben 2.mp3", {
-    volume: 1,
-  });
-
-  const [playBen3] = useSound("/ben/ben 3.mp3", {
-    volume: 1,
-  });
-
-  const [playBen4] = useSound("/ben/ben 4.mp3", {
-    volume: 1,
-  });
-
-  const [playBen5] = useSound("/ben/ben 5.mp3", {
-    volume: 1,
-  });
-
-  const [playLeFishe, { stop: stopLeFishe }] = useSound("/lefishe.mp3", {
-    volume: 1,
-    interrupt: true,
-    onplay: () => {
-      setOverride(true);
-    },
-    onend: () => {
-      setOverride(false);
-    },
-  });
-
-  const playBen = useCallback(() => {
-    const benSounds = [playBen1, playBen2, playBen3, playBen4, playBen5];
-    const randomIndex = Math.floor(Math.random() * benSounds.length);
-    benSounds[randomIndex]();
-  }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
-
   const clearAllTimeouts = useCallback(() => {
     if (textTimeoutRef.current) {
       clearTimeout(textTimeoutRef.current);
       textTimeoutRef.current = null;
-
-      scriptTimeoutsRef.current.forEach((id) => clearTimeout(id));
-      scriptTimeoutsRef.current = [];
     }
+
+    scriptTimeoutsRef.current.forEach((id) => clearTimeout(id));
+    scriptTimeoutsRef.current = [];
   }, []);
+
+  const runScript = (
+    script: (typeof customScript)[keyof typeof customScript],
+  ) => {
+    setToolsLocked(true);
+
+    let totalTime = 0;
+
+    script.forEach((line) => {
+      totalTime += line.time;
+
+      const id = setTimeout(() => {
+        if (line.title === "$wait$") {
+          setActiveText(null);
+        } else {
+          setActiveText(line.title);
+        }
+      }, totalTime - line.time);
+
+      scriptTimeoutsRef.current.push(id);
+    });
+
+    const id = setTimeout(() => {
+      setActiveText(null);
+      setToolsLocked(false);
+    }, totalTime);
+
+    scriptTimeoutsRef.current.push(id);
+  };
 
   const playCardSound = useCallback(
     (wait: boolean = false) => {
@@ -230,8 +360,9 @@ export default function Page() {
 
       if (wait) {
         setTimeout(() => {
+          // eslint-disable-next-line react-hooks/immutability
           playCardSound();
-        }, 500);
+        }, 1000);
 
         return;
       }
@@ -248,30 +379,7 @@ export default function Page() {
         if (customScript[speech]) {
           custom = true;
 
-          const script = customScript[speech];
-
-          let totalTime = 0;
-
-          script.forEach((line) => {
-            totalTime += line.time;
-
-            const id = setTimeout(() => {
-              if (line.title === "$wait$") {
-                setActiveText(null);
-              } else {
-                setActiveText(line.title);
-              }
-            }, totalTime - line.time);
-
-            scriptTimeoutsRef.current.push(id);
-          });
-
-          const id = setTimeout(() => {
-            setActiveText(null);
-            setToolsLocked(false);
-          }, totalTime);
-
-          scriptTimeoutsRef.current.push(id);
+          runScript(customScript[speech]);
         } else {
           setActiveText(speech);
         }
@@ -317,6 +425,7 @@ export default function Page() {
 
       if (reviewIndex + 1 >= queue.length) {
         setWin(true);
+
         setReviewStarted(false);
         setReviewIndex(0);
 
@@ -359,12 +468,31 @@ export default function Page() {
   useEffect(() => {
     if (!win) return;
 
-    if (reviews.length < quiz.length) {
-      fireConfetti(true);
+    if (reviews.length < queue.length) {
+      if (reviews.length === 0) {
+        fireConfetti(false);
+
+        runScript(customScript.winAll);
+      } else {
+        const score = queue.length - reviews.length;
+        const total = queue.length;
+
+        const modifiedScript = customScript.winSome.map((line) => {
+          return {
+            ...line,
+            title: line.title
+              .replace("$score$", score.toString())
+              .replace("$total$", total.toString()),
+          };
+        });
+
+        runScript(modifiedScript);
+      }
     } else {
+      runScript(customScript.lostAll);
       playAlert();
     }
-  }, [win, fireConfetti, playAlert, reviews, quiz]);
+  }, [win, fireConfetti, playAlert, reviews, queue]);
 
   // useEffect(() => {
   //   const speech = queue[reviewIndex]?.answer.split(".")[0];
@@ -402,8 +530,10 @@ export default function Page() {
     playFilmRoll();
 
     setTimeout(() => {
-      setReviewStarted(true);
-      setFirstLoad(false);
+      if (!win) {
+        setReviewStarted(true);
+        setFirstLoad(false);
+      }
 
       playEntertainer();
     }, 3000);
@@ -443,11 +573,26 @@ export default function Page() {
           />
 
           <div className={styles.frameText}>{activeText.toUpperCase()}</div>
+
+          <div className={styles.actionTextTools}>
+            <KeybindButton
+              keybinds={[T_Keybind.escape]}
+              onPress={() => {
+                clearAllTimeouts();
+
+                setActiveText(null);
+                setToolsLocked(false);
+              }}
+              forceTheme={"dark"}
+            >
+              Skip Text
+            </KeybindButton>
+          </div>
         </div>
       )}
 
       <AnimatePresence mode={"popLayout"}>
-        {!reviewStarted && (
+        {!reviewStarted && !toolsLocked && (
           <motion.div
             className={styles.titleCtn}
             initial={{ opacity: 0 }}
@@ -457,13 +602,17 @@ export default function Page() {
             key={"title-ctn"}
           >
             <h1 className={styles.title}>Level {level} Flashcards</h1>
+
             {firstLoad && <p className={styles.desc}>Loading...</p>}
+
             {!firstLoad && reviews.length === 0 && !win && (
               <p className={styles.desc}>Get ready to review!</p>
             )}
-            {!firstLoad && reviews.length === 0 && win && (
-              <p className={styles.desc}>Great job reviewing! Try again?</p>
-            )}
+
+            {/*{!firstLoad && reviews.length === 0 && win && (*/}
+            {/*  <p className={styles.desc}>Great job reviewing! Try again?</p>*/}
+            {/*)}*/}
+
             {!firstLoad &&
               reviews.length > 0 &&
               reviews.length < quiz.length && (
@@ -472,13 +621,14 @@ export default function Page() {
                   {reviews.length > 1 ? "s" : ""} left to review.
                 </p>
               )}
+
             {!firstLoad && !(reviews.length < quiz.length) && (
-              <p className={styles.desc}>You failed all reviews lol.</p>
+              <p className={styles.desc}>Why are you still here</p>
             )}
           </motion.div>
         )}
 
-        {!firstLoad && !reviewStarted && (
+        {!firstLoad && !reviewStarted && !toolsLocked && (
           <motion.div
             className={styles.reviewTools}
             initial={{ opacity: 0 }}
@@ -496,10 +646,10 @@ export default function Page() {
                   router.push(`/level/${level}`);
                 }, 750);
               }}
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               dangerous={true}
               loading={exitReviewLoading}
-              disabled={exitReviewLoading}
+              disabled={exitReviewLoading || !!activeText || toolsLocked}
               loadingText={"Please wait..."}
               loadingTextEnabled={true}
             >
@@ -509,16 +659,17 @@ export default function Page() {
             {reviews.length > 0 && reviews.length < quiz.length && (
               <KeybindButton
                 keybinds={[T_Keybind.shift, T_Keybind.enter]}
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 onPress={() => {
                   setQueue(reviews);
                   setReviews([]);
+
                   setWin(false);
                   setFlipped(false);
 
                   setReviewStarted(true);
                 }}
-                // disabled={reviewLoading || returnLoading}
+                disabled={!!activeText || toolsLocked}
                 // loading={returnLoading}
                 // loadingText={"Please wait..."}
                 // loadingTextEnabled={true}
@@ -530,7 +681,7 @@ export default function Page() {
 
             <KeybindButton
               keybinds={[T_Keybind.enter]}
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               onPress={() => {
                 setQueue(quiz);
                 setReviews([]);
@@ -538,7 +689,7 @@ export default function Page() {
 
                 setReviewStarted(true);
               }}
-              // disabled={reviewLoading || returnLoading}
+              disabled={!!activeText || toolsLocked}
               // loading={returnLoading}
               // loadingText={"Please wait..."}
               // loadingTextEnabled={true}
@@ -565,12 +716,13 @@ export default function Page() {
             key={"exitreview"}
           >
             <KeybindButton
-              keybinds={[T_Keybind.escape]}
+              keybinds={[T_Keybind.shift, T_Keybind.escape]}
               onPress={() => {
                 setReviewStarted(false);
                 setReviewIndex(0);
               }}
-              forcetheme={"dark"}
+              disabled={!!activeText || toolsLocked}
+              forceTheme={"dark"}
               dangerous={true}
             >
               Quit Session
@@ -687,11 +839,11 @@ export default function Page() {
               {flipped && (
                 <KeybindButton
                   keybinds={[T_Keybind.x]}
-                  forcetheme={"dark"}
+                  forceTheme={"dark"}
                   onPress={() => {
                     handleNext(true);
                   }}
-                  disabled={activeText || toolsLocked}
+                  disabled={!!activeText || toolsLocked}
                   // loading={returnLoading}
                   // loadingText={"Please wait..."}
                   // loadingTextEnabled={true}
@@ -705,14 +857,14 @@ export default function Page() {
               {flipped && (
                 <KeybindButton
                   keybinds={[T_Keybind.d]}
-                  forcetheme={"dark"}
+                  forceTheme={"dark"}
                   onPress={() => {
                     window.open(
                       `https://www.thai2english.com/?q=${encodeURIComponent(queue[reviewIndex].question)}`,
                       "_blank",
                     );
                   }}
-                  disabled={activeText || toolsLocked}
+                  disabled={!!activeText || toolsLocked}
 
                   // disabled={reviewLoading || returnLoading}
                   // loading={returnLoading}
@@ -727,7 +879,7 @@ export default function Page() {
 
               <KeybindButton
                 keybinds={[T_Keybind.s]}
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 onPress={() => {
                   playCardSound();
                 }}
@@ -745,12 +897,12 @@ export default function Page() {
 
               <KeybindButton
                 keybinds={[T_Keybind.space]}
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 key={"space"}
                 onPress={() => {
                   handleFlip();
                 }}
-                disabled={activeText || toolsLocked}
+                disabled={!!activeText || toolsLocked}
 
                 // disabled={reviewLoading || returnLoading}
                 // loading={returnLoading}
@@ -765,11 +917,11 @@ export default function Page() {
               {flipped && (
                 <KeybindButton
                   keybinds={[T_Keybind.enter]}
-                  forcetheme={"dark"}
+                  forceTheme={"dark"}
                   onPress={() => {
                     handleNext(false);
                   }}
-                  disabled={activeText || toolsLocked}
+                  disabled={!!activeText || toolsLocked}
 
                   // disabled={reviewLoading || returnLoading}
                   // loading={returnLoading}

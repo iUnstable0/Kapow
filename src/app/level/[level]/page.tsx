@@ -318,7 +318,7 @@ export default function Page() {
             key={"toolbar"}
           >
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.escape]}
               onPress={() => {
                 setReturnLoading(true);
@@ -338,7 +338,7 @@ export default function Page() {
             </KeybindButton>
 
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.a]}
               onPress={() => {
                 setAnswersVisible((prev) => !prev);
@@ -352,7 +352,7 @@ export default function Page() {
 
             <div className={styles.toolrowitm}>
               <KeybindButton
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 keybinds={[T_Keybind.shift, T_Keybind.enter]}
                 onPress={() => {
                   setReviewLoading(true);
@@ -370,7 +370,7 @@ export default function Page() {
               </KeybindButton>
 
               <KeybindButton
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 keybinds={[T_Keybind.enter]}
                 onPress={() => {
                   startGame();
@@ -397,7 +397,7 @@ export default function Page() {
             <div> Timer: {currentTimer}</div>
             <KeybindButton
               keybinds={[T_Keybind.shift, T_Keybind.escape]}
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               onPress={() => {
                 setGameStarted(false);
 
@@ -447,7 +447,7 @@ export default function Page() {
             key={"toolbar-lost"}
           >
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.enter]}
               onPress={() => {
                 startGame();
@@ -459,7 +459,7 @@ export default function Page() {
             </KeybindButton>
 
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.enter]}
               onPress={() => {
                 setReturnLoading(true);
@@ -507,7 +507,7 @@ export default function Page() {
             key={"toolbar-win"}
           >
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.shift, T_Keybind.enter]}
               onPress={() => {
                 startGame();
@@ -520,7 +520,7 @@ export default function Page() {
             </KeybindButton>
 
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.enter]}
               onPress={() => {
                 setReturnLoading(true);
@@ -661,7 +661,7 @@ export default function Page() {
                         disabled={false}
                         loading={false}
                         loadingText={"loadingText"}
-                        forcetheme={"dark"}
+                        forceTheme={"dark"}
                       />
                     </motion.div>
                   ))}
@@ -722,7 +722,7 @@ export default function Page() {
                         disabled={false}
                         loading={false}
                         loadingText={"loadingText"}
-                        forcetheme={"dark"}
+                        forceTheme={"dark"}
                       />
                       <Image
                         key={`img_option_${q.question}_${trollModeEnabled}`}

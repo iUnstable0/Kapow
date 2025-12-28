@@ -43,7 +43,7 @@ export default function Home() {
 
           <div className={styles.controls}>
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.left_arrow]}
               onPress={() => {
                 if (selectedLevel > 1) {
@@ -60,7 +60,7 @@ export default function Home() {
             </KeybindButton>
 
             <KeybindButton
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               keybinds={[T_Keybind.right_arrow]}
               onPress={() => {
                 let currentMaxLevel = maxLevel;
@@ -125,7 +125,7 @@ export default function Home() {
       </div>
 
       <KeybindButton
-        forcetheme={"dark"}
+        forceTheme={"dark"}
         keybinds={[T_Keybind.enter]}
         onPress={() => {
           setStartLoading(true);

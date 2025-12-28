@@ -306,7 +306,7 @@ export default function Page() {
                   router.push(`/level/${level}`);
                 }, 750);
               }}
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               dangerous={true}
               loading={exitReviewLoading}
               disabled={exitReviewLoading}
@@ -319,7 +319,7 @@ export default function Page() {
             {reviews.length > 0 && reviews.length < quiz.length && (
               <KeybindButton
                 keybinds={[T_Keybind.shift, T_Keybind.enter]}
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 onPress={() => {
                   setQueue(reviews);
                   setReviews([]);
@@ -340,7 +340,7 @@ export default function Page() {
 
             <KeybindButton
               keybinds={[T_Keybind.enter]}
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               onPress={() => {
                 setQueue(quiz);
                 setReviews([]);
@@ -380,7 +380,7 @@ export default function Page() {
                 setReviewStarted(false);
                 setReviewIndex(0);
               }}
-              forcetheme={"dark"}
+              forceTheme={"dark"}
               dangerous={true}
             >
               Quit Session
@@ -455,7 +455,7 @@ export default function Page() {
               {flipped && (
                 <KeybindButton
                   keybinds={[T_Keybind.x]}
-                  forcetheme={"dark"}
+                  forceTheme={"dark"}
                   onPress={() => {
                     handleNext(true);
                   }}
@@ -473,7 +473,7 @@ export default function Page() {
               {flipped && (
                 <KeybindButton
                   keybinds={[T_Keybind.d]}
-                  forcetheme={"dark"}
+                  forceTheme={"dark"}
                   onPress={() => {
                     window.open(
                       `https://www.thai2english.com/?q=${encodeURIComponent(queue[reviewIndex].question)}`,
@@ -493,7 +493,7 @@ export default function Page() {
 
               <KeybindButton
                 keybinds={[T_Keybind.s]}
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 onPress={() => {
                   playCardSound();
                 }}
@@ -509,7 +509,7 @@ export default function Page() {
 
               <KeybindButton
                 keybinds={[T_Keybind.space]}
-                forcetheme={"dark"}
+                forceTheme={"dark"}
                 key={"space"}
                 onPress={() => {
                   handleFlip();
@@ -527,7 +527,7 @@ export default function Page() {
               {flipped && (
                 <KeybindButton
                   keybinds={[T_Keybind.enter]}
-                  forcetheme={"dark"}
+                  forceTheme={"dark"}
                   onPress={() => {
                     handleNext(false);
                   }}

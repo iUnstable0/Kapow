@@ -83,6 +83,7 @@ export type MorphingPopoverProps = {
 
 function MorphingPopover({
   children,
+  // @ts-expect-error idk
   transition = TRANSITION,
   defaultOpen,
   open,
@@ -96,6 +97,7 @@ function MorphingPopover({
 
   return (
     <MorphingPopoverContext.Provider
+      // @ts-expect-error idk
       value={{ ...popoverLogic, variants, triggerRef }}
     >
       <MotionConfig transition={transition}>
@@ -221,6 +223,7 @@ function MorphingPopoverContent({
     left: 0,
   });
 
+  // @ts-expect-error idk
   useClickOutside(ref, () => {
     if (dismissOnClickOutside) {
       context.close();

@@ -79,7 +79,7 @@ export const KeybindButton = ({
   onPress,
   textClassName,
   disabled,
-  forcetheme,
+  forceTheme,
   children,
   icon,
   iconClassName,
@@ -96,7 +96,7 @@ export const KeybindButton = ({
   onPress?: () => void;
   textClassName?: string;
   disabled?: boolean;
-  forcetheme?: "light" | "dark";
+  forceTheme?: "light" | "dark";
   children?: React.ReactNode;
   icon?: React.ReactNode;
   iconClassName?: string;
@@ -111,9 +111,9 @@ export const KeybindButton = ({
 }) => {
   let styles;
 
-  if (forcetheme === "light") {
+  if (forceTheme === "light") {
     styles = stylesLight;
-  } else if (forcetheme === "dark") {
+  } else if (forceTheme === "dark") {
     styles = stylesDark;
   } else {
     styles = stylesDynamic;
@@ -121,7 +121,7 @@ export const KeybindButton = ({
 
   return (
     <motion.div
-      key={`keybindbutton_${keybinds.join("_")}_${forcetheme}`}
+      key={`keybindbutton_${keybinds.join("_")}_${forceTheme}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -206,17 +206,17 @@ export const KeybindButton = ({
 
             {loadingText && typeof loading === "boolean" && (
               <Spinner
-                id={`keybind-${keybinds.join("-")}-${forcetheme}`}
+                // id={`keybind-${keybinds.join("-")}-${forceTheme}`}
                 loading={loading}
                 size={24}
-                forcetheme={forcetheme}
+                forceTheme={forceTheme}
                 preload={!icon && preload}
                 dangerous={dangerous}
               />
             )}
 
             <motion.div
-              key={`keybind_${keybinds.join("_")}_${forcetheme}_text`}
+              key={`keybind_${keybinds.join("_")}_${forceTheme}_text`}
               className={clsx(styles.keybindButtonText, textClassName)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -270,7 +270,7 @@ export const KeybindButton = ({
                   disabled={disabled}
                   loading={loading}
                   loadingText={loadingText}
-                  forcetheme={forcetheme}
+                  forceTheme={forceTheme}
                   magnetic={magnetic}
                 />
               )}
@@ -289,7 +289,7 @@ export default function Keybind({
   dangerous,
   onPress,
   disabled,
-  forcetheme,
+  forceTheme,
   loadingText,
   loading,
   magnetic = true,
@@ -300,16 +300,16 @@ export default function Keybind({
   dangerous?: boolean;
   onPress?: () => void;
   disabled?: boolean;
-  forcetheme?: "light" | "dark";
+  forceTheme?: "light" | "dark";
   loadingText?: string;
   loading?: boolean;
   magnetic?: boolean;
 }) {
   let styles = stylesDynamic;
 
-  if (forcetheme === "light") {
+  if (forceTheme === "light") {
     styles = stylesLight;
-  } else if (forcetheme === "dark") {
+  } else if (forceTheme === "dark") {
     styles = stylesDark;
   }
 
@@ -458,7 +458,7 @@ export default function Keybind({
 
   return (
     <motion.div
-      key={`keybind_${keybinds.join("_")}_${forcetheme}_magnet`}
+      key={`keybind_${keybinds.join("_")}_${forceTheme}_magnet`}
       className={clsx(styles.keybindContainerMagnet, parentClass)}
       transition={{
         type: "spring",
@@ -477,7 +477,7 @@ export default function Keybind({
         actionArea="global"
         range={disabled ? 0 : magnetic ? 75 : 0}
         className={styles.keybindContainerMagnet}
-        data-theme={forcetheme}
+        data-theme={forceTheme}
       >
         {keybinds.map((keybind, index) => (
           <div
