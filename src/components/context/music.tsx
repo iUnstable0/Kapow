@@ -124,13 +124,19 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       }
 
       soundRef.current = new Howl({
-        src: [src],
+        src: [encodeURI(src)],
         html5: true,
         volume: 0,
         // autoplay: true,
-        // autoplay: false,
-        autoplay: !isLockedRef.current,
+        autoplay: false,
+        format: ["mp3"],
+        // autoplay: !isLockedRef.current,
         onload: () => setIsLoaded(true),
+        onloaderror: (id, error) => {
+          console.error("Music failed to load", error);
+          alert("ERROR open console and report to me pls ty");
+          setIsLoaded(true);
+        },
         onplay: () => {
           setIsPlaying(true);
 
