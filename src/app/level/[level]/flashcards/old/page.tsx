@@ -25,8 +25,43 @@ import ProjectorOverlay from "@/components/projector";
 
 const MotionImage = motion.create(Image);
 
+const customScript = {
+  fish: [
+    {
+      title: "killer fish from san diego",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 1000,
+    },
+    {
+      title: "i dont know what i am",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "but i taste very good",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 1000,
+    },
+    {
+      title: "im a killer fish!!!",
+      time: 2000,
+    },
+  ],
+};
+
 export default function Page() {
   const router = useRouter();
+
+  const textTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -35,6 +70,8 @@ export default function Page() {
   const { setVolume, setOverride, siteEntered } = useGlobalMusic();
 
   const isProcessing = useRef(false);
+
+  const [toolsLocked, setToolsLocked] = useState<boolean>(false);
 
   const [flipped, setFlipped] = useState<boolean>(false);
   const [flipState, setFlipState] = useState<"question" | "answer">("question");
@@ -120,74 +157,53 @@ export default function Page() {
   }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
 
   const playCardSound = useCallback(() => {
-    let fishPlayed = false;
+    if (textTimeoutRef.current) {
+      clearTimeout(textTimeoutRef.current);
+    }
+
+    let custom = false;
 
     if (flipState === "question") {
-      setVolume(0.07);
-
       playSound(queue[reviewIndex].voice);
     } else {
-      let matchedSwitch = false;
+      const speech = queue[reviewIndex].answer.split(".")[0];
 
-      if (trollModeEnabled) {
-        switch (queue[reviewIndex].answer.split(".")[0]) {
-          case "dog":
-            playBen();
+      if (customScript[speech]) {
+        custom = true;
 
-            matchedSwitch = true;
-            break;
-          case "fish":
-            playLeFishe();
+        setToolsLocked(true);
 
-            fishPlayed = true;
-            matchedSwitch = true;
-            break;
-        }
-      }
+        const script = customScript[speech];
 
-      if (!fishPlayed) {
-        setVolume(0.07);
-      }
+        let totalTime = 0;
 
-      setTimeout(
-        () => {
-          let speech = queue[reviewIndex].answer.split(".")[0];
+        script.forEach((line) => {
+          totalTime += line.time;
 
-          if (!trollModeEnabled) {
-            if (speech === "school bus") {
-              speech = "elephant";
-            } else if (speech === "chicken jocky") {
-              speech = "chicken";
+          setTimeout(() => {
+            if (line.title === "$wait$") {
+              setActiveText(null);
+            } else {
+              setActiveText(line.title);
             }
-          }
+          }, totalTime - line.time);
+        });
 
-          const utterance = new SpeechSynthesisUtterance(speech);
-
-          // utterance.pitch = 0.1;
-          // utterance.rate = 0.1;
-          // utterance.volume = 1;
-
-          window.speechSynthesis.speak(utterance);
-        },
-        matchedSwitch ? 1000 : 0,
-      );
+        setTimeout(() => {
+          setActiveText(null);
+          setToolsLocked(false);
+        }, totalTime);
+      } else {
+        setActiveText(speech);
+      }
     }
 
-    if (!fishPlayed) {
-      setTimeout(() => {
-        setVolume(0.5);
-      }, 1000);
+    if (!custom) {
+      textTimeoutRef.current = setTimeout(() => {
+        setActiveText(null);
+      }, 2000);
     }
-  }, [
-    flipState,
-    playSound,
-    queue,
-    reviewIndex,
-    playBen,
-    playLeFishe,
-    setVolume,
-    trollModeEnabled,
-  ]);
+  }, [flipState, playSound, queue, reviewIndex, setActiveText]);
 
   const markForReview = useCallback(
     (item: (typeof quiz)[number]) => {
@@ -250,7 +266,12 @@ export default function Page() {
   useEffect(() => {
     if (!reviewStarted) return;
 
-    playCardSound();
+    setTimeout(
+      () => {
+        playCardSound();
+      },
+      flipState === "question" ? 0 : 1000,
+    );
   }, [flipState, playCardSound, reviewStarted]);
 
   useEffect(() => {
@@ -311,10 +332,13 @@ export default function Page() {
           <Image
             src={"/frame-optimised.png"}
             alt={"frame"}
-            fill={true}
+            width={200}
+            height={200}
             className={styles.frame}
             priority={true}
           />
+
+          <div className={styles.frameText}>{activeText}</div>
         </div>
       )}
 
@@ -522,7 +546,7 @@ export default function Page() {
                   onPress={() => {
                     handleNext(true);
                   }}
-                  // disabled={reviewLoading || returnLoading}
+                  disabled={activeText || toolsLocked}
                   // loading={returnLoading}
                   // loadingText={"Please wait..."}
                   // loadingTextEnabled={true}
@@ -543,6 +567,8 @@ export default function Page() {
                       "_blank",
                     );
                   }}
+                  disabled={activeText || toolsLocked}
+
                   // disabled={reviewLoading || returnLoading}
                   // loading={returnLoading}
                   // loadingText={"Please wait..."}
@@ -560,6 +586,8 @@ export default function Page() {
                 onPress={() => {
                   playCardSound();
                 }}
+                disabled={activeText || toolsLocked}
+
                 // disabled={reviewLoading || returnLoading}
                 // loading={returnLoading}
                 // loadingText={"Please wait..."}
@@ -577,6 +605,8 @@ export default function Page() {
                 onPress={() => {
                   handleFlip();
                 }}
+                disabled={activeText || toolsLocked}
+
                 // disabled={reviewLoading || returnLoading}
                 // loading={returnLoading}
                 // loadingText={"Please wait..."}
@@ -594,6 +624,8 @@ export default function Page() {
                   onPress={() => {
                     handleNext(false);
                   }}
+                  disabled={activeText || toolsLocked}
+
                   // disabled={reviewLoading || returnLoading}
                   // loading={returnLoading}
                   // loadingText={"Please wait..."}

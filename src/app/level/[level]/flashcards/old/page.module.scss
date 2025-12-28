@@ -22,11 +22,40 @@
 
 .frameCtn {
   width: 100%;
-  height: 100%;
+  max-width: 1920px;
+
+  height: 100vh;
+  max-height: 1080px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+
+  background: black;
+
+  transform: translate(-50%, -50%);
+
+  z-index: 10;
+
+  .frameText {
+    font-size: calc(16px + 2vw);
+    font-weight: 600;
+    font-family: "Courier New", Courier, monospace;
+    text-transform: uppercase;
+  }
 }
 
 .frame {
-  object-fit: cover;
+  position: fixed;
+
+  object-fit: contain;
+
+  width: 100%;
+  height: 100%;
   //background: black;
 }
 
@@ -37,7 +66,7 @@
   gap: 16px;
 
   font-family:
-    Special Elite,
+    Courier New,
     cursive;
   text-transform: uppercase;
 }
