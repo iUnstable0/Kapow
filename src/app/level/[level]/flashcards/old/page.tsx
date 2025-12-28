@@ -241,6 +241,13 @@ while true:\nprint("SNAKE")
       time: 3500,
     },
   ],
+
+  pig: [
+    {
+      title: "$wait$",
+      time: 176000,
+    },
+  ],
 };
 
 export default function Page() {
@@ -248,6 +255,8 @@ export default function Page() {
 
   const textTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scriptTimeoutsRef = useRef<NodeJS.Timeout[]>([]);
+  const pigVideoRef = useRef<HTMLVideoElement>(null);
+  const videoStoppingRef = useRef<boolean>(false);
 
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -280,8 +289,11 @@ export default function Page() {
   const [reviewIndex, setReviewIndex] = useState<number>(0);
 
   const [activeText, setActiveText] = useState<string | null>(null);
+  const [pigVideoActive, setPigVideoActive] = useState<boolean>(false);
 
   const [entertainerStopped, setEntertainerStopped] = useState<boolean>(false);
+
+  const [entertainerVolume, setEntertainerVolume] = useState<number>(0.5);
 
   const [playPause] = useSound("/pause.mp3", {
     volume: 1,
@@ -315,18 +327,30 @@ export default function Page() {
       loop: true,
       html5: true,
       interrupt: true,
-    }
+    },
   );
 
   const [playEntertainer, { stop: stopEntertainer }] = useSound(
     "/entertainer.mp3",
     {
-      volume: 0.5,
+      volume: entertainerVolume,
       loop: true,
       html5: true,
       interrupt: true,
-    }
+    },
   );
+
+  // const [playPigOats, { stop: stopPigOats }] = useSound("/pigoats.mp3", {
+  //   volume: 1,
+  //   // html5: true,
+  //   interrupt: true,
+  //   onplay: () => {
+  //     setEntertainerVolume(0);
+  //   },
+  //   onend: () => {
+  //     setEntertainerVolume(0.5);
+  //   },
+  // });
 
   const clearAllTimeouts = useCallback(() => {
     if (textTimeoutRef.current) {
@@ -357,7 +381,7 @@ export default function Page() {
             setActiveText(
               line.title
                 .replace("$score$", score.toString())
-                .replace("$total$", total.toString())
+                .replace("$total$", total.toString()),
             );
           }
         }, totalTime - line.time);
@@ -367,16 +391,50 @@ export default function Page() {
 
       const id = setTimeout(() => {
         setActiveText(null);
-        setToolsLocked(false);
+
+        if (!pigVideoActive) {
+          setToolsLocked(false);
+        }
       }, totalTime);
 
       scriptTimeoutsRef.current.push(id);
     },
-    [queue.length, reviews.length]
+    [queue.length, reviews.length, pigVideoActive],
   );
+
+  const handlePigVideoEnd = useCallback(() => {
+    videoStoppingRef.current = true;
+
+    setPigVideoActive(false);
+    setEntertainerVolume(0.5);
+    setToolsLocked(false);
+    setActiveText(null);
+
+    if (pigVideoRef.current) {
+      pigVideoRef.current.pause();
+      pigVideoRef.current.currentTime = 0;
+    }
+
+    setTimeout(() => {
+      videoStoppingRef.current = false;
+    }, 100);
+  }, []);
+
+  const handlePigPause = useCallback(() => {
+    if (
+      pigVideoActive &&
+      !videoStoppingRef.current &&
+      pigVideoRef.current &&
+      !pigVideoRef.current.ended
+    ) {
+      pigVideoRef.current.play().catch(() => {});
+    }
+  }, [pigVideoActive]);
 
   const playCardSound = useCallback(
     (wait: boolean = false) => {
+      if (pigVideoActive) return;
+
       if (flipState === "answer") {
         setToolsLocked(true);
       }
@@ -403,6 +461,15 @@ export default function Page() {
           custom = true;
 
           runScript(customScript[speech]);
+
+          switch (speech) {
+            case "pig":
+              setPigVideoActive(true);
+
+              break;
+            default:
+              break;
+          }
         } else {
           setActiveText(speech);
         }
@@ -415,7 +482,15 @@ export default function Page() {
         }
       }
     },
-    [flipState, playSound, queue, reviewIndex, setActiveText, clearAllTimeouts]
+    [
+      flipState,
+      clearAllTimeouts,
+      playSound,
+      queue,
+      reviewIndex,
+      runScript,
+      pigVideoActive,
+    ],
   );
 
   const markForReview = useCallback(
@@ -424,7 +499,7 @@ export default function Page() {
 
       setReviews((prev) => [...prev, item]);
     },
-    [reviews]
+    [reviews],
   );
 
   const handleNext = useCallback(
@@ -435,7 +510,7 @@ export default function Page() {
         markForReview(currentCard);
       } else {
         setReviews((prev) =>
-          prev.filter((rev) => rev.question !== currentCard.question)
+          prev.filter((rev) => rev.question !== currentCard.question),
         );
       }
 
@@ -452,7 +527,7 @@ export default function Page() {
         setReviewIndex(Math.min(reviewIndex + 1, queue.length - 1));
       }
     },
-    [queue, reviewIndex, markForReview]
+    [queue, reviewIndex, markForReview],
   );
 
   const handleFlip = useCallback(() => {
@@ -470,7 +545,13 @@ export default function Page() {
     if (!reviewStarted) return;
 
     playCardSound(flipState === "answer");
-  }, [flipState, playCardSound, reviewStarted]);
+  }, [flipState, reviewStarted]);
+
+  useEffect(() => {
+    if (pigVideoActive && pigVideoRef.current) {
+      pigVideoRef.current.play().catch((e) => console.error("Play error", e));
+    }
+  }, [pigVideoActive]);
 
   useEffect(() => {
     if (!win) return;
@@ -480,7 +561,7 @@ export default function Page() {
         scriptTimeoutsRef.current.push(
           setTimeout(() => {
             fireConfetti(false);
-          }, 5000)
+          }, 5000),
         );
 
         runScript(customScript.winAll);
@@ -530,19 +611,19 @@ export default function Page() {
       scriptTimeoutsRef.current.push(
         setTimeout(() => {
           playSilence();
-        }, 1700)
+        }, 1700),
       );
 
       scriptTimeoutsRef.current.push(
         setTimeout(() => {
           playCry();
-        }, 12200)
+        }, 12200),
       );
 
       scriptTimeoutsRef.current.push(
         setTimeout(() => {
           playAngry();
-        }, 14200)
+        }, 14200),
       );
     }
   }, [
@@ -557,6 +638,7 @@ export default function Page() {
     playSilence,
     playCry,
     playAngry,
+    runScript,
   ]);
 
   useEffect(() => {
@@ -633,6 +715,34 @@ export default function Page() {
       <ProjectorOverlay />
 
       <div
+        className={clsx(
+          styles.videoCtn,
+          pigVideoActive && styles.videoCtnActive,
+        )}
+      >
+        <video
+          ref={pigVideoRef}
+          src="/pigoats.mp4"
+          className={styles.video}
+          playsInline
+          onPause={handlePigPause}
+          onPlay={() => setEntertainerVolume(0)}
+          onEnded={handlePigVideoEnd}
+        />
+
+        <div className={styles.actionTextTools}>
+          <KeybindButton
+            keybinds={[T_Keybind.escape]}
+            onPress={handlePigVideoEnd}
+            disabled={!pigVideoActive}
+            forceTheme={"dark"}
+          >
+            Skip Video
+          </KeybindButton>
+        </div>
+      </div>
+
+      <div
         className={clsx(styles.frameCtn, activeText && styles.frameCtnActive)}
       >
         <Image
@@ -648,25 +758,28 @@ export default function Page() {
           {(activeText || "").toUpperCase()}
         </div>
 
-        {/* <div className={styles.actionTextTools}>
+        <div className={styles.actionTextTools}>
           <KeybindButton
             keybinds={[T_Keybind.escape]}
             onPress={() => {
               clearAllTimeouts();
 
               setActiveText(null);
-              setToolsLocked(false);
+
+              if (!pigVideoActive) {
+                setToolsLocked(false);
+              }
             }}
             disabled={!activeText}
             forceTheme={"dark"}
           >
             Skip Text
           </KeybindButton>
-        </div> */}
+        </div>
       </div>
 
       <AnimatePresence mode={"popLayout"}>
-        {!reviewStarted && !toolsLocked && (
+        {!reviewStarted && !toolsLocked && !pigVideoActive && (
           <motion.div
             className={styles.titleCtn}
             initial={{ opacity: 0 }}
@@ -698,7 +811,7 @@ export default function Page() {
           </motion.div>
         )}
 
-        {!firstLoad && !reviewStarted && !toolsLocked && (
+        {!firstLoad && !reviewStarted && !toolsLocked && !pigVideoActive && (
           <motion.div
             key={"reviewremaining"}
             className={styles.reviewTools}
@@ -890,7 +1003,7 @@ export default function Page() {
 
                 setReviewIndex(0);
               }}
-              disabled={!!activeText || toolsLocked}
+              disabled={!!activeText || toolsLocked || pigVideoActive}
               forceTheme={"dark"}
               dangerous={true}
               icon={<X />}
@@ -993,7 +1106,7 @@ export default function Page() {
                   onPress={() => {
                     handleNext(true);
                   }}
-                  disabled={!!activeText || toolsLocked}
+                  disabled={!!activeText || toolsLocked || pigVideoActive}
                   dangerous={true}
                 >
                   Mark for Review
@@ -1007,10 +1120,10 @@ export default function Page() {
                   onPress={() => {
                     window.open(
                       `https://www.thai2english.com/?q=${encodeURIComponent(queue[reviewIndex].question)}`,
-                      "_blank"
+                      "_blank",
                     );
                   }}
-                  disabled={!!activeText || toolsLocked}
+                  disabled={!!activeText || toolsLocked || pigVideoActive}
                 >
                   Open Dictionary
                 </KeybindButton>
@@ -1022,7 +1135,7 @@ export default function Page() {
                 onPress={() => {
                   playCardSound();
                 }}
-                disabled={!!activeText || toolsLocked}
+                disabled={!!activeText || toolsLocked || pigVideoActive}
               >
                 Play Sound
               </KeybindButton>
@@ -1034,7 +1147,7 @@ export default function Page() {
                 onPress={() => {
                   handleFlip();
                 }}
-                disabled={!!activeText || toolsLocked}
+                disabled={!!activeText || toolsLocked || pigVideoActive}
               >
                 Flip
               </KeybindButton>
@@ -1046,7 +1159,7 @@ export default function Page() {
                   onPress={() => {
                     handleNext(false);
                   }}
-                  disabled={!!activeText || toolsLocked}
+                  disabled={!!activeText || toolsLocked || pigVideoActive}
                 >
                   Next
                 </KeybindButton>
