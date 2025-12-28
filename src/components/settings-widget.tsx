@@ -12,7 +12,7 @@ import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 
 import {
-  Z_PlaylistEnum,
+  Z_Playlist,
   type T_Playlist,
   T_FlashcardsMode,
   Z_FlashcardsMode,
@@ -190,7 +190,7 @@ export default function SettingsWidget() {
                     }}
                     onOpenChange={(isOpen) => setSelectionOpen(isOpen)}
                   >
-                    {Object.values(Z_PlaylistEnum.enum).map((playlist) => (
+                    {Object.values(Z_Playlist.enum).map((playlist) => (
                       <Selection.Item
                         key={`playlist-${playlist}`}
                         value={playlist}

@@ -61,6 +61,7 @@ interface T_MusicContext {
   isLoaded: boolean;
   toggle: () => void;
   currentTrack: string;
+  setOverride: (override: boolean) => void;
 }
 
 let hasUserInteractedGlobal = false;
@@ -69,25 +70,31 @@ const MusicContext = createContext<T_MusicContext | null>(null);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
   const soundRef = useRef<Howl | null>(null);
-
   const handleNextRef = useRef<() => void>(() => {});
+
+  const volumeRef = useRef<number>(0.5);
+
+  const isLockedRef = useRef<boolean>(false);
+  const wasPlayingBeforeLock = useRef<boolean>(false);
 
   const { musicEnabled, selectedPlaylist } = useSettings();
 
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const volumeRef = useRef(0.5);
-  const [volume, setVolumeState] = useState(0.5);
-
-  const [queue, setQueue] = useState<string[]>([]);
-  const [queueIndex, setQueueIndex] = useState<number>(0);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isLocked, setIsLocked] = useState<boolean>(false);
 
   const [siteEntered, setSiteEntered] = useState<boolean>(
     hasUserInteractedGlobal,
   );
 
+  const [volume, setVolumeState] = useState<number>(0.5);
+  const [queueIndex, setQueueIndex] = useState<number>(0);
+
+  const [queue, setQueue] = useState<string[]>([]);
+
   const handleNext = useCallback(() => {
+    if (isLocked) return;
+
     setQueueIndex((prevIndex) => {
       let nextIndex = prevIndex + 1;
 
@@ -97,7 +104,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
       return nextIndex;
     });
-  }, [queue]);
+  }, [queue, isLocked]);
 
   const loadSong = useCallback(
     (src: string) => {
@@ -115,7 +122,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         src: [src],
         html5: true,
         volume: 0,
-        autoplay: true,
+        // autoplay: true,
+        autoplay: !isLockedRef.current,
         onload: () => setIsLoaded(true),
         onplay: () => {
           setIsPlaying(true);
@@ -152,6 +160,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const play = () => {
+    if (isLocked) return;
+
     const sound = soundRef.current;
 
     if (!sound) {
@@ -210,9 +220,38 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const next = () => handleNext();
 
   const toggle = () => {
+    if (isLocked) return;
+
     if (soundRef.current?.playing()) pause();
     else play();
   };
+
+  const setOverride = useCallback(
+    (override: boolean) => {
+      setIsLocked(override);
+
+      if (override) {
+        wasPlayingBeforeLock.current = soundRef.current?.playing() ?? false;
+
+        pause();
+      } else {
+        if (wasPlayingBeforeLock.current) {
+          // Cant call play() here because isLocked might still be true in the render cycle
+          // for the play() func (if u scroll up theres a isLocked guard)
+
+          const sound = soundRef.current;
+
+          if (sound && !sound.playing()) {
+            sound.off("fade");
+            sound.volume(0);
+            sound.play();
+            sound.fade(0, volumeRef.current, 2000);
+          }
+        }
+      }
+    },
+    [pause],
+  );
 
   useEffect(() => {
     setQueue(shuffleArray(playlists[selectedPlaylist]));
@@ -229,6 +268,16 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     }
   }, [queueIndex, queue, loadSong]);
 
+  useEffect(() => {
+    isLockedRef.current = isLocked;
+  }, [isLocked]);
+
+  useEffect(() => {
+    if (isLocked && musicEnabled) {
+      wasPlayingBeforeLock.current = true;
+    }
+  }, [isLocked, musicEnabled]);
+
   return (
     <MusicContext.Provider
       value={{
@@ -242,6 +291,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         isLoaded,
         toggle,
         currentTrack: queue[queueIndex],
+        setOverride,
       }}
     >
       <AnimatePresence mode="wait">

@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const Z_PlaylistEnum = z.enum([
+export const Z_Playlist = z.enum([
   "hiphop",
   "coffee",
   "blueberry",
@@ -8,7 +8,7 @@ export const Z_PlaylistEnum = z.enum([
   "all",
 ]);
 
-export type T_Playlist = z.infer<typeof Z_PlaylistEnum>;
+export type T_Playlist = z.infer<typeof Z_Playlist>;
 
 export const Z_MaxLevel = z.coerce.number().min(1).max(5);
 

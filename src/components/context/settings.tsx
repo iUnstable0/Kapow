@@ -6,7 +6,7 @@ import React, { useState, createContext, useContext, useEffect } from "react";
 
 import {
   Z_MaxLevel,
-  Z_PlaylistEnum,
+  Z_Playlist,
   type T_Playlist,
   Z_FlashcardsMode,
   type T_FlashcardsMode,
@@ -68,7 +68,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     if (
       selectedPlaylist === null ||
-      !Z_PlaylistEnum.safeParse(selectedPlaylist).success
+      !Z_Playlist.safeParse(selectedPlaylist).success
     ) {
       localStorage.setItem("selectedPlaylist", "cisco");
       selectedPlaylist = "cisco" as T_Playlist;
@@ -76,7 +76,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
     if (
       flashcardsMode === null ||
-      !Z_FlashcardsMode.safeParse(selectedPlaylist).success
+      !Z_FlashcardsMode.safeParse(flashcardsMode).success
     ) {
       localStorage.setItem("flashcardsMode", "new");
       flashcardsMode = "new" as T_FlashcardsMode;
@@ -113,16 +113,16 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setMaxLevel(level);
   };
 
-  const handlePlaylistChange = (playlist: T_Playlist) => {
-    localStorage.setItem("selectedPlaylist", playlist);
+  const handlePlaylistChange = (value: T_Playlist) => {
+    localStorage.setItem("selectedPlaylist", value);
 
-    setSelectedPlaylist(playlist);
+    setSelectedPlaylist(value);
   };
 
-  const handleFlashcardsModeChange = (playlist: T_FlashcardsMode) => {
-    localStorage.setItem("flashcardsMode", playlist);
+  const handleFlashcardsModeChange = (value: T_FlashcardsMode) => {
+    localStorage.setItem("flashcardsMode", value);
 
-    setFlashcardsMode(playlist);
+    setFlashcardsMode(value);
   };
 
   if (!mounted) {

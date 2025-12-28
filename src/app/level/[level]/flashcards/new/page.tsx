@@ -28,9 +28,9 @@ export default function Page() {
 
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
-  const { trollModeEnabled } = useSettings();
+  const { trollModeEnabled, flashcardsMode } = useSettings();
 
-  const { play, pause, setVolume } = useGlobalMusic();
+  const { play, pause, setVolume, setOverride } = useGlobalMusic();
 
   const isProcessing = useRef(false);
 
@@ -75,17 +75,17 @@ export default function Page() {
     volume: 1,
   });
 
-  const [playLeFishe] = useSound("/lefishe.mp3", {
-    volume: 0.5,
+  const [playLeFishe, { stop: stopLeFishe }] = useSound("/lefishe.mp3", {
+    volume: 0.05,
     interrupt: true,
     onplay: () => {
-      setFish(true);
-      setVolume(0.07);
+      setOverride(true);
+      // setVolume(0.07);
       // pause();
     },
     onend: () => {
-      setFish(false);
-      setVolume(0.5);
+      setOverride(false);
+      // setVolume(0.5);
       // play();
     },
   });
@@ -98,11 +98,13 @@ export default function Page() {
 
   const playCardSound = useCallback(() => {
     // pause();
-    setVolume(0.07);
+    // setVolume(0.07);
 
     let fishPlayed = false;
 
     if (flipState === "question") {
+      setVolume(0.07);
+
       playSound(queue[reviewIndex].voice);
     } else {
       let matchedSwitch = false;
@@ -121,6 +123,10 @@ export default function Page() {
             matchedSwitch = true;
             break;
         }
+      }
+
+      if (!fishPlayed) {
+        setVolume(0.07);
       }
 
       setTimeout(
@@ -147,7 +153,7 @@ export default function Page() {
       );
     }
 
-    if (!fishPlayed && !fish) {
+    if (!fishPlayed) {
       setTimeout(() => {
         setVolume(0.5);
       }, 1000);
@@ -159,7 +165,6 @@ export default function Page() {
     reviewIndex,
     playBen,
     playLeFishe,
-    fish,
     setVolume,
     trollModeEnabled,
   ]);
@@ -244,6 +249,16 @@ export default function Page() {
       setFirstLoad(false);
     }, 2000);
   }, []);
+
+  useEffect(() => {
+    if (!trollModeEnabled) {
+      stopLeFishe();
+    }
+  }, [trollModeEnabled, stopLeFishe]);
+
+  useEffect(() => {
+    router.replace(`/level/${level}/flashcards/${flashcardsMode}`);
+  }, [flashcardsMode, level, router]);
 
   return (
     <div className={styles.container}>

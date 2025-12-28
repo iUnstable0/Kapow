@@ -52,7 +52,8 @@ export default function Page() {
   const router = useRouter();
 
   const { play, pause, setVolume } = useGlobalMusic();
-  const { trollModeEnabled, maxLevel, setMaxLevel } = useSettings();
+  const { trollModeEnabled, maxLevel, setMaxLevel, flashcardsMode } =
+    useSettings();
 
   const { level, timer, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -349,7 +350,7 @@ export default function Page() {
                   setReviewLoading(true);
 
                   setTimeout(() => {
-                    router.push(`/level/${level}/flashcards`);
+                    router.push(`/level/${level}/flashcards/${flashcardsMode}`);
                   }, 750);
                 }}
                 loading={reviewLoading}
