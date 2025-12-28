@@ -13,13 +13,23 @@ import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 
-import { ArrowLeftIcon, BookCopy, Brain, ListChecks } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  BookCopy,
+  Brain,
+  ExternalLink,
+  ListChecks,
+  AudioLines,
+  X,
+} from "lucide-react";
 
 import clsx from "clsx";
 import useSound from "use-sound";
 
 import { motion, AnimatePresence } from "motion/react";
 import { DateTime } from "luxon";
+
+import { capitalize } from "@/lib/utils";
 
 import { useSettings } from "@/components/context/settings";
 import { useGlobalMusic } from "@/components/context/music";
@@ -34,6 +44,7 @@ import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
 import styles from "./page.module.scss";
 
 import { Z_GameMode, type T_GameMode } from "@/types";
+import { Magnetic } from "@/components/mp/magnetic";
 
 const leftKeys = [
   T_Keybind.q,
@@ -303,7 +314,7 @@ export default function Page() {
           {!gameStarted && (
             <motion.div
               className={styles.levelInfoCtn}
-              key={"title-ctn"}
+              key={"title-ctn-start"}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -354,6 +365,108 @@ export default function Page() {
                 </div>
               </div>
 
+              <div
+                className={clsx(
+                  styles.levelInfoSection,
+                  styles.levelInfoOptions
+                )}
+              >
+                <KeybindButton
+                  forceTheme={"dark"}
+                  keybinds={[T_Keybind.escape]}
+                  onPress={() => {
+                    setReturnLoading(true);
+
+                    setTimeout(() => {
+                      router.push(`/`);
+                    }, 750);
+                  }}
+                  disabled={reviewLoading || returnLoading}
+                  loading={returnLoading}
+                  loadingText={"Please wait..."}
+                  loadingTextEnabled={true}
+                  dangerous={true}
+                  icon={<ArrowLeftIcon />}
+                  layoutId="back-btn"
+                >
+                  Back
+                </KeybindButton>
+
+                <KeybindButton
+                  forceTheme={"dark"}
+                  keybinds={[T_Keybind.a]}
+                  onPress={() => {
+                    setAnswersVisible((prev) => !prev);
+                  }}
+                  disabled={reviewLoading || returnLoading}
+                  icon={<ListChecks />}
+                >
+                  {answersVisible ? "Hide Answers" : "Show Answers"}
+                </KeybindButton>
+
+                <KeybindButton
+                  forceTheme={"dark"}
+                  keybinds={[T_Keybind.f]}
+                  onPress={() => {
+                    setReviewLoading(true);
+
+                    setTimeout(() => {
+                      router.push(
+                        `/level/${level}/flashcards/${flashcardsMode}`
+                      );
+                    }, 750);
+                  }}
+                  loading={reviewLoading}
+                  disabled={reviewLoading || returnLoading}
+                  loadingText={"Please wait..."}
+                  loadingTextEnabled={true}
+                  icon={<BookCopy />}
+                >
+                  Flashcards
+                </KeybindButton>
+
+                <KeybindButton
+                  forceTheme={"dark"}
+                  keybinds={[T_Keybind.enter]}
+                  onPress={() => {
+                    startGame();
+                  }}
+                  disabled={reviewLoading || returnLoading}
+                  loadingTextEnabled={false}
+                  icon={<Brain />}
+                >
+                  Start Level
+                </KeybindButton>
+              </div>
+            </motion.div>
+          )}
+
+          {gameStarted && win && (
+            <motion.div
+              className={styles.levelInfoCtn}
+              key={"title-ctn-win"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                type: "spring",
+
+                stiffness: 120,
+                damping: 20,
+
+                opacity: {
+                  duration: 0.2,
+                },
+              }}
+              data-enabled={answersVisible}
+              layout
+            >
+              <div className={styles.levelInfoSection}>
+                <h1 className={styles.levelTitle}>
+                  You completed Level {level}!
+                </h1>
+              </div>
+
               <div className={styles.levelInfoSection}>
                 <motion.div
                   className={styles.toolrow}
@@ -361,7 +474,6 @@ export default function Page() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
-                  key={"toolbar"}
                 >
                   <KeybindButton
                     forceTheme={"dark"}
@@ -380,41 +492,9 @@ export default function Page() {
                     reversed={false}
                     dangerous={true}
                     icon={<ArrowLeftIcon />}
+                    layoutId="back-btn"
                   >
                     Back
-                  </KeybindButton>
-                  <KeybindButton
-                    forceTheme={"dark"}
-                    keybinds={[T_Keybind.a]}
-                    onPress={() => {
-                      setAnswersVisible((prev) => !prev);
-                    }}
-                    disabled={reviewLoading || returnLoading}
-                    loadingText={"Please wait..."}
-                    loadingTextEnabled={true}
-                    icon={<ListChecks />}
-                  >
-                    {answersVisible ? "Hide Answers" : "Show Answers"}
-                  </KeybindButton>
-                  <KeybindButton
-                    forceTheme={"dark"}
-                    keybinds={[T_Keybind.f]}
-                    onPress={() => {
-                      setReviewLoading(true);
-
-                      setTimeout(() => {
-                        router.push(
-                          `/level/${level}/flashcards/${flashcardsMode}`
-                        );
-                      }, 750);
-                    }}
-                    loading={reviewLoading}
-                    disabled={reviewLoading || returnLoading}
-                    loadingText={"Please wait..."}
-                    loadingTextEnabled={true}
-                    icon={<BookCopy />}
-                  >
-                    Flashcards
                   </KeybindButton>
 
                   <KeybindButton
@@ -423,11 +503,80 @@ export default function Page() {
                     onPress={() => {
                       startGame();
                     }}
-                    disabled={reviewLoading || returnLoading}
-                    loadingTextEnabled={false}
-                    icon={<Brain />}
+                    disabled={returnLoading}
+                    icon={<ListChecks />}
                   >
-                    Start Level
+                    Play Again
+                  </KeybindButton>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+
+          {gameStarted && lost && (
+            <motion.div
+              className={styles.levelInfoCtn}
+              key={"title-ctn-lost"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                type: "spring",
+
+                stiffness: 120,
+                damping: 20,
+
+                opacity: {
+                  duration: 0.2,
+                },
+              }}
+              data-enabled={answersVisible}
+              layout
+            >
+              <div className={styles.levelInfoSection}>
+                <h1 className={styles.levelTitle}>You failed Level {level}!</h1>
+              </div>
+
+              <div className={styles.levelInfoSection}>
+                <motion.div
+                  className={styles.toolrow}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <KeybindButton
+                    forceTheme={"dark"}
+                    keybinds={[T_Keybind.escape]}
+                    onPress={() => {
+                      setReturnLoading(true);
+
+                      setTimeout(() => {
+                        router.push(`/`);
+                      }, 750);
+                    }}
+                    disabled={reviewLoading || returnLoading}
+                    loading={returnLoading}
+                    loadingText={"Please wait..."}
+                    loadingTextEnabled={true}
+                    reversed={false}
+                    dangerous={true}
+                    icon={<ArrowLeftIcon />}
+                    layoutId="back-btn"
+                  >
+                    Back
+                  </KeybindButton>
+
+                  <KeybindButton
+                    forceTheme={"dark"}
+                    keybinds={[T_Keybind.enter]}
+                    onPress={() => {
+                      startGame();
+                    }}
+                    disabled={returnLoading}
+                    icon={<ListChecks />}
+                  >
+                    Retry
                   </KeybindButton>
                 </motion.div>
               </div>
@@ -454,35 +603,21 @@ export default function Page() {
             >
               <div className={styles.answersFrame}>
                 {quiz.map((q) => (
-                  <div key={`awdaq_${q.question}`} className={styles.answerRow}>
-                    <div
-                      className={styles.question}
-                      onClick={() => {
-                        playCardSound(q);
-                      }}
-                    >
-                      <span className={styles.hint}>
-                        (click to play audio!)
-                      </span>
-                      {q.question} = {q.realanswer}
-                      <span className={styles.dict}>
-                        <Link
-                          href={`https://www.thai2english.com/?q=${encodeURIComponent(q.question)}`}
-                          target={"_blank"}
-                        >
-                          open in dictionary
-                        </Link>
-                      </span>
-                    </div>
-                    <div
-                      key={`awddasdaq_${q.question}`}
-                      className={styles.imageCtn}
-                      onClick={() => {
+                  <div key={`answer_${q.question}`} className={styles.answer}>
+                    <Magnetic
+                      // key={`answer_image_${q.question}`}
+                      actionArea="global"
+                      range={100}
+                      intensity={0.1}
+                      springOptions={{ bounce: 0.1 }}
+                      className={styles.answerImageCtn}
+                      action={() => {
                         playCardSound(q, true);
                       }}
                     >
                       <Image
                         key={`img_answer_${q.question}_${trollModeEnabled}`}
+                        className={styles.answerImage}
                         src={`/level${level}/${
                           trollModeEnabled
                             ? q.answer
@@ -495,8 +630,47 @@ export default function Page() {
                         alt={"answer image"}
                         width={200}
                         height={200}
-                        className={styles.image}
                       />
+                    </Magnetic>
+
+                    <div className={styles.answerInfo}>
+                      <div>
+                        <h1 className={styles.answerTitle}>
+                          <strong>{capitalize(q.realanswer)}</strong>
+                        </h1>
+                        <h2 className={styles.answerQuestion}>{q.question}</h2>
+                      </div>
+
+                      <div className={styles.answerActions}>
+                        <Magnetic
+                          intensity={0.1}
+                          springOptions={{ bounce: 0.1 }}
+                          actionArea="global"
+                          range={75}
+                          className={styles.actionButton}
+                          action={() => {
+                            playCardSound(q);
+                          }}
+                        >
+                          <AudioLines className={styles.icon} />
+                        </Magnetic>
+
+                        <Link
+                          href={`https://www.thai2english.com/?q=${encodeURIComponent(q.question)}`}
+                          target={"_blank"}
+                          className={styles.actionButton}
+                        >
+                          <Magnetic
+                            intensity={0.1}
+                            springOptions={{ bounce: 0.1 }}
+                            actionArea="global"
+                            range={75}
+                            // className={styles.keybindContainerMagnet}
+                          >
+                            <ExternalLink className={styles.icon} />
+                          </Magnetic>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -509,18 +683,50 @@ export default function Page() {
       <AnimatePresence mode={"popLayout"}>
         {gameStarted && !win && !lost && (
           <motion.div
+            key={`stageLabel-${stage}`}
             className={styles.stageLabel}
-            initial={{ opacity: 0, filter: "blur(10px)" }}
-            animate={{ opacity: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, filter: "blur(10px)" }}
-            transition={{ duration: 0.5 }}
-            key={`stagelabel-${stage}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              type: "spring",
+
+              stiffness: 120,
+              damping: 20,
+
+              opacity: {
+                duration: 0.2,
+              },
+            }}
+            layout
           >
             <div>Stage: {stage}/5</div>
             <div> Timer: {currentTimer}</div>
+          </motion.div>
+        )}
+
+        {gameStarted && !win && !lost && (
+          <motion.div
+            key={`endSession`}
+            className={styles.endSession}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              type: "spring",
+
+              stiffness: 120,
+              damping: 20,
+
+              opacity: {
+                duration: 0.2,
+              },
+            }}
+            // layout
+          >
             <KeybindButton
-              keybinds={[T_Keybind.shift, T_Keybind.escape]}
               forceTheme={"dark"}
+              keybinds={[T_Keybind.shift, T_Keybind.escape]}
               onPress={() => {
                 setGameStarted(false);
 
@@ -529,147 +735,34 @@ export default function Page() {
                   setCurrentTimer("infinite");
                 }
               }}
-              disabled={false}
-              loading={false}
-              loadingText={"Please wait..."}
-              loadingTextEnabled={true}
-              reversed={false}
+              loadingTextEnabled={false}
               dangerous={true}
+              icon={<X />}
+              layoutId="back-btn"
             >
-              Quit
-            </KeybindButton>
-          </motion.div>
-        )}
-
-        {gameStarted && lost && (
-          <motion.div
-            className={styles.titleCtn}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"title-ctn-win"}
-          >
-            <h1 className={styles.title}>You failed Level {level}!</h1>
-            {/*  <p className={styles.desc}>*/}
-            {/*    {timer > 0*/}
-            {/*      ? `*/}
-            {/*Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`*/}
-            {/*      : `Timer: no timer`}*/}
-            {/*  </p>*/}
-          </motion.div>
-        )}
-
-        {gameStarted && lost && (
-          <motion.div
-            className={styles.toolrow}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"toolbar-lost"}
-          >
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.enter]}
-              onPress={() => {
-                startGame();
-              }}
-              disabled={returnLoading}
-              loadingTextEnabled={false}
-            >
-              Retry
-            </KeybindButton>
-
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.enter]}
-              onPress={() => {
-                setReturnLoading(true);
-
-                setTimeout(() => {
-                  router.push(`/`);
-                }, 750);
-              }}
-              loading={returnLoading}
-              disabled={returnLoading}
-              loadingText={"Please wait..."}
-              loadingTextEnabled={true}
-            >
-              Return
-            </KeybindButton>
-          </motion.div>
-        )}
-
-        {gameStarted && win && (
-          <motion.div
-            className={styles.titleCtn}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"title-ctn-win"}
-          >
-            <h1 className={styles.title}>You completed Level {level}!</h1>
-            {/*  <p className={styles.desc}>*/}
-            {/*    {timer > 0*/}
-            {/*      ? `*/}
-            {/*Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`*/}
-            {/*      : `Timer: no timer`}*/}
-            {/*  </p>*/}
-          </motion.div>
-        )}
-
-        {gameStarted && win && (
-          <motion.div
-            className={styles.toolrow}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"toolbar-win"}
-          >
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.shift, T_Keybind.enter]}
-              onPress={() => {
-                startGame();
-              }}
-              // loading={returnLoading}
-              disabled={returnLoading}
-              loadingTextEnabled={false}
-            >
-              Play Again
-            </KeybindButton>
-
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.enter]}
-              onPress={() => {
-                setReturnLoading(true);
-
-                setTimeout(() => {
-                  router.push(`/`);
-                }, 750);
-              }}
-              loading={returnLoading}
-              disabled={returnLoading}
-              loadingText={"Please wait..."}
-              loadingTextEnabled={true}
-            >
-              Return
+              End Session
             </KeybindButton>
           </motion.div>
         )}
 
         {gameStarted && !win && !lost && (
           <motion.div
-            className={styles.gameCtn}
-            initial={{ opacity: 0, filter: "blur(10px)" }}
-            animate={{ opacity: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, filter: "blur(10px)" }}
-            transition={{ duration: 0.5 }}
             key={`game-ctn-${stage}`}
+            className={styles.gameCtn}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              type: "spring",
+
+              stiffness: 120,
+              damping: 20,
+
+              opacity: {
+                duration: 0.2,
+              },
+            }}
+            layout
           >
             <div className={styles.option}>
               <AnimatePresence mode={"popLayout"}>

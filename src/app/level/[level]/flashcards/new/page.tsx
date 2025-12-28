@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 
-import { ArrowLeft, BookCopy, Flame } from "lucide-react";
+import { ArrowLeft, BookCopy, Flame, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import useSound from "use-sound";
 
@@ -359,6 +359,7 @@ export default function Page() {
               loadingText={"Please wait..."}
               loadingTextEnabled={true}
               icon={<ArrowLeft />}
+              layoutId="back-btn"
             >
               Back
             </KeybindButton>
@@ -432,6 +433,8 @@ export default function Page() {
               }}
               forceTheme={"dark"}
               dangerous={true}
+              icon={<X />}
+              layoutId="back-btn"
             >
               End Review
             </KeybindButton>

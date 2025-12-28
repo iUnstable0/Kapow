@@ -90,6 +90,7 @@ export const KeybindButton = ({
   preload = true,
   loadingTextEnabled = true,
   reversed = false,
+  layoutId,
 }: {
   keybinds: T_Keybind[];
   dangerous?: boolean;
@@ -108,6 +109,7 @@ export const KeybindButton = ({
   preload?: boolean;
   loadingTextEnabled?: boolean;
   reversed?: boolean;
+  layoutId?: string;
 }) => {
   let styles;
 
@@ -122,9 +124,9 @@ export const KeybindButton = ({
   return (
     <motion.div
       key={`keybindbutton_${keybinds.join("_")}_${forceTheme}`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      // initial={{ opacity: 0 }}
+      // animate={{ opacity: 1 }}
+      // exit={{ opacity: 0 }}
       transition={{
         type: "spring",
         stiffness: 120,
@@ -135,6 +137,7 @@ export const KeybindButton = ({
         },
       }}
       layout
+      layoutId={layoutId}
       // style={{
       //   background: "red",
       // }}
@@ -146,137 +149,132 @@ export const KeybindButton = ({
         range={disabled ? 0 : magnetic ? 75 : 0}
         className={className}
       >
-        <AnimatePresence>
-          <motion.button
-            className={clsx(
-              styles.keybindButton,
-              dangerous && styles.keybindButtonDangerous,
-              reversed && styles.keybindButtonReversed,
-              // dangerous && loading === true && styles.keybindButtonDangerous,
+        <button
+          className={clsx(
+            styles.keybindButton,
+            dangerous && styles.keybindButtonDangerous,
+            reversed && styles.keybindButtonReversed
+            // dangerous && loading === true && styles.keybindButtonDangerous,
+          )}
+          onClick={() => {
+            if (!disabled && !loading) {
+              onPress?.();
+            }
+          }}
+          // transition={{
+          //   type: "spring",
+          //   stiffness: 200,
+          //   damping: 20,
+          //   opacity: {
+          //     duration: 0.2,
+          //     ease: "easeInOut",
+          //   },
+          // }}
+          onMouseDown={(e) => e.preventDefault()}
+          disabled={disabled}
+          tabIndex={-1}
+          // THIS WAS THE CULPRIT
+          // layout
+        >
+          <AnimatePresence mode="popLayout">
+            {!loadingText && icon && (
+              <motion.div
+                className={clsx(styles.keybindButtonIcon, iconClassName)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {icon}
+              </motion.div>
             )}
-            onClick={() => {
-              if (!disabled && !loading) {
-                onPress?.();
-              }
+
+            {loadingText && !loading && icon && (
+              <motion.div
+                className={clsx(styles.keybindButtonIcon, iconClassName)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {icon}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {loadingText && typeof loading === "boolean" && (
+            <Spinner
+              // id={`keybind-${keybinds.join("-")}-${forceTheme}`}
+              loading={loading}
+              size={24}
+              forceTheme={forceTheme}
+              preload={!icon && preload}
+              dangerous={dangerous}
+            />
+          )}
+
+          <motion.div
+            key={`keybind_${keybinds.join("_")}_${forceTheme}_text`}
+            className={clsx(styles.keybindButtonText, textClassName)}
+            // initial={{ opacity: 0 }}
+            // animate={{ opacity: 1 }}
+            // exit={{ opacity: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 120,
+              damping: 20,
+              opacity: {
+                duration: 0.2,
+                ease: "easeInOut",
+              },
             }}
-            // whileHover={{ scale: disabled ? 1 : 1.1 }}
-            // whileTap={{
-            //   scale: disabled ? 1 : 1.05,
-            // }}
-            // transition={{
-            //   type: "spring",
-            //   stiffness: 200,
-            //   damping: 20,
-            //   opacity: {
-            //     duration: 0.2,
-            //     ease: "easeInOut",
-            //   },
-            // }}
-            onMouseDown={(e) => e.preventDefault()}
-            disabled={disabled}
-            tabIndex={-1}
-            // THIS WAS THE CULPRIT
+            style={{
+              // if loading and preload is false then set margin left to 32px
+              // ...(loading && !preload ? { paddingLeft: "32px" } : {}),
+              width: "auto",
+            }}
+            // TODO: Maybe disable this?
             // layout
           >
-            <AnimatePresence mode="popLayout">
-              {!loadingText && icon && (
-                <motion.div
-                  className={clsx(styles.keybindButtonIcon, iconClassName)}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {icon}
-                </motion.div>
-              )}
-
-              {loadingText && !loading && icon && (
-                <motion.div
-                  className={clsx(styles.keybindButtonIcon, iconClassName)}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {icon}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {loadingText && typeof loading === "boolean" && (
-              <Spinner
-                // id={`keybind-${keybinds.join("-")}-${forceTheme}`}
-                loading={loading}
-                size={24}
-                forceTheme={forceTheme}
-                preload={!icon && preload}
-                dangerous={dangerous}
-              />
+            {/* Temp fix sameline */}
+            {loadingTextEnabled ? (
+              <TextMorph
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {`${
+                  (loading &&
+                    loadingText &&
+                    loadingTextEnabled &&
+                    loadingText) ||
+                  ((!loading || !loadingTextEnabled) && children)
+                }`}
+              </TextMorph>
+            ) : (
+              children
             )}
 
-            <motion.div
-              key={`keybind_${keybinds.join("_")}_${forceTheme}_text`}
-              className={clsx(styles.keybindButtonText, textClassName)}
-              // initial={{ opacity: 0 }}
-              // animate={{ opacity: 1 }}
-              // exit={{ opacity: 0 }}
-              transition={{
-                type: "spring",
-                stiffness: 120,
-                damping: 20,
-                opacity: {
-                  duration: 0.2,
-                  ease: "easeInOut",
-                },
-              }}
-              style={{
-                // if loading and preload is false then set margin left to 32px
-                // ...(loading && !preload ? { paddingLeft: "32px" } : {}),
-                width: "auto",
-              }}
-              layout
-            >
-              {/* Temp fix sameline */}
-              {loadingTextEnabled ? (
-                <TextMorph
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {`${
-                    (loading &&
-                      loadingText &&
-                      loadingTextEnabled &&
-                      loadingText) ||
-                    ((!loading || !loadingTextEnabled) && children)
-                  }`}
-                </TextMorph>
-              ) : (
-                children
-              )}
+            {/* {children} */}
+          </motion.div>
 
-              {/* {children} */}
-            </motion.div>
-
-            <AnimatePresence>
-              {keybinds.length > 0 && (
-                <Keybind
-                  keybinds={keybinds}
-                  dangerous={dangerous}
-                  onPress={onPress}
-                  disabled={disabled}
-                  loading={loading}
-                  loadingText={loadingText}
-                  forceTheme={forceTheme}
-                  magnetic={magnetic}
-                />
-              )}
-            </AnimatePresence>
-          </motion.button>
-        </AnimatePresence>
+          <AnimatePresence>
+            {keybinds.length > 0 && (
+              <Keybind
+                keybinds={keybinds}
+                dangerous={dangerous}
+                onPress={onPress}
+                disabled={disabled}
+                loading={loading}
+                loadingText={loadingText}
+                forceTheme={forceTheme}
+                magnetic={magnetic}
+              />
+            )}
+          </AnimatePresence>
+        </button>
       </Magnetic>
     </motion.div>
   );
@@ -314,7 +312,7 @@ export default function Keybind({
   }
 
   // Set of currently held keys
-  const [heldKeys, setHeldKeys] = useState<Set<string>>(new Set());
+  const heldKeys = React.useRef<Set<string>>(new Set());
   const [animatedKeys, setAnimatedKeys] = useState<Set<string>>(new Set());
 
   // useEffect(() => {
@@ -332,16 +330,16 @@ export default function Keybind({
       setAnimatedKeys((prev) => new Set(prev).add(key));
     };
 
-    const removeFromAnimatedKeys = (key: string) => {
+    const removeFromAnimatedKeys = (key: string, keysSnapshot: Set<string>) => {
       const keyeventId = `(${keybinds.join(",")}) -- ${key}`;
 
       setTimeout(() => {
         if (
           onPress &&
-          keybinds.every((key) => heldKeys.has(key)) &&
+          keybinds.every((key) => keysSnapshot.has(key)) &&
           keybinds[keybinds.length - 1] === key
         ) {
-          if (heldKeys.size === keybinds.length) {
+          if (keysSnapshot.size === keybinds.length) {
             if (!disabled && !loading) {
               console.log(keyeventId, "keybind activated");
               onPress();
@@ -350,8 +348,8 @@ export default function Keybind({
             console.log(
               keyeventId,
               " | unknown key pressed with keybind",
-              Array.from(heldKeys).join(","),
-              " | not activating!",
+              Array.from(keysSnapshot).join(","),
+              " | not activating!"
             );
           }
         }
@@ -406,7 +404,7 @@ export default function Keybind({
       // if (keybinds.includes(key as T_Keybind)) {
       // If it alr contain key then abort!
 
-      setHeldKeys((prev) => new Set(prev).add(key));
+      heldKeys.current.add(key);
 
       if (keybinds.includes(key as T_Keybind)) {
         addToAnimatedKeys(key);
@@ -433,16 +431,12 @@ export default function Keybind({
 
       console.log(keyeventId, "released");
 
-      setHeldKeys((prev) => {
-        const next = new Set(prev);
+      const keysSnapshot = new Set(heldKeys.current);
 
-        next.delete(key);
-
-        return next;
-      });
+      heldKeys.current.delete(key);
 
       if (animatedKeys.has(key) && keybinds.includes(key as T_Keybind)) {
-        removeFromAnimatedKeys(key);
+        removeFromAnimatedKeys(key, keysSnapshot);
       }
     };
 
@@ -454,7 +448,7 @@ export default function Keybind({
       window.removeEventListener("keyup", handleKeyUp);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heldKeys, animatedKeys, disabled]);
+  }, [animatedKeys, disabled]);
 
   return (
     <motion.div
@@ -469,7 +463,8 @@ export default function Keybind({
           ease: "easeInOut",
         },
       }}
-      layout
+      // TODO: Maybe this too
+      // layout
     >
       <Magnetic
         intensity={0.1}
@@ -487,9 +482,9 @@ export default function Keybind({
               animatedKeys.has(keybind) && styles.keybindContainer_active,
               animatedKeys.size === keybinds.length &&
                 Array.from(animatedKeys).filter((key) =>
-                  keybinds.includes(key as T_Keybind),
+                  keybinds.includes(key as T_Keybind)
                 ).length === keybinds.length &&
-                styles.keybindContainer_activeall,
+                styles.keybindContainer_activeall
             )}
             key={`keybind_${keybind}_${index}`}
           >

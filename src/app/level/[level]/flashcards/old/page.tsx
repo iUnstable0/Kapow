@@ -6,7 +6,7 @@ import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 
-import { ArrowLeft, BookCopy, Flame } from "lucide-react";
+import { ArrowLeft, BookCopy, Flame, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import useSound from "use-sound";
 import clsx from "clsx";
@@ -673,12 +673,21 @@ export default function Page() {
 
         {!firstLoad && !reviewStarted && !toolsLocked && (
           <motion.div
+            key={"reviewremaining"}
             className={styles.reviewTools}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"reviewremaining"}
+            transition={{
+              type: "spring",
+
+              stiffness: 120,
+              damping: 20,
+
+              opacity: {
+                duration: 0.2,
+              },
+            }}
           >
             <KeybindButton
               keybinds={[T_Keybind.escape]}
@@ -833,7 +842,16 @@ export default function Page() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{
+              type: "spring",
+
+              stiffness: 120,
+              damping: 20,
+
+              opacity: {
+                duration: 0.2,
+              },
+            }}
             key={"exitreview"}
           >
             <KeybindButton
@@ -848,6 +866,7 @@ export default function Page() {
               disabled={!!activeText || toolsLocked}
               forceTheme={"dark"}
               dangerous={true}
+              icon={<X />}
             >
               End Review
             </KeybindButton>

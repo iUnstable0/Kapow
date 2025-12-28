@@ -84,6 +84,14 @@
       gap: 16px;
     }
 
+    .levelInfoOptions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      gap: 24px;
+    }
+
     .levelTitle {
       font-size: 48px;
       font-weight: bold;
@@ -113,10 +121,22 @@
   .answersCtn {
     max-height: 80vh;
 
-    // background: blue;
-
     overflow-y: auto;
     overflow-x: hidden;
+
+    // remove scrollbar style
+    &::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
 
     // &::before {
     //   content: "";
@@ -133,58 +153,169 @@
     // }
 
     .answersFrame {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      gap: 24px;
+
       padding: 48px;
     }
 
-    position: relative;
+    .answer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+
+      flex-direction: row;
+
+      width: 100%;
+
+      gap: 20px;
+    }
+
+    .answerImageCtn {
+      width: 200px;
+      height: 132px;
+
+      .answerImage {
+        object-fit: cover;
+        border-radius: 12px;
+
+        width: 100%;
+        height: 100%;
+
+        cursor: pointer;
+
+        transition: scale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        &:hover {
+          scale: 1.02;
+        }
+
+        &:active {
+          scale: 0.98;
+        }
+      }
+    }
+
+    .answerInfo {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+
+      flex-direction: column;
+
+      // background: red;
+
+      height: 100%;
+
+      gap: 38px;
+    }
+
+    .answerTitle {
+      font-size: 20px;
+    }
+
+    .answerQuestion {
+      font-size: 20px;
+    }
+
+    .answerActions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      flex-direction: row;
+
+      gap: 24px;
+    }
+
+    .actionButton {
+      &:hover {
+        .icon {
+          scale: 1.1;
+          filter: drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5));
+        }
+      }
+
+      &:active {
+        .icon {
+          scale: 1.05;
+          filter: drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5));
+        }
+      }
+
+      .icon {
+        transition:
+          filter 0.2s ease-in-out,
+          scale 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+    }
   }
 }
 
-.toolrow {
+.stageLabel {
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
+
+  flex-direction: column;
 
   gap: 24px;
 
-  position: sticky;
-  bottom: 20px;
-  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  padding: 24px;
+
+  font-size: 18px;
+
+  z-index: 2;
+}
+
+.endSession {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 24px;
+
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  padding: 24px;
+
+  z-index: 2;
 }
 
 .gameCtn {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: row;
-  gap: 24px;
 
-  //background: red;
+  flex-direction: row;
+
+  gap: 24px;
 
   width: 100%;
 
   padding-bottom: 40px;
 }
 
-.stageLabel {
-  font-size: 18px;
+// .toolrow {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: flex-start;
 
-  position: fixed;
-  top: 0;
-  left: 0;
+//   gap: 24px;
 
-  z-index: 2;
-
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  justify-content: center;
-
-  gap: 24px;
-
-  padding: 20px;
-}
-
+//   position: sticky;
+//   bottom: 20px;
+//   z-index: 10;
+// }
 .option {
   display: flex;
   justify-content: space-between;
