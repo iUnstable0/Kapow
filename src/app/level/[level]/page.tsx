@@ -548,6 +548,7 @@ export default function Page() {
                       playCardSound(q);
                     }}
                   >
+                    <span className={styles.hint}>(click to play audio!)</span>
                     {q.question} = {q.realanswer}
                     <span className={styles.dict}>
                       <Link

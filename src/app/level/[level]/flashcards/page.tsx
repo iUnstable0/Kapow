@@ -259,8 +259,11 @@ export default function Page() {
           >
             <h1 className={styles.title}>Level {level} Flashcards</h1>
             {firstLoad && <p className={styles.desc}>Loading...</p>}
-            {!firstLoad && reviews.length === 0 && (
+            {!firstLoad && reviews.length === 0 && !win && (
               <p className={styles.desc}>Get ready to review!</p>
+            )}
+            {!firstLoad && reviews.length === 0 && win && (
+              <p className={styles.desc}>Great job reviewing! Try again?</p>
             )}
             {!firstLoad &&
               reviews.length > 0 &&
@@ -346,7 +349,9 @@ export default function Page() {
                 ? reviews.length < quiz.length
                   ? "Review all"
                   : "Review again"
-                : "Start"}
+                : win
+                  ? "Redo"
+                  : "Start"}
             </KeybindButton>
           </motion.div>
         )}
