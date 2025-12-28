@@ -15,5 +15,5 @@ export const Z_MaxLevel = z.coerce.number().min(1).max(5);
 export const Z_FlashcardsMode = z.enum(["new", "old"]);
 export type T_FlashcardsMode = z.infer<typeof Z_FlashcardsMode>;
 
-export const Z_GameMode = z.enum(["matching", "guess the pronunciation"]);
+export const Z_GameMode = z.enum(["picture matching", "guess the pronunciation"]);
 export type T_GameMode = z.infer<typeof Z_GameMode>;

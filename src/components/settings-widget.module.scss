@@ -49,6 +49,7 @@
     }
   }
 }
+
 .settingsPage {
   position: fixed;
   bottom: 0;
@@ -57,9 +58,7 @@
   margin-right: 20px;
   margin-bottom: 20px;
 
-  //background-color: #2d2d2d;
-
-  background: transparent;
+  background-color: #2d2d2d3c;
   backdrop-filter: blur(10px);
 
   //background-color: rgba(40, 40, 40, 0.32);
@@ -100,6 +99,8 @@
   gap: 10px;
 
   padding: 12px;
+
+  font-size: 1.05rem;
 
   //border-top: 1px solid #3d3d3d;
   border-top: 1px solid rgba(255, 255, 255, 0.1);

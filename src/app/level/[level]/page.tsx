@@ -79,7 +79,7 @@ export default function Page() {
   const [answersVisible, setAnswersVisible] = useState<boolean>(false);
 
   const [selectedGameMode, setSelectedGameMode] =
-    useState<T_GameMode>("matching");
+    useState<T_GameMode>("picture matching");
 
   const [win, setWin] = useState<boolean>(false);
   const [lost, setLost] = useState<boolean>(false);
@@ -322,20 +322,21 @@ export default function Page() {
                   duration: 0.2,
                 },
               }}
+              data-enabled={answersVisible}
               layout
             >
               <div className={styles.levelInfoSection}>
                 <h1 className={styles.levelTitle}>Level {level}</h1>
 
                 <p className={styles.levelDesc}>
+                  Timer:{" "}
                   {timer > 0
-                    ? `
-          Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`
-                    : `Timer: no timer`}
+                    ? `${DateTime.fromSeconds(timer).toFormat("mm:ss")}`
+                    : `no timer`}
                 </p>
 
                 <div className={styles.gameMode}>
-                  Game Mode:
+                  <span>Game Mode:</span>
                   <div className={styles.gameModeSelect}>
                     <Selection
                       value={selectedGameMode}
@@ -435,14 +436,23 @@ export default function Page() {
 
           {!gameStarted && answersVisible && (
             <motion.div
-              className={styles.gameCtn}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              key={"answers"}
+              className={styles.answersCtn}
+              key={"answers-ctn"}
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{
+                type: "spring",
+
+                stiffness: 120,
+                damping: 20,
+
+                opacity: {
+                  duration: 0.2,
+                },
+              }}
             >
-              <div className={styles.option}>
+              <div className={styles.answersFrame}>
                 {quiz.map((q) => (
                   <div key={`awdaq_${q.question}`} className={styles.answerRow}>
                     <div

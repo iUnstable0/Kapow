@@ -40,7 +40,7 @@ const blueberry_songs = Array.from(
 );
 
 const cisco_songs = Array.from(
-  { length: 1 },
+  { length: 3 },
   (_, i) => `/cisco/cisco ${i + 1}.mp3`
 );
 

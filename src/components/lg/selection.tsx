@@ -38,6 +38,7 @@ interface SelectionProps {
   onSelect?: (value: string) => void;
   onOpenChange?: (isOpen: boolean) => void;
   className?: string;
+  strategy?: "fixed" | "absolute";
 }
 
 interface SelectionItemProps {
@@ -51,6 +52,7 @@ export default function Selection({
   value,
   onSelect,
   onOpenChange,
+  strategy
 }: SelectionProps) {
   const [isTextOverflow, setIsTextOverflow] = useState<boolean>(false);
 
@@ -151,7 +153,7 @@ export default function Selection({
           className={styles.selectionPage}
           portal={true}
           anchor={"top-left"}
-          strategy="fixed"
+          strategy={strategy}
         >
           <Magnetic
             intensity={0.1}

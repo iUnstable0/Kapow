@@ -121,7 +121,7 @@ export default function SettingsWidget() {
             range={125}
             className={clsx(
               styles.settingsMagnet,
-              !settingsOpen && styles.settingsMagnetClosed,
+              !settingsOpen && styles.settingsMagnetClosed
             )}
           >
             <motion.span layoutId={"icon-settings"} layout={"position"}>
@@ -189,6 +189,7 @@ export default function SettingsWidget() {
                       setSelectedPlaylist(value as T_Playlist);
                     }}
                     onOpenChange={(isOpen) => setSelectionOpen(isOpen)}
+                    strategy="fixed"
                   >
                     {Object.values(Z_Playlist.enum).map((playlist) => (
                       <Selection.Item
@@ -213,6 +214,7 @@ export default function SettingsWidget() {
                   setFlashcardsMode(value as T_FlashcardsMode);
                 }}
                 onOpenChange={(isOpen) => setSelectionOpen(isOpen)}
+                strategy="fixed"
               >
                 {Object.values(Z_FlashcardsMode.enum).map((mode) => (
                   <Selection.Item key={`mode-${mode}`} value={mode}>
