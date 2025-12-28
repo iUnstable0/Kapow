@@ -29,7 +29,7 @@ import useSound from "use-sound";
 import { motion, AnimatePresence } from "motion/react";
 import { DateTime } from "luxon";
 
-import { capitalize } from "@/lib/utils";
+import { calcImgSrc, capitalize } from "@/lib/utils";
 
 import { useSettings } from "@/components/context/settings";
 import { useGlobalMusic } from "@/components/context/music";
@@ -313,24 +313,20 @@ export default function Page() {
         <AnimatePresence mode={"popLayout"}>
           {!gameStarted && (
             <motion.div
-              className={styles.levelInfoCtn}
               key={"title-ctn-start"}
+              className={styles.levelInfoCtn}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{
                 type: "spring",
 
-                // Stiffness/damping seems more stable
-                // than bounce + duration
                 stiffness: 120,
                 damping: 20,
 
-                // bounce: 0.2,
-                // duration: 1,
-
                 opacity: {
                   duration: 0.2,
+                  ease: "easeInOut",
                 },
               }}
               data-enabled={answersVisible}
@@ -346,7 +342,7 @@ export default function Page() {
                     : `no timer`}
                 </p>
 
-                <div className={styles.gameMode}>
+                {/* <div className={styles.gameMode}>
                   <span>Game Mode:</span>
                   <div className={styles.gameModeSelect}>
                     <Selection
@@ -362,7 +358,7 @@ export default function Page() {
                       ))}
                     </Selection>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <div
@@ -387,7 +383,6 @@ export default function Page() {
                   loadingTextEnabled={true}
                   dangerous={true}
                   icon={<ArrowLeftIcon />}
-                  layoutId="back-btn"
                 >
                   Back
                 </KeybindButton>
@@ -400,6 +395,7 @@ export default function Page() {
                   }}
                   disabled={reviewLoading || returnLoading}
                   icon={<ListChecks />}
+                  layout
                 >
                   {answersVisible ? "Hide Answers" : "Show Answers"}
                 </KeybindButton>
@@ -421,6 +417,7 @@ export default function Page() {
                   loadingText={"Please wait..."}
                   loadingTextEnabled={true}
                   icon={<BookCopy />}
+                  layout
                 >
                   Flashcards
                 </KeybindButton>
@@ -434,6 +431,7 @@ export default function Page() {
                   disabled={reviewLoading || returnLoading}
                   loadingTextEnabled={false}
                   icon={<Brain />}
+                  layout
                 >
                   Start Level
                 </KeybindButton>
@@ -474,6 +472,7 @@ export default function Page() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
+                  // layout
                 >
                   <KeybindButton
                     forceTheme={"dark"}
@@ -492,7 +491,6 @@ export default function Page() {
                     reversed={false}
                     dangerous={true}
                     icon={<ArrowLeftIcon />}
-                    layoutId="back-btn"
                   >
                     Back
                   </KeybindButton>
@@ -562,7 +560,6 @@ export default function Page() {
                     reversed={false}
                     dangerous={true}
                     icon={<ArrowLeftIcon />}
-                    layoutId="back-btn"
                   >
                     Back
                   </KeybindButton>
@@ -722,7 +719,7 @@ export default function Page() {
                 duration: 0.2,
               },
             }}
-            // layout
+            layout
           >
             <KeybindButton
               forceTheme={"dark"}
@@ -738,7 +735,6 @@ export default function Page() {
               loadingTextEnabled={false}
               dangerous={true}
               icon={<X />}
-              layoutId="back-btn"
             >
               End Session
             </KeybindButton>
@@ -764,142 +760,91 @@ export default function Page() {
             }}
             layout
           >
-            <div className={styles.option}>
-              <AnimatePresence mode={"popLayout"}>
-                {gameData.questions
-                  .filter((q) => !answered.includes(q.question))
-                  .map((q, i) => (
-                    <motion.div
-                      key={`q_${q.question}`}
-                      className={clsx(
-                        styles.question,
-                        selectedQuestion == q.question &&
-                          styles.question_selected
-                      )}
-                      initial={{
-                        opacity: 0,
-                      }}
-                      animate={{
-                        opacity: 1,
-                      }}
-                      exit={{
-                        opacity: 0,
-                      }}
-                      whileHover={{
-                        scale: 1.01,
-                      }}
-                      whileTap={{
-                        scale: 0.98,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 120,
-                        damping: 20,
-                        opacity: {
-                          duration: 0.25,
-                        },
-                      }}
-                      onClick={() => {
-                        playCardSound(q);
-                        setSelectedQuestion(q.question);
-                      }}
-                      layout
-                    >
-                      {q.question}
-
-                      <Keybind
-                        keybinds={[leftKeys[i]]}
-                        dangerous={false}
-                        onPress={() => {
+            <div className={styles.gameFrame}>
+              <div className={styles.column}>
+                <AnimatePresence mode={"popLayout"}>
+                  {gameData.questions
+                    .filter((q) => !answered.includes(q.question))
+                    .map((q, i) => (
+                      <motion.div
+                        key={`question_${q.question}`}
+                        className={clsx(
+                          styles.question,
+                          selectedQuestion == q.question &&
+                            styles.question_selected
+                        )}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        animate={{
+                          opacity: 1,
+                        }}
+                        exit={{
+                          opacity: 0,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 120,
+                          damping: 20,
+                          opacity: {
+                            duration: 0.2,
+                            ease: "easeInOut",
+                          },
+                        }}
+                        onClick={() => {
                           playCardSound(q);
-
                           setSelectedQuestion(q.question);
                         }}
-                        disabled={false}
-                        loading={false}
-                        loadingText={"loadingText"}
-                        forceTheme={"dark"}
-                      />
-                    </motion.div>
-                  ))}
-              </AnimatePresence>
-            </div>
+                        layout
+                      >
+                        {q.question}
+                      </motion.div>
+                    ))}
+                </AnimatePresence>
+              </div>
 
-            <div className={styles.option}>
-              <AnimatePresence mode={"popLayout"}>
-                {gameData.images
-                  .filter((q) => !answered.includes(q.question))
-                  .map((q, i) => (
-                    <motion.div
-                      key={`m_${q.question}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 120,
-                        damping: 20,
-                        opacity: {
-                          duration: 0.25,
-                        },
-                      }}
-                      whileHover={{
-                        scale: 1.01,
-                      }}
-                      whileTap={{
-                        scale: 0.98,
-                      }}
-                      layout
-                      className={styles.imageCtn}
-                      onClick={() => handleAnswer(q)}
-                      // onClick={() => {
-                      //   if (selectedQuestion === q.question) {
-                      //     playDing();
-                      //     setSelectedQuestion("");
-                      //     setAnswered((prev) => [...prev, q.question]);
-                      //   } else {
-                      //     if (selectedQuestion !== "") playAlert();
-                      //   }
-                      // }}
-                    >
-                      <Keybind
-                        keybinds={[rightKeys[i]]}
-                        dangerous={false}
-                        onPress={() => handleAnswer(q)}
-                        // onPress={() => {
-                        //   if (selectedQuestion === q.question) {
-                        //     playDing();
-                        //     setSelectedQuestion("");
-                        //     setAnswered((prev) => [...prev, q.question]);
-                        //   } else {
-                        //     if (selectedQuestion !== "") playAlert();
-                        //   }
-                        // }}
-                        parentClass={styles.keybindBtn}
-                        disabled={false}
-                        loading={false}
-                        loadingText={"loadingText"}
-                        forceTheme={"dark"}
-                      />
-                      <Image
-                        key={`img_option_${q.question}_${trollModeEnabled}`}
-                        src={`/level${level}/${
-                          trollModeEnabled
-                            ? q.answer
-                            : `${q.answer.split(".")[0]}.${
-                                q.answer.split(".")[
-                                  q.answer.split(".").length - 1
-                                ]
-                              }`
-                        }`}
-                        alt={"answer image"}
-                        width={200}
-                        height={200}
-                        className={styles.image}
-                      />
-                    </motion.div>
-                  ))}
-              </AnimatePresence>
+              <div className={styles.column}>
+                <AnimatePresence mode={"popLayout"}>
+                  {gameData.images
+                    .filter((q) => !answered.includes(q.question))
+                    .map((q, i) => (
+                      <motion.div
+                        key={`image_${q.question}`}
+                        className={styles.imageCtn}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        animate={{
+                          opacity: 1,
+                        }}
+                        exit={{
+                          opacity: 0,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 120,
+                          damping: 20,
+
+                          opacity: {
+                            duration: 0.2,
+                            ease: "easeInOut",
+                          },
+                        }}
+                        onClick={() => handleAnswer(q)}
+                        layout
+                      >
+                        <Image
+                          draggable={false}
+                          src={`/level${level}/${calcImgSrc(q.answer)}`}
+                          alt={"answer image"}
+                          width={200}
+                          height={200}
+                          className={styles.image}
+                        />
+                      </motion.div>
+                    ))}
+                </AnimatePresence>
+              </div>
             </div>
           </motion.div>
         )}

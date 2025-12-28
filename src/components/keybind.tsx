@@ -91,6 +91,7 @@ export const KeybindButton = ({
   loadingTextEnabled = true,
   reversed = false,
   layoutId,
+  layout,
 }: {
   keybinds: T_Keybind[];
   dangerous?: boolean;
@@ -110,6 +111,7 @@ export const KeybindButton = ({
   loadingTextEnabled?: boolean;
   reversed?: boolean;
   layoutId?: string;
+  layout?: boolean;
 }) => {
   let styles;
 
@@ -124,9 +126,9 @@ export const KeybindButton = ({
   return (
     <motion.div
       key={`keybindbutton_${keybinds.join("_")}_${forceTheme}`}
-      // initial={{ opacity: 0 }}
-      // animate={{ opacity: 1 }}
-      // exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{
         type: "spring",
         stiffness: 120,
@@ -137,6 +139,7 @@ export const KeybindButton = ({
         },
       }}
       layout
+      // layout={layoutId ? true : layout}
       layoutId={layoutId}
       // style={{
       //   background: "red",
@@ -173,6 +176,7 @@ export const KeybindButton = ({
           onMouseDown={(e) => e.preventDefault()}
           disabled={disabled}
           tabIndex={-1}
+
           // THIS WAS THE CULPRIT
           // layout
         >
@@ -184,6 +188,7 @@ export const KeybindButton = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
+                layout
               >
                 {icon}
               </motion.div>
@@ -196,6 +201,7 @@ export const KeybindButton = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
+                layout
               >
                 {icon}
               </motion.div>
@@ -214,25 +220,27 @@ export const KeybindButton = ({
           )}
 
           <motion.div
-            key={`keybind_${keybinds.join("_")}_${forceTheme}_text`}
+            // key={`keybind_${keybinds.join("_")}_${forceTheme}_text`}
             className={clsx(styles.keybindButtonText, textClassName)}
             // initial={{ opacity: 0 }}
             // animate={{ opacity: 1 }}
             // exit={{ opacity: 0 }}
             transition={{
               type: "spring",
+
               stiffness: 120,
               damping: 20,
+
               opacity: {
                 duration: 0.2,
                 ease: "easeInOut",
               },
             }}
-            style={{
-              // if loading and preload is false then set margin left to 32px
-              // ...(loading && !preload ? { paddingLeft: "32px" } : {}),
-              width: "auto",
-            }}
+            // style={{
+            // if loading and preload is false then set margin left to 32px
+            // ...(loading && !preload ? { paddingLeft: "32px" } : {}),
+            // width: "auto",
+            // }}
             // TODO: Maybe disable this?
             // layout
           >
@@ -464,7 +472,7 @@ export default function Keybind({
         },
       }}
       // TODO: Maybe this too
-      // layout
+      layout
     >
       <Magnetic
         intensity={0.1}

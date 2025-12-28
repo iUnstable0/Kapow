@@ -23,3 +23,9 @@ export function shuffleArray<T>(array: T[]): T[] {
 export function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function calcImgSrc(answer: string): string {
+  const srcSplit = answer.split(".");
+
+  return `${srcSplit[0]}.${srcSplit[srcSplit.length - 1]}`;
+}

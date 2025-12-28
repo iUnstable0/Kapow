@@ -15,6 +15,8 @@ import { useGlobalMusic } from "@/components/context/music";
 import { useConfetti } from "@/components/confetti";
 import { useSettings } from "@/components/context/settings";
 
+import { calcImgSrc } from "@/lib/utils";
+
 import { ProgressiveBlur } from "@/components/mp/progressive-blur";
 
 import { KeybindButton, T_Keybind } from "@/components/keybind";
@@ -221,14 +223,6 @@ export default function Page() {
     }
   }, [flipState]);
 
-  const calcImgSrc = (answer: string) => {
-    if (trollModeEnabled) return answer;
-
-    const srcSplit = answer.split(".");
-
-    return `${srcSplit[0]}.${srcSplit[srcSplit.length - 1]}`;
-  };
-
   useEffect(() => {
     if (!reviewStarted) return;
 
@@ -359,7 +353,6 @@ export default function Page() {
               loadingText={"Please wait..."}
               loadingTextEnabled={true}
               icon={<ArrowLeft />}
-              layoutId="back-btn"
             >
               Back
             </KeybindButton>
@@ -434,7 +427,6 @@ export default function Page() {
               forceTheme={"dark"}
               dangerous={true}
               icon={<X />}
-              layoutId="back-btn"
             >
               End Review
             </KeybindButton>

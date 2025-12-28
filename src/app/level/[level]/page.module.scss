@@ -1,3 +1,6 @@
+$card-height: 270px;
+$gap-size: 24px;
+
 .container {
   display: flex;
   justify-content: center;
@@ -36,7 +39,9 @@
   background-color: inherit;
   // background: purple;
 
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
 
   .levelInfoCtn {
     display: flex;
@@ -294,105 +299,128 @@
 .gameCtn {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 
   flex-direction: row;
-
-  gap: 24px;
+  position: relative;
 
   width: 100%;
+  height: 100vh;
 
-  padding-bottom: 40px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-top: 140px;
+  padding-bottom: 100px;
+
+  .gameFrame {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+
+    gap: 48px;
+
+    width: 100%;
+    max-width: 800px;
+    padding: 0 24px;
+
+    z-index: 3;
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+
+      flex: 1;
+
+      gap: $gap-size;
+    }
+
+    .question {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+
+      background: #2d2d2d;
+
+      padding: 0 32px;
+
+      height: $card-height;
+
+      font-size: 20px;
+      font-weight: 600;
+      color: #f0f0f0;
+
+      border-radius: 16px;
+
+      border: 2px solid transparent;
+
+      cursor: pointer;
+
+      transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background: #383838;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    .question_selected {
+      background: #464646;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .imageCtn {
+      position: relative;
+      cursor: pointer;
+
+      height: $card-height;
+      width: 100%;
+
+      border-radius: 16px;
+      overflow: hidden;
+
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    .image {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+
+      pointer-events: none;
+    }
+  }
 }
 
-// .toolrow {
+// .answerRow {
 //   display: flex;
-//   flex-direction: column;
-//   align-items: flex-start;
+//   justify-content: center;
+//   align-items: center;
+//   flex-direction: row;
 
-//   gap: 24px;
+//   width: 100%;
 
-//   position: sticky;
-//   bottom: 20px;
-//   z-index: 10;
+//   gap: 20px;
 // }
-.option {
-  display: flex;
-  justify-content: space-between;
-  //justify-content: space-around;
-  align-items: center;
-  flex-direction: column;
-
-  width: 100%;
-
-  gap: 12px;
-
-  max-width: 800px;
-
-  z-index: 3;
-
-  //padding: 24px;
-
-  //background: blue;
-}
-
-.answerRow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-
-  width: 100%;
-
-  gap: 20px;
-}
-
-.question {
-  background: #2d2d2d;
-  border-radius: 12px;
-  padding: 24px 32px;
-  cursor: pointer;
-
-  margin-right: 20px;
-  flex: 1;
-
-  transition: background-color 0.2s ease-in-out;
-}
-
-.hint {
-  font-size: 14px;
-
-  margin-right: 8px;
-}
-.dict {
-  font-size: 14px;
-  margin-top: 8px;
-  color: rgb(72, 142, 255);
-
-  margin-left: 24px;
-}
-
-.question_selected {
-  background: #464646;
-}
-
-.image {
-  object-fit: cover;
-  border-radius: 12px;
-
-  width: 100%;
-  height: 100%;
-}
-
-.imageCtn {
-  width: 200px;
-  height: 132px;
-}
-
-.keybindBtn {
-  position: absolute;
-  z-index: 10;
-  backdrop-filter: blur(10px);
-
-  //  shadow
-}
