@@ -122,28 +122,18 @@
 
   z-index: -1;
 
-  transform: scale(1.05);
-
   filter: blur(60px) sepia(0.5) saturate(200%) brightness(1.1);
-
-  //mask-image: radial-gradient(ellipse at center, black 10%, black 100%);
-  //-webkit-mask-image: radial-gradient(
-  //  ellipse at center,
-  //  black 40%,
-  //  transparent 100%
-  //);
 
   border-radius: 40px;
   pointer-events: none;
   opacity: 0.6;
 
-  //filter: blur(20px) saturate(70%) brightness(1.2);
-  //
-  //transform: scale(1.05);
-  //
   object-fit: cover;
-  //border-radius: 24px;
-  //pointer-events: none;
+
+  transform: translateZ(0) scale(1.05);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, filter, opacity;
 }
 
 .pgBlurCtn {
