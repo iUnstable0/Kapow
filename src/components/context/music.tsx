@@ -175,13 +175,13 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // if (!sound.playing()) {
-    sound.off("fade");
+    if (!sound.playing()) {
+      sound.off("fade");
 
-    sound.volume(0);
-    sound.play();
-    sound.fade(0, volumeRef.current, 2000);
-    // }
+      sound.volume(0);
+      sound.play();
+      sound.fade(0, volumeRef.current, 2000);
+    }
   };
 
   const pause = useCallback(() => {
@@ -285,6 +285,12 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   }, [isLocked, musicEnabled]);
 
   useEffect(() => {
+    if (musicEnabled && siteEntered) {
+      play();
+    }
+  }, [musicEnabled, play, siteEntered]);
+
+  useEffect(() => {
     if (pathname.endsWith("/old")) {
       setOverride(true);
     } else {
@@ -330,7 +336,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
                 hasUserInteractedGlobal = true;
 
-                play();
+                // play();
 
                 // playMain();
               }

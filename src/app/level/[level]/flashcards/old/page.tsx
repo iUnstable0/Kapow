@@ -28,7 +28,7 @@ const MotionImage = motion.create(Image);
 const customScript = {
   fish: [
     {
-      title: "killer fish from san diego",
+      title: "KILLER FISH FROM SAN DIEGO",
       time: 2000,
     },
     {
@@ -36,7 +36,7 @@ const customScript = {
       time: 1000,
     },
     {
-      title: "i dont know what i am",
+      title: "I DON'T KNOW WHAT I AM",
       time: 2000,
     },
     {
@@ -44,7 +44,7 @@ const customScript = {
       time: 500,
     },
     {
-      title: "but i taste very good",
+      title: "BUT I TASTE VERY GOOD",
       time: 2000,
     },
     {
@@ -52,7 +52,62 @@ const customScript = {
       time: 1000,
     },
     {
-      title: "im a killer fish!!!",
+      title: "IM A KILLER FISH!!!",
+      time: 2000,
+    },
+  ],
+
+  sharp: [
+    {
+      title: "I AM THE TWINSTAR",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 800,
+    },
+    {
+      title: "SCIENTIFICALLY DESIGNED",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "TO DESTROY",
+      time: 1500,
+    },
+    {
+      title: "$wait$",
+      time: 200,
+    },
+    {
+      title: "HUMANITY",
+      time: 100,
+    },
+    {
+      title: "$wait$",
+      time: 100,
+    },
+    {
+      title: "VEGETABLES",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 1000,
+    },
+    {
+      title: "PLS BUY ME IM $39.99",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 3000,
+    },
+    {
+      title: "OH BTW THE ANSWER WAS 'sharp'",
       time: 2000,
     },
   ],
@@ -62,6 +117,7 @@ export default function Page() {
   const router = useRouter();
 
   const textTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scriptTimeoutsRef = useRef<NodeJS.Timeout[]>([]);
 
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
@@ -156,54 +212,80 @@ export default function Page() {
     benSounds[randomIndex]();
   }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
 
-  const playCardSound = useCallback(() => {
+  const clearAllTimeouts = useCallback(() => {
     if (textTimeoutRef.current) {
       clearTimeout(textTimeoutRef.current);
+      textTimeoutRef.current = null;
+
+      scriptTimeoutsRef.current.forEach((id) => clearTimeout(id));
+      scriptTimeoutsRef.current = [];
     }
+  }, []);
 
-    let custom = false;
-
-    if (flipState === "question") {
-      playSound(queue[reviewIndex].voice);
-    } else {
-      const speech = queue[reviewIndex].answer.split(".")[0];
-
-      if (customScript[speech]) {
-        custom = true;
-
+  const playCardSound = useCallback(
+    (wait: boolean = false) => {
+      if (flipState === "answer") {
         setToolsLocked(true);
-
-        const script = customScript[speech];
-
-        let totalTime = 0;
-
-        script.forEach((line) => {
-          totalTime += line.time;
-
-          setTimeout(() => {
-            if (line.title === "$wait$") {
-              setActiveText(null);
-            } else {
-              setActiveText(line.title);
-            }
-          }, totalTime - line.time);
-        });
-
-        setTimeout(() => {
-          setActiveText(null);
-          setToolsLocked(false);
-        }, totalTime);
-      } else {
-        setActiveText(speech);
       }
-    }
 
-    if (!custom) {
-      textTimeoutRef.current = setTimeout(() => {
-        setActiveText(null);
-      }, 2000);
-    }
-  }, [flipState, playSound, queue, reviewIndex, setActiveText]);
+      if (wait) {
+        setTimeout(() => {
+          playCardSound();
+        }, 500);
+
+        return;
+      }
+
+      clearAllTimeouts();
+
+      let custom = false;
+
+      if (flipState === "question") {
+        playSound(queue[reviewIndex].voice);
+      } else {
+        const speech = queue[reviewIndex].answer.split(".")[0];
+
+        if (customScript[speech]) {
+          custom = true;
+
+          const script = customScript[speech];
+
+          let totalTime = 0;
+
+          script.forEach((line) => {
+            totalTime += line.time;
+
+            const id = setTimeout(() => {
+              if (line.title === "$wait$") {
+                setActiveText(null);
+              } else {
+                setActiveText(line.title);
+              }
+            }, totalTime - line.time);
+
+            scriptTimeoutsRef.current.push(id);
+          });
+
+          const id = setTimeout(() => {
+            setActiveText(null);
+            setToolsLocked(false);
+          }, totalTime);
+
+          scriptTimeoutsRef.current.push(id);
+        } else {
+          setActiveText(speech);
+        }
+
+        if (!custom) {
+          textTimeoutRef.current = setTimeout(() => {
+            setActiveText(null);
+            setToolsLocked(false);
+          }, 2000);
+        }
+      }
+    },
+    [flipState, playSound, queue, reviewIndex, setActiveText, clearAllTimeouts],
+  );
 
   const markForReview = useCallback(
     (item: (typeof quiz)[number]) => {
@@ -266,12 +348,12 @@ export default function Page() {
   useEffect(() => {
     if (!reviewStarted) return;
 
-    setTimeout(
-      () => {
-        playCardSound();
-      },
-      flipState === "question" ? 0 : 1000,
-    );
+    playCardSound(true);
+    // setTimeout(
+    //   () => {
+    //   },
+    //   flipState === "question" ? 0 : 1000,
+    // );
   }, [flipState, playCardSound, reviewStarted]);
 
   useEffect(() => {
@@ -283,6 +365,26 @@ export default function Page() {
       playAlert();
     }
   }, [win, fireConfetti, playAlert, reviews, quiz]);
+
+  // useEffect(() => {
+  //   const speech = queue[reviewIndex]?.answer.split(".")[0];
+  //
+  //   if (!speech) return;
+  //
+  //   if (customScript[speech] && flipState === "answer") {
+  //     setToolsLocked(true);
+  //   } else {
+  //     setToolsLocked(false);
+  //   }
+  // }, [flipState, queue, reviewIndex]);
+
+  // useEffect(() => {
+  //   if (flipState === "question") {
+  //     setToolsLocked(false);
+  //   } else {
+  //     setToolsLocked(true);
+  //   }
+  // }, [flipState, reviewIndex]);
 
   // useEffect(() => {
   //   setTimeout(() => {
@@ -309,6 +411,7 @@ export default function Page() {
     return () => {
       stopFilmRoll();
       stopEntertainer();
+      clearAllTimeouts();
     };
   }, [
     playFilmRoll,
@@ -317,6 +420,7 @@ export default function Page() {
     stopFilmRoll,
     stopEntertainer,
     siteEntered,
+    clearAllTimeouts,
   ]);
 
   useEffect(() => {
@@ -338,7 +442,7 @@ export default function Page() {
             priority={true}
           />
 
-          <div className={styles.frameText}>{activeText}</div>
+          <div className={styles.frameText}>{activeText.toUpperCase()}</div>
         </div>
       )}
 
@@ -514,28 +618,69 @@ export default function Page() {
               )}
 
               {flipState === "answer" && (
-                <MotionImage
-                  key={`answer-${reviewIndex}_${trollModeEnabled}`}
-                  src={`/level${level}/${
-                    queue[reviewIndex].answer.split(".")[0]
-                  }.old.gif`}
-                  alt={"answer image"}
-                  width={200}
-                  height={200}
-                  className={styles.image}
-                  initial={{
-                    opacity: 0,
-                    filter: "blur(10px) sepia(0.75)",
-                  }}
-                  animate={{
-                    opacity: 1,
-                    filter:
-                      "blur(0px) sepia(0.75) contrast(1.2) saturate(0.7) brightness(0.7)",
-                  }}
-                  exit={{ opacity: 0, filter: "blur(10px) sepia(0.75)" }}
-                  transition={{ duration: 0.5 }}
-                />
+                <>
+                  <MotionImage
+                    key={`answer-glow-${reviewIndex}`}
+                    src={`/level${level}/${
+                      queue[reviewIndex].answer.split(".")[0]
+                    }.old.gif`}
+                    alt={"glow background"}
+                    width={200}
+                    height={200}
+                    className={styles.glowLayer}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.6 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                  />
+
+                  <MotionImage
+                    key={`answer-${reviewIndex}_${trollModeEnabled}`}
+                    src={`/level${level}/${
+                      queue[reviewIndex].answer.split(".")[0]
+                    }.old.gif`}
+                    alt={"answer image"}
+                    width={200}
+                    height={200}
+                    className={styles.image}
+                    initial={{
+                      opacity: 0,
+                      filter: "blur(10px)",
+                    }}
+                    animate={{
+                      opacity: 1,
+                      filter:
+                        "blur(0px) sepia(0.75) contrast(1.2) saturate(0.7) brightness(0.7)",
+                    }}
+                    exit={{ opacity: 0, filter: "blur(10px) sepia(0.75)" }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </>
               )}
+
+              {/*{flipState === "answer" && (*/}
+              {/*  <MotionImage*/}
+              {/*    key={`answer-${reviewIndex}_${trollModeEnabled}`}*/}
+              {/*    src={`/level${level}/${*/}
+              {/*      queue[reviewIndex].answer.split(".")[0]*/}
+              {/*    }.old.gif`}*/}
+              {/*    alt={"answer image"}*/}
+              {/*    width={200}*/}
+              {/*    height={200}*/}
+              {/*    className={styles.image}*/}
+              {/*    initial={{*/}
+              {/*      opacity: 0,*/}
+              {/*      filter: "blur(10px) sepia(0.75)",*/}
+              {/*    }}*/}
+              {/*    animate={{*/}
+              {/*      opacity: 1,*/}
+              {/*      filter:*/}
+              {/*        "blur(0px) sepia(0.75) contrast(1.2) saturate(0.7) brightness(0.7)",*/}
+              {/*    }}*/}
+              {/*    exit={{ opacity: 0, filter: "blur(10px) sepia(0.75)" }}*/}
+              {/*    transition={{ duration: 0.5 }}*/}
+              {/*  />*/}
+              {/*)}*/}
             </AnimatePresence>
 
             <div className={styles.controls}>
@@ -586,7 +731,7 @@ export default function Page() {
                 onPress={() => {
                   playCardSound();
                 }}
-                disabled={activeText || toolsLocked}
+                disabled={!!activeText || toolsLocked}
 
                 // disabled={reviewLoading || returnLoading}
                 // loading={returnLoading}
