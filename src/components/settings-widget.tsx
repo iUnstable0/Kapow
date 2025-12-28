@@ -11,7 +11,12 @@ import { AnimatePresence, motion } from "motion/react";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 
-import { Z_PlaylistEnum, type T_Playlist } from "@/types";
+import {
+  Z_PlaylistEnum,
+  type T_Playlist,
+  T_FlashcardsMode,
+  Z_FlashcardsMode,
+} from "@/types";
 
 import { useSettings } from "@/components/context/settings";
 
@@ -78,10 +83,15 @@ export default function SettingsWidget() {
   const {
     trollModeEnabled,
     setTrollModeEnabled,
+
     musicEnabled,
     setMusicEnabled,
+
     selectedPlaylist,
     setSelectedPlaylist,
+
+    flashcardsMode,
+    setFlashcardsMode,
   } = useSettings();
 
   const [selectionOpen, setSelectionOpen] = useState<boolean>(false);
@@ -181,7 +191,10 @@ export default function SettingsWidget() {
                     onOpenChange={(isOpen) => setSelectionOpen(isOpen)}
                   >
                     {Object.values(Z_PlaylistEnum.enum).map((playlist) => (
-                      <Selection.Item key={playlist} value={playlist}>
+                      <Selection.Item
+                        key={`playlist-${playlist}`}
+                        value={playlist}
+                      >
                         {playlist}
                       </Selection.Item>
                     ))}
@@ -190,6 +203,25 @@ export default function SettingsWidget() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          <motion.div className={styles.section} layout>
+            <div className={styles.musicTrackSelection}>
+              Flashcards Mode
+              <Selection
+                value={flashcardsMode}
+                onSelect={(value) => {
+                  setFlashcardsMode(value as T_FlashcardsMode);
+                }}
+                onOpenChange={(isOpen) => setSelectionOpen(isOpen)}
+              >
+                {Object.values(Z_FlashcardsMode.enum).map((mode) => (
+                  <Selection.Item key={`mode-${mode}`} value={mode}>
+                    {mode}
+                  </Selection.Item>
+                ))}
+              </Selection>
+            </div>
+          </motion.div>
         </Magnetic>
       </MorphingPopoverContent>
     </MorphingPopover>

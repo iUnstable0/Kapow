@@ -11,3 +11,6 @@ export const Z_PlaylistEnum = z.enum([
 export type T_Playlist = z.infer<typeof Z_PlaylistEnum>;
 
 export const Z_MaxLevel = z.coerce.number().min(1).max(5);
+
+export const Z_FlashcardsMode = z.enum(["new", "old"]);
+export type T_FlashcardsMode = z.infer<typeof Z_FlashcardsMode>;

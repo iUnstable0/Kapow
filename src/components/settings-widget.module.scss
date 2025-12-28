@@ -115,6 +115,16 @@
   gap: 8px;
 }
 
+.flashcardsModeSelection {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
 .icon {
   width: 32px;
   height: 32px;
