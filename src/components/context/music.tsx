@@ -143,19 +143,16 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   );
 
   const setVolume = useCallback((newVolume: number) => {
-    // const v = Math.max(0, Math.min(1, newVolume));
-    const v = newVolume;
-    // muhehehe
+    setVolumeState(newVolume);
+    volumeRef.current = newVolume;
 
-    setVolumeState(v);
-    volumeRef.current = v;
+    if (isLockedRef.current) return;
 
     const sound = soundRef.current;
 
     if (sound) {
       sound.off("fade");
-
-      sound.fade(sound.volume(), v, 100);
+      sound.fade(sound.volume(), newVolume, 100);
     }
   }, []);
 
@@ -181,7 +178,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const pause = () => {
+  const pause = useCallback(() => {
     const sound = soundRef.current;
 
     if (!sound || !sound.playing()) return;
@@ -195,7 +192,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       sound.pause();
       sound.volume(volumeRef.current);
     });
-  };
+  }, []);
 
   const stop = () => {
     const sound = soundRef.current;
@@ -229,12 +226,15 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const setOverride = useCallback(
     (override: boolean) => {
       setIsLocked(override);
+      isLockedRef.current = override;
 
       if (override) {
         wasPlayingBeforeLock.current = soundRef.current?.playing() ?? false;
 
         pause();
       } else {
+        if (!musicEnabled) return;
+
         if (wasPlayingBeforeLock.current) {
           // Cant call play() here because isLocked might still be true in the render cycle
           // for the play() func (if u scroll up theres a isLocked guard)
@@ -250,7 +250,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         }
       }
     },
-    [pause],
+    [pause, musicEnabled],
   );
 
   useEffect(() => {

@@ -76,17 +76,13 @@ export default function Page() {
   });
 
   const [playLeFishe, { stop: stopLeFishe }] = useSound("/lefishe.mp3", {
-    volume: 0.05,
+    volume: 1,
     interrupt: true,
     onplay: () => {
       setOverride(true);
-      // setVolume(0.07);
-      // pause();
     },
     onend: () => {
       setOverride(false);
-      // setVolume(0.5);
-      // play();
     },
   });
 
@@ -97,9 +93,6 @@ export default function Page() {
   }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
 
   const playCardSound = useCallback(() => {
-    // pause();
-    // setVolume(0.07);
-
     let fishPlayed = false;
 
     if (flipState === "question") {
@@ -131,17 +124,17 @@ export default function Page() {
 
       setTimeout(
         () => {
-          let spech = queue[reviewIndex].answer.split(".")[0];
+          let speech = queue[reviewIndex].answer.split(".")[0];
 
           if (!trollModeEnabled) {
-            if (spech === "school bus") {
-              spech = "elephant";
-            } else if (spech === "chicken jocky") {
-              spech = "chicken";
+            if (speech === "school bus") {
+              speech = "elephant";
+            } else if (speech === "chicken jocky") {
+              speech = "chicken";
             }
           }
 
-          const utterance = new SpeechSynthesisUtterance(spech);
+          const utterance = new SpeechSynthesisUtterance(speech);
 
           // utterance.pitch = 0.1;
           // utterance.rate = 0.1;
@@ -253,8 +246,9 @@ export default function Page() {
   useEffect(() => {
     if (!trollModeEnabled) {
       stopLeFishe();
+      setOverride(false);
     }
-  }, [trollModeEnabled, stopLeFishe]);
+  }, [trollModeEnabled, stopLeFishe, setOverride]);
 
   useEffect(() => {
     router.replace(`/level/${level}/flashcards/${flashcardsMode}`);

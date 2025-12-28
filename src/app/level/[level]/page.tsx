@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -51,25 +57,26 @@ const rightKeys = [
 export default function Page() {
   const router = useRouter();
 
-  const { play, pause, setVolume } = useGlobalMusic();
+  const { play, pause, setVolume, setOverride } = useGlobalMusic();
   const { trollModeEnabled, maxLevel, setMaxLevel, flashcardsMode } =
     useSettings();
 
   const { level, timer, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
 
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const [returnLoading, setReturnLoading] = useState<boolean>(false);
   const [reviewLoading, setReviewLoading] = useState<boolean>(false);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
-  const [selectedQuestion, setSelectedQuestion] = useState<string>("");
-  const [stage, setStage] = useState<number>(1);
-  const [fish, setFish] = useState<boolean>(false);
   const [answersVisible, setAnswersVisible] = useState<boolean>(false);
 
   const [win, setWin] = useState<boolean>(false);
   const [lost, setLost] = useState<boolean>(false);
 
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [stage, setStage] = useState<number>(1);
+
+  const [selectedQuestion, setSelectedQuestion] = useState<string>("");
 
   const [answered, setAnswered] = useState<Array<string>>([]);
   const [currentTimer, setCurrentTimer] = useState<string>("infinite");
@@ -102,18 +109,14 @@ export default function Page() {
     volume: 1,
   });
 
-  const [playLeFishe] = useSound("/lefishe.mp3", {
-    volume: 0.5,
+  const [playLeFishe, { stop: stopLeFishe }] = useSound("/lefishe.mp3", {
+    volume: 1,
     interrupt: true,
     onplay: () => {
-      setFish(true);
-      // pause();
-      setVolume(0.07);
+      setOverride(true);
     },
     onend: () => {
-      setFish(false);
-      // play();
-      setVolume(0.5);
+      setOverride(false);
     },
   });
 
@@ -127,6 +130,7 @@ export default function Page() {
   const startGame = useCallback(() => {
     setWin(false);
     setLost(false);
+
     setStage(1);
 
     setGameStarted(true);
@@ -179,13 +183,10 @@ export default function Page() {
 
   const playCardSound = useCallback(
     (q: (typeof quiz)[number], tts: boolean = false) => {
-      // pause();
-      setVolume(0.07);
-
       let fishPlayed = false;
 
       if (!tts) {
-        // setVolume(0.07);
+        setVolume(0.07);
 
         playSound(q.voice);
       } else {
@@ -207,23 +208,23 @@ export default function Page() {
           }
         }
 
-        // if (!fishPlayed && !fish) {
-        //   setVolume(0.07);
-        // }
+        if (!fishPlayed) {
+          setVolume(0.07);
+        }
 
         setTimeout(
           () => {
-            let spech = q.answer.split(".")[0];
+            let speech = q.answer.split(".")[0];
 
             if (!trollModeEnabled) {
-              if (spech === "school bus") {
-                spech = "elephant";
-              } else if (spech === "chicken jocky") {
-                spech = "chicken";
+              if (speech === "school bus") {
+                speech = "elephant";
+              } else if (speech === "chicken jocky") {
+                speech = "chicken";
               }
             }
 
-            const utterance = new SpeechSynthesisUtterance(spech);
+            const utterance = new SpeechSynthesisUtterance(speech);
 
             // utterance.pitch = 0.1;
             // utterance.rate = 0.1;
@@ -235,13 +236,13 @@ export default function Page() {
         );
       }
 
-      if (!fishPlayed && !fish) {
+      if (!fishPlayed) {
         setTimeout(() => {
           setVolume(0.5);
         }, 1000);
       }
     },
-    [setVolume, fish, playSound, trollModeEnabled, playBen, playLeFishe],
+    [playSound, playBen, playLeFishe, setVolume, trollModeEnabled],
   );
 
   const handleAnswer = (q: (typeof quiz)[number]) => {
@@ -277,6 +278,13 @@ export default function Page() {
       playAlert();
     }
   };
+
+  useEffect(() => {
+    if (!trollModeEnabled) {
+      stopLeFishe();
+      setOverride(false);
+    }
+  }, [trollModeEnabled, stopLeFishe, setOverride]);
 
   return (
     <motion.div className={styles.container}>
