@@ -141,9 +141,6 @@ export const KeybindButton = ({
       layout
       // layout={layoutId ? true : layout}
       layoutId={layoutId}
-      // style={{
-      //   background: "red",
-      // }}
     >
       <Magnetic
         intensity={0.1}
