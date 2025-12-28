@@ -43,3 +43,96 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes projector-jitter {
+  0%,
+  50% {
+    transform: translate(0, 0);
+  }
+
+  51% {
+    transform: translate(0, 1px);
+  }
+
+  52% {
+    transform: translate(0, -1px);
+  }
+
+  53% {
+    transform: translate(0, 0);
+  }
+
+  80% {
+    transform: translate(0.5px, 0);
+  }
+
+  81% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-projector-jitter {
+  animation: projector-jitter 3s ease-out infinite;
+}
+
+@keyframes dust-flicker-1 {
+  0%,
+  89% {
+    opacity: 0;
+  } /* Mostly invisible */
+  90% {
+    opacity: 0.8;
+    transform: translateX(0px) translateY(0px) rotate(0deg);
+  } /* Appears */
+  92% {
+    opacity: 0.8;
+    transform: translateX(2px) translateY(-1px) rotate(10deg);
+  } /* Shifts slightly */
+  93%,
+  100% {
+    opacity: 0;
+  } /* Gone */
+}
+
+/* Flicker Pattern 2 (Slower, Different Timing) */
+@keyframes dust-flicker-2 {
+  0%,
+  30% {
+    opacity: 0;
+  }
+  31% {
+    opacity: 0.6;
+    transform: translateX(0px);
+  }
+  35% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 0;
+  }
+  61% {
+    opacity: 0.7;
+    transform: translateX(-20px) translateY(10px);
+  } /* Appears elsewhere */
+  63% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Apply these classes to different dust elements */
+.animate-dust-fast {
+  /* 2s duration, loops infinitely */
+  animation: dust-flicker-1 2s steps(1) infinite;
+}
+.animate-dust-slow {
+  /* 5s duration, loops infinitely with a delay */
+  animation: dust-flicker-2 5s steps(1) infinite backwards;
+  animation-delay: 1s;
+}

@@ -128,7 +128,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         html5: true,
         volume: 0,
         // autoplay: true,
-        autoplay: !isLockedRef.current,
+        autoplay: false,
+        // autoplay: !isLockedRef.current,
         onload: () => setIsLoaded(true),
         onplay: () => {
           setIsPlaying(true);

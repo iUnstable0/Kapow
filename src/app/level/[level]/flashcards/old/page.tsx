@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { motion, AnimatePresence } from "motion/react";
+import clsx from "clsx";
 
 import useSound from "use-sound";
 
@@ -20,6 +21,7 @@ import { ProgressiveBlur } from "@/components/mp/progressive-blur";
 import { KeybindButton, T_Keybind } from "@/components/keybind";
 
 import styles from "./page.module.scss";
+import ProjectorOverlay from "@/components/projector";
 
 const MotionImage = motion.create(Image);
 
@@ -30,7 +32,7 @@ export default function Page() {
   const { fireConfetti } = useConfetti();
   const { trollModeEnabled, flashcardsMode } = useSettings();
 
-  const { etVolume, setOverride, siteEntered } = useGlobalMusic();
+  const { setVolume, setOverride, siteEntered } = useGlobalMusic();
 
   const isProcessing = useRef(false);
 
@@ -48,6 +50,8 @@ export default function Page() {
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const [reviewIndex, setReviewIndex] = useState<number>(0);
+
+  const [activeText, setActiveText] = useState<string | null>(null);
 
   const [playAlert] = useSound("/alert.mp3", {
     volume: 2,
@@ -275,11 +279,11 @@ export default function Page() {
     playFilmRoll();
 
     setTimeout(() => {
-      // setReviewStarted(true);
-      // setFirstLoad(false);
+      setReviewStarted(true);
+      setFirstLoad(false);
 
       playEntertainer();
-    }, 2000);
+    }, 3000);
 
     return () => {
       stopFilmRoll();
@@ -299,7 +303,21 @@ export default function Page() {
   }, [flashcardsMode, level, router]);
 
   return (
-    <div className={styles.container}>
+    <div className={clsx(styles.container, "animate-projector-jitter")}>
+      <ProjectorOverlay />
+
+      {activeText && (
+        <div className={styles.frameCtn}>
+          <Image
+            src={"/frame-optimised.png"}
+            alt={"frame"}
+            fill={true}
+            className={styles.frame}
+            priority={true}
+          />
+        </div>
+      )}
+
       <AnimatePresence mode={"popLayout"}>
         {!reviewStarted && (
           <motion.div
@@ -475,21 +493,22 @@ export default function Page() {
                 <MotionImage
                   key={`answer-${reviewIndex}_${trollModeEnabled}`}
                   src={`/level${level}/${
-                    trollModeEnabled
-                      ? queue[reviewIndex].answer
-                      : `${queue[reviewIndex].answer.split(".")[0]}.${
-                          queue[reviewIndex].answer.split(".")[
-                            queue[reviewIndex].answer.split(".").length - 1
-                          ]
-                        }`
-                  }`}
+                    queue[reviewIndex].answer.split(".")[0]
+                  }.old.gif`}
                   alt={"answer image"}
                   width={200}
                   height={200}
                   className={styles.image}
-                  initial={{ opacity: 0, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, filter: "blur(10px)" }}
+                  initial={{
+                    opacity: 0,
+                    filter: "blur(10px) sepia(0.75)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    filter:
+                      "blur(0px) sepia(0.75) contrast(1.2) saturate(0.7) brightness(0.7)",
+                  }}
+                  exit={{ opacity: 0, filter: "blur(10px) sepia(0.75)" }}
                   transition={{ duration: 0.5 }}
                 />
               )}
