@@ -117,9 +117,9 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         soundRef.current.unload();
       }
 
-      setIsLoaded(true);
-
       if (!musicEnabled) {
+        setIsLoaded(true);
+
         return;
       }
 
@@ -128,9 +128,9 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         html5: true,
         volume: 0,
         // autoplay: true,
-        autoplay: false,
-        // autoplay: !isLockedRef.current,
-        // onload: () => setIsLoaded(true),
+        // autoplay: false,
+        autoplay: !isLockedRef.current,
+        onload: () => setIsLoaded(true),
         onplay: () => {
           setIsPlaying(true);
 
