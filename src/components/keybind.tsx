@@ -218,9 +218,9 @@ export const KeybindButton = ({
             <motion.div
               key={`keybind_${keybinds.join("_")}_${forceTheme}_text`}
               className={clsx(styles.keybindButtonText, textClassName)}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              // initial={{ opacity: 0 }}
+              // animate={{ opacity: 1 }}
+              // exit={{ opacity: 0 }}
               transition={{
                 type: "spring",
                 stiffness: 120,
