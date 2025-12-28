@@ -23,14 +23,33 @@ export function TextMorph({
   const uniqueId = useId();
 
   const characters = useMemo(() => {
-    const charCounts: Record<string, number> = {};
+    const chars = children.split("");
 
-    return children.split("").map((char) => {
+    const totalCharCounts = chars.reduce(
+      (acc, char) => {
+        const lower = char.toLowerCase();
+        acc[lower] = (acc[lower] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    const leftCharCounts: Record<string, number> = {};
+    const rightCharCounts = { ...totalCharCounts };
+
+    return chars.map((char) => {
       const lowerChar = char.toLowerCase();
-      charCounts[lowerChar] = (charCounts[lowerChar] || 0) + 1;
+
+      const leftCount = (leftCharCounts[lowerChar] =
+        (leftCharCounts[lowerChar] || 0) + 1);
+
+      const rightCount = rightCharCounts[lowerChar];
+      if (rightCharCounts[lowerChar] !== undefined) {
+        rightCharCounts[lowerChar]--;
+      }
 
       return {
-        id: `${uniqueId}-${lowerChar}${charCounts[lowerChar]}`,
+        id: `${uniqueId}-${lowerChar}-${leftCount}-${rightCount}`,
         label: char === " " ? "\u00A0" : char,
       };
     });

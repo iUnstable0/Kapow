@@ -27,6 +27,11 @@ import { useSettings } from "@/components/context/settings";
 import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
 
 import styles from "./page.module.scss";
+import {
+  ArrowLeftIcon,
+  BookCopy,
+  ListChecks,
+} from "lucide-react";
 
 const leftKeys = [
   T_Keybind.q,
@@ -57,7 +62,7 @@ const rightKeys = [
 export default function Page() {
   const router = useRouter();
 
-  const { play, pause, setVolume, setOverride } = useGlobalMusic();
+  const { setVolume, setOverride } = useGlobalMusic();
   const { trollModeEnabled, maxLevel, setMaxLevel, flashcardsMode } =
     useSettings();
 
@@ -232,7 +237,7 @@ export default function Page() {
 
             window.speechSynthesis.speak(utterance);
           },
-          matchedSwitch ? 1000 : 0,
+          matchedSwitch ? 1000 : 0
         );
       }
 
@@ -242,7 +247,7 @@ export default function Page() {
         }, 1000);
       }
     },
-    [playSound, playBen, playLeFishe, setVolume, trollModeEnabled],
+    [playSound, playBen, playLeFishe, setVolume, trollModeEnabled]
   );
 
   const handleAnswer = (q: (typeof quiz)[number]) => {
@@ -333,6 +338,7 @@ export default function Page() {
               loadingTextEnabled={true}
               reversed={false}
               dangerous={true}
+              icon={<ArrowLeftIcon />}
             >
               Back
             </KeybindButton>
@@ -346,41 +352,31 @@ export default function Page() {
               disabled={reviewLoading || returnLoading}
               loadingText={"Please wait..."}
               loadingTextEnabled={true}
+              icon={<ListChecks />}
             >
-              Toggle answers
+              {answersVisible ? "Hide Answers" : "Show Answers"}
             </KeybindButton>
 
-            <div className={styles.toolrowitm}>
-              <KeybindButton
-                forceTheme={"dark"}
-                keybinds={[T_Keybind.shift, T_Keybind.enter]}
-                onPress={() => {
-                  setReviewLoading(true);
+            {/* <div className={styles.toolrowitm}> */}
+            <KeybindButton
+              forceTheme={"dark"}
+              keybinds={[T_Keybind.f]}
+              onPress={() => {
+                setReviewLoading(true);
 
-                  setTimeout(() => {
-                    router.push(`/level/${level}/flashcards/${flashcardsMode}`);
-                  }, 750);
-                }}
-                loading={reviewLoading}
-                disabled={reviewLoading || returnLoading}
-                loadingText={"Please wait..."}
-                loadingTextEnabled={true}
-              >
-                Flashcards
-              </KeybindButton>
-
-              <KeybindButton
-                forceTheme={"dark"}
-                keybinds={[T_Keybind.enter]}
-                onPress={() => {
-                  startGame();
-                }}
-                disabled={reviewLoading || returnLoading}
-                loadingTextEnabled={false}
-              >
-                Play
-              </KeybindButton>
-            </div>
+                setTimeout(() => {
+                  router.push(`/level/${level}/flashcards/${flashcardsMode}`);
+                }, 750);
+              }}
+              loading={reviewLoading}
+              disabled={reviewLoading || returnLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
+              icon={<BookCopy />}
+            >
+              Flashcards
+            </KeybindButton>
+            {/* </div> */}
           </motion.div>
         )}
 
@@ -617,7 +613,7 @@ export default function Page() {
                       className={clsx(
                         styles.question,
                         selectedQuestion == q.question &&
-                          styles.question_selected,
+                          styles.question_selected
                       )}
                       initial={{
                         opacity: 0,

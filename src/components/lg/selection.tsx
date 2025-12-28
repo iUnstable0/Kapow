@@ -111,7 +111,7 @@ export default function Selection({
               ref={containerRef}
               className={clsx(
                 styles.marqueeWindow,
-                isTextOverflow && styles.hasOverflow,
+                isTextOverflow && styles.hasOverflow
               )}
             >
               <motion.span
@@ -135,7 +135,7 @@ export default function Selection({
         <MorphingPopoverContent
           className={styles.selectionPage}
           portal={true}
-          anchor={"top-right"}
+          anchor={"top-left"}
           strategy="fixed"
         >
           <Magnetic
@@ -174,7 +174,7 @@ function SelectionItem({ children, value, className }: SelectionItemProps) {
       <motion.span
         className={clsx(
           styles.itemText,
-          context.selectedValue === value && styles.itemTextSelected,
+          context.selectedValue === value && styles.itemTextSelected
         )}
         layoutId={`selection-item-${value}`}
         layout={"position"}

@@ -321,7 +321,7 @@ export default function Page() {
       loop: true,
       html5: true,
       interrupt: true,
-    },
+    }
   );
 
   const [playEntertainer, { stop: stopEntertainer }] = useSound(
@@ -331,7 +331,7 @@ export default function Page() {
       loop: true,
       html5: true,
       interrupt: true,
-    },
+    }
   );
 
   const clearAllTimeouts = useCallback(() => {
@@ -345,7 +345,7 @@ export default function Page() {
   }, []);
 
   const runScript = (
-    script: (typeof customScript)[keyof typeof customScript],
+    script: (typeof customScript)[keyof typeof customScript]
   ) => {
     setToolsLocked(true);
 
@@ -413,7 +413,7 @@ export default function Page() {
         }
       }
     },
-    [flipState, playSound, queue, reviewIndex, setActiveText, clearAllTimeouts],
+    [flipState, playSound, queue, reviewIndex, setActiveText, clearAllTimeouts]
   );
 
   const markForReview = useCallback(
@@ -422,7 +422,7 @@ export default function Page() {
 
       setReviews((prev) => [...prev, item]);
     },
-    [reviews],
+    [reviews]
   );
 
   const handleNext = useCallback(
@@ -433,7 +433,7 @@ export default function Page() {
         markForReview(currentCard);
       } else {
         setReviews((prev) =>
-          prev.filter((rev) => rev.question !== currentCard.question),
+          prev.filter((rev) => rev.question !== currentCard.question)
         );
       }
 
@@ -450,7 +450,7 @@ export default function Page() {
         setReviewIndex(Math.min(reviewIndex + 1, queue.length - 1));
       }
     },
-    [queue, reviewIndex, markForReview],
+    [queue, reviewIndex, markForReview]
   );
 
   const handleFlip = useCallback(() => {
@@ -483,7 +483,7 @@ export default function Page() {
         scriptTimeoutsRef.current.push(
           setTimeout(() => {
             fireConfetti(false);
-          }, 5000),
+          }, 5000)
         );
 
         runScript(customScript.winAll);
@@ -529,19 +529,19 @@ export default function Page() {
       scriptTimeoutsRef.current.push(
         setTimeout(() => {
           playSilence();
-        }, 1700),
+        }, 1700)
       );
 
       scriptTimeoutsRef.current.push(
         setTimeout(() => {
           playCry();
-        }, 12200),
+        }, 12200)
       );
 
       scriptTimeoutsRef.current.push(
         setTimeout(() => {
           playAngry();
-        }, 14200),
+        }, 14200)
       );
 
       // playAlert();
@@ -597,7 +597,7 @@ export default function Page() {
     playFilmStart();
     playFilmRoll();
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       // if (!win) {
       setReviewStarted(true);
       setFirstLoad(false);
@@ -610,6 +610,7 @@ export default function Page() {
       stopFilmRoll();
       stopEntertainer();
       clearAllTimeouts();
+      clearTimeout(timer);
     };
   }, [
     playFilmRoll,
@@ -1040,7 +1041,7 @@ export default function Page() {
                   onPress={() => {
                     window.open(
                       `https://www.thai2english.com/?q=${encodeURIComponent(queue[reviewIndex].question)}`,
-                      "_blank",
+                      "_blank"
                     );
                   }}
                   disabled={!!activeText || toolsLocked}

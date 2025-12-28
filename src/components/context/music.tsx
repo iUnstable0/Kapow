@@ -26,22 +26,22 @@ import type { T_Playlist } from "@/types";
 
 const adhd_songs = Array.from(
   { length: 15 },
-  (_, i) => `/adhd/song ${i + 1}.mp3`,
+  (_, i) => `/adhd/song ${i + 1}.mp3`
 );
 
 const coffee_songs = Array.from(
   { length: 10 },
-  (_, i) => `/coffee/coffee ${i + 1}.mp3`,
+  (_, i) => `/coffee/coffee ${i + 1}.mp3`
 );
 
 const blueberry_songs = Array.from(
   { length: 13 },
-  (_, i) => `/blueberry/blueberry ${i + 1}.mp3`,
+  (_, i) => `/blueberry/blueberry ${i + 1}.mp3`
 );
 
 const cisco_songs = Array.from(
   { length: 1 },
-  (_, i) => `/cisco/cisco ${i + 1}.mp3`,
+  (_, i) => `/cisco/cisco ${i + 1}.mp3`
 );
 
 const playlists: Record<T_Playlist, string[]> = {
@@ -89,7 +89,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   const [isLocked, setIsLocked] = useState<boolean>(false);
 
   const [siteEntered, setSiteEntered] = useState<boolean>(
-    hasUserInteractedGlobal,
+    hasUserInteractedGlobal
   );
 
   const [volume, setVolumeState] = useState<number>(0.5);
@@ -153,7 +153,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         },
       });
     },
-    [musicEnabled],
+    [musicEnabled]
   );
 
   const setVolume = useCallback((newVolume: number) => {
@@ -255,16 +255,20 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
           const sound = soundRef.current;
 
-          if (sound && !sound.playing()) {
+          if (sound) {
             sound.off("fade");
-            sound.volume(0);
-            sound.play();
-            sound.fade(0, volumeRef.current, 2000);
+
+            if (!sound.playing()) {
+              sound.volume(0);
+              sound.play();
+            }
+
+            sound.fade(sound.volume(), volumeRef.current, 2000);
           }
         }
       }
     },
-    [pause, musicEnabled],
+    [pause, musicEnabled]
   );
 
   useEffect(() => {
