@@ -132,11 +132,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         format: ["mp3"],
         // autoplay: !isLockedRef.current,
         onload: () => setIsLoaded(true),
-        onloaderror: (id, error) => {
-          console.error("Music failed to load", error);
-          alert("ERROR open console and report to me pls ty");
-          setIsLoaded(true);
-        },
         onplay: () => {
           setIsPlaying(true);
 
