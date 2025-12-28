@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import levels from "@/components/levels.json";
 
-import { LevelProvider } from "@/components/level";
+import { LevelProvider } from "@/components/context/level";
 import { ConfettiProvider } from "@/components/confetti";
 
 export default async function LevelLayout({

@@ -11,7 +11,7 @@ import clsx from "clsx";
 
 import useSound from "use-sound";
 
-import { useLevel } from "@/components/level";
+import { useLevel } from "@/components/context/level";
 import { useGlobalMusic } from "@/components/context/music";
 import { useConfetti } from "@/components/confetti";
 import { useSettings } from "@/components/context/settings";

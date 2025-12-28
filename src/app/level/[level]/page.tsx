@@ -13,25 +13,27 @@ import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 
+import { ArrowLeftIcon, BookCopy, Brain, ListChecks } from "lucide-react";
+
 import clsx from "clsx";
 import useSound from "use-sound";
 
 import { motion, AnimatePresence } from "motion/react";
 import { DateTime } from "luxon";
 
-import { useGlobalMusic } from "@/components/context/music";
-import { useLevel } from "@/components/level";
-import { useConfetti } from "@/components/confetti";
 import { useSettings } from "@/components/context/settings";
+import { useGlobalMusic } from "@/components/context/music";
+import { useLevel } from "@/components/context/level";
+
+import { useConfetti } from "@/components/confetti";
+
+import Selection from "@/components/lg/selection";
 
 import Keybind, { KeybindButton, T_Keybind } from "@/components/keybind";
 
 import styles from "./page.module.scss";
-import {
-  ArrowLeftIcon,
-  BookCopy,
-  ListChecks,
-} from "lucide-react";
+
+import { Z_GameMode, type T_GameMode } from "@/types";
 
 const leftKeys = [
   T_Keybind.q,
@@ -75,6 +77,9 @@ export default function Page() {
   const [reviewLoading, setReviewLoading] = useState<boolean>(false);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [answersVisible, setAnswersVisible] = useState<boolean>(false);
+
+  const [selectedGameMode, setSelectedGameMode] =
+    useState<T_GameMode>("matching");
 
   const [win, setWin] = useState<boolean>(false);
   const [lost, setLost] = useState<boolean>(false);
@@ -310,6 +315,25 @@ export default function Page() {
           Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`
                 : `Timer: no timer`}
             </p>
+
+            <div className={styles.gameMode}>
+              Game Mode:
+
+              <div className={styles.gameModeSelect}>
+                <Selection
+                  value={selectedGameMode}
+                  onSelect={(value) => {
+                    setSelectedGameMode(value as T_GameMode);
+                  }}
+                >
+                  {Object.values(Z_GameMode.enum).map((mode) => (
+                    <Selection.Item key={`gameMode-${mode}`} value={mode}>
+                      {mode}
+                    </Selection.Item>
+                  ))}
+                </Selection>
+              </div>
+            </div>
           </motion.div>
         )}
 
@@ -342,7 +366,6 @@ export default function Page() {
             >
               Back
             </KeybindButton>
-
             <KeybindButton
               forceTheme={"dark"}
               keybinds={[T_Keybind.a]}
@@ -356,8 +379,6 @@ export default function Page() {
             >
               {answersVisible ? "Hide Answers" : "Show Answers"}
             </KeybindButton>
-
-            {/* <div className={styles.toolrowitm}> */}
             <KeybindButton
               forceTheme={"dark"}
               keybinds={[T_Keybind.f]}
@@ -376,7 +397,19 @@ export default function Page() {
             >
               Flashcards
             </KeybindButton>
-            {/* </div> */}
+
+            <KeybindButton
+              forceTheme={"dark"}
+              keybinds={[T_Keybind.enter]}
+              onPress={() => {
+                startGame();
+              }}
+              disabled={reviewLoading || returnLoading}
+              loadingTextEnabled={false}
+              icon={<Brain />}
+            >
+              Start Level
+            </KeybindButton>
           </motion.div>
         )}
 

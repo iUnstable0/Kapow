@@ -4,6 +4,7 @@ import React, {
   useRef,
   useState,
   useEffect,
+  useLayoutEffect,
   createContext,
   useContext,
 } from "react";
@@ -57,12 +58,13 @@ export default function Selection({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const checkOverflow = () => {
-      if (containerRef.current && textRef.current) {
+      if (containerRef.current && measureRef.current) {
         const containerWidth = containerRef.current.clientWidth;
-        const textWidth = textRef.current.scrollWidth;
+        const textWidth = measureRef.current.scrollWidth;
 
         setIsTextOverflow(textWidth > containerWidth);
       }
@@ -114,6 +116,19 @@ export default function Selection({
                 isTextOverflow && styles.hasOverflow
               )}
             >
+              <span
+                ref={measureRef}
+                style={{
+                  position: "absolute",
+                  visibility: "hidden",
+                  whiteSpace: "nowrap",
+                  pointerEvents: "none",
+                }}
+                aria-hidden={true}
+              >
+                {value}
+              </span>
+
               <motion.span
                 ref={textRef}
                 className={

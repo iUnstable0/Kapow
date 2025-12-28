@@ -49,7 +49,7 @@
   },
   {
     "level": 2,
-    "timer": 120,
+    "timer": 500,
     "quiz": [
       {
         "question": "กา",
@@ -97,7 +97,7 @@
   },
   {
     "level": 3,
-    "timer": 120,
+    "timer": 500,
     "quiz": [
       {
         "question": "งู",
@@ -145,7 +145,7 @@
   },
   {
     "level": 4,
-    "timer": 120,
+    "timer": 300,
     "quiz": [
       {
         "question": "นก",

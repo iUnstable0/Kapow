@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "motion/react";
 
 import useSound from "use-sound";
 
-import { useLevel } from "@/components/level";
+import { useLevel } from "@/components/context/level";
 import { useGlobalMusic } from "@/components/context/music";
 import { useConfetti } from "@/components/confetti";
 import { useSettings } from "@/components/context/settings";
@@ -140,7 +140,7 @@ export default function Page() {
 
           window.speechSynthesis.speak(utterance);
         },
-        matchedSwitch ? 1000 : 0,
+        matchedSwitch ? 1000 : 0
       );
     }
 
@@ -166,7 +166,7 @@ export default function Page() {
 
       setReviews((prev) => [...prev, item]);
     },
-    [reviews],
+    [reviews]
   );
 
   const handleNext = useCallback(
@@ -181,7 +181,7 @@ export default function Page() {
         markForReview(currentCard);
       } else {
         setReviews((prev) =>
-          prev.filter((rev) => rev.question !== currentCard.question),
+          prev.filter((rev) => rev.question !== currentCard.question)
         );
       }
 
@@ -205,7 +205,7 @@ export default function Page() {
         }, 300);
       }
     },
-    [queue, reviewIndex, markForReview, isProcessing],
+    [queue, reviewIndex, markForReview, isProcessing]
   );
 
   const handleFlip = useCallback(() => {
@@ -477,7 +477,7 @@ export default function Page() {
                   onPress={() => {
                     window.open(
                       `https://www.thai2english.com/?q=${encodeURIComponent(queue[reviewIndex].question)}`,
-                      "_blank",
+                      "_blank"
                     );
                   }}
                   // disabled={reviewLoading || returnLoading}
