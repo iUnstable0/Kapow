@@ -6,8 +6,8 @@ import Image from "next/image";
 
 import { useRouter } from "next/navigation";
 
+import { ArrowLeft, BookCopy, Flame } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-
 import useSound from "use-sound";
 
 import { useLevel } from "@/components/context/level";
@@ -26,26 +26,28 @@ const MotionImage = motion.create(Image);
 export default function Page() {
   const router = useRouter();
 
+  const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const { level, quiz, playSound } = useLevel();
   const { fireConfetti } = useConfetti();
   const { trollModeEnabled, flashcardsMode } = useSettings();
 
   const { setVolume, setOverride, siteEntered } = useGlobalMusic();
 
-  const isProcessing = useRef(false);
-
   const [flipped, setFlipped] = useState<boolean>(false);
+  const [reviewStarted, setReviewStarted] = useState<boolean>(false);
+
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const [imagesPreloaded, setImagesPreloaded] = useState<boolean>(false);
+
+  const [win, setWin] = useState<boolean>(false);
+
   const [flipState, setFlipState] = useState<"question" | "answer">("question");
 
   const [exitReviewLoading, setExitReviewLoading] = useState<boolean>(false);
 
   const [queue, setQueue] = useState<typeof quiz>(quiz);
   const [reviews, setReviews] = useState<typeof quiz>([]);
-
-  const [win, setWin] = useState<boolean>(false);
-
-  const [reviewStarted, setReviewStarted] = useState<boolean>(false);
-  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const [reviewIndex, setReviewIndex] = useState<number>(0);
 
@@ -90,7 +92,16 @@ export default function Page() {
     benSounds[randomIndex]();
   }, [playBen1, playBen2, playBen3, playBen4, playBen5]);
 
+  const clearAllTimeouts = useCallback(() => {
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current);
+      speechTimeoutRef.current = null;
+    }
+  }, []);
+
   const playCardSound = useCallback(() => {
+    clearAllTimeouts();
+
     let fishPlayed = false;
 
     if (flipState === "question") {
@@ -120,15 +131,18 @@ export default function Page() {
         setVolume(0.07);
       }
 
-      setTimeout(
+      speechTimeoutRef.current = setTimeout(
         () => {
           let speech = queue[reviewIndex].answer.split(".")[0];
 
           if (!trollModeEnabled) {
-            if (speech === "school bus") {
-              speech = "elephant";
-            } else if (speech === "chicken jocky") {
-              speech = "chicken";
+            switch (speech) {
+              case "school bus":
+                speech = "elephant";
+                break;
+              case "chicken jocky":
+                speech = "chicken";
+                break;
             }
           }
 
@@ -171,10 +185,6 @@ export default function Page() {
 
   const handleNext = useCallback(
     (review: boolean) => {
-      if (isProcessing.current) return;
-
-      isProcessing.current = true;
-
       const currentCard = queue[reviewIndex];
 
       if (review) {
@@ -190,22 +200,15 @@ export default function Page() {
 
       if (reviewIndex + 1 >= queue.length) {
         setWin(true);
+
         setReviewStarted(false);
         setReviewIndex(0);
-
-        isProcessing.current = false;
       } else {
-        setReviewIndex((prev) => Math.min(prev + 1, queue.length - 1));
-
-        console.log("FC NEXT");
-
-        setTimeout(() => {
-          isProcessing.current = false;
-          console.log("FC UNLOCK");
-        }, 300);
+        // setReviewIndex((prev) => Math.min(prev + 1, queue.length - 1));
+        setReviewIndex(Math.min(reviewIndex + 1, queue.length - 1));
       }
     },
-    [queue, reviewIndex, markForReview, isProcessing]
+    [queue, reviewIndex, markForReview]
   );
 
   const handleFlip = useCallback(() => {
@@ -218,6 +221,14 @@ export default function Page() {
     }
   }, [flipState]);
 
+  const calcImgSrc = (answer: string) => {
+    if (trollModeEnabled) return answer;
+
+    const srcSplit = answer.split(".");
+
+    return `${srcSplit[0]}.${srcSplit[srcSplit.length - 1]}`;
+  };
+
   useEffect(() => {
     if (!reviewStarted) return;
 
@@ -227,21 +238,51 @@ export default function Page() {
   useEffect(() => {
     if (!win) return;
 
-    if (reviews.length < quiz.length) {
-      fireConfetti(true);
+    if (reviews.length < queue.length) {
+      if (reviews.length === 0) {
+        fireConfetti(true);
+      }
     } else {
       playAlert();
     }
-  }, [win, fireConfetti, playAlert, reviews, quiz]);
+  }, [win, fireConfetti, reviews, queue, playAlert]);
 
   useEffect(() => {
     if (!siteEntered) return;
+    if (!imagesPreloaded) return;
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setReviewStarted(true);
       setFirstLoad(false);
-    }, 2000);
-  }, [siteEntered]);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [siteEntered, imagesPreloaded]);
+
+  useEffect(() => {
+    const preloadImages = async () => {
+      const promises = quiz.map((item) => {
+        return new Promise((resolve, reject) => {
+          const img = new window.Image();
+
+          const filename = calcImgSrc(item.answer);
+          img.src = filename;
+
+          img.onload = () => resolve(true);
+
+          img.onerror = (error) => {
+            console.warn(`Failed to preload image: ${filename}`, error);
+            resolve(true);
+          };
+        });
+      });
+
+      await Promise.all(promises);
+      setImagesPreloaded(true);
+    };
+
+    preloadImages();
+  }, [level, quiz]);
 
   useEffect(() => {
     if (!trollModeEnabled) {
@@ -267,13 +308,17 @@ export default function Page() {
             key={"title-ctn"}
           >
             <h1 className={styles.title}>Level {level} Flashcards</h1>
+
             {firstLoad && <p className={styles.desc}>Loading...</p>}
+
             {!firstLoad && reviews.length === 0 && !win && (
               <p className={styles.desc}>Get ready to review!</p>
             )}
+
             {!firstLoad && reviews.length === 0 && win && (
               <p className={styles.desc}>Great job reviewing! Try again?</p>
             )}
+
             {!firstLoad &&
               reviews.length > 0 &&
               reviews.length < quiz.length && (
@@ -282,6 +327,7 @@ export default function Page() {
                   {reviews.length > 1 ? "s" : ""} left to review.
                 </p>
               )}
+
             {!firstLoad && !(reviews.length < quiz.length) && (
               <p className={styles.desc}>You failed all reviews lol.</p>
             )}
@@ -312,47 +358,48 @@ export default function Page() {
               disabled={exitReviewLoading}
               loadingText={"Please wait..."}
               loadingTextEnabled={true}
+              icon={<ArrowLeft />}
             >
-              Exit Flashcards
+              Back
             </KeybindButton>
 
             {reviews.length > 0 && reviews.length < quiz.length && (
               <KeybindButton
-                keybinds={[T_Keybind.shift, T_Keybind.enter]}
+                // keybinds={[T_Keybind.shift, T_Keybind.enter]}
+                // keybinds={[T_Keybind.enter]}
+                keybinds={[T_Keybind.r]}
                 forceTheme={"dark"}
                 onPress={() => {
                   setQueue(reviews);
                   setReviews([]);
+
                   setWin(false);
-                  setFlipped(false);
+
+                  // setFlipped(false);
 
                   setReviewStarted(true);
                 }}
-                // disabled={reviewLoading || returnLoading}
-                // loading={returnLoading}
-                // loadingText={"Please wait..."}
-                // loadingTextEnabled={true}
-                // reversed={true}
+                disabled={exitReviewLoading}
+                icon={<Flame />}
               >
-                Review remaining
+                Review Remaining
               </KeybindButton>
             )}
 
             <KeybindButton
               keybinds={[T_Keybind.enter]}
+              // keybinds={[T_Keybind.shift, T_Keybind.enter]}
               forceTheme={"dark"}
               onPress={() => {
                 setQueue(quiz);
                 setReviews([]);
+
                 setWin(false);
 
                 setReviewStarted(true);
               }}
-              // disabled={reviewLoading || returnLoading}
-              // loading={returnLoading}
-              // loadingText={"Please wait..."}
-              // loadingTextEnabled={true}
-              // reversed={true}
+              disabled={exitReviewLoading}
+              icon={<BookCopy />}
             >
               {reviews.length > 0
                 ? reviews.length < quiz.length
@@ -375,15 +422,18 @@ export default function Page() {
             key={"exitreview"}
           >
             <KeybindButton
-              keybinds={[T_Keybind.escape]}
+              keybinds={[T_Keybind.shift, T_Keybind.escape]}
               onPress={() => {
                 setReviewStarted(false);
+                setFlipped(false);
+                setFlipState("question");
+
                 setReviewIndex(0);
               }}
               forceTheme={"dark"}
               dangerous={true}
             >
-              Quit Session
+              End Review
             </KeybindButton>
           </motion.div>
         )}
@@ -430,15 +480,7 @@ export default function Page() {
               {flipState === "answer" && (
                 <MotionImage
                   key={`answer-${reviewIndex}_${trollModeEnabled}`}
-                  src={`/level${level}/${
-                    trollModeEnabled
-                      ? queue[reviewIndex].answer
-                      : `${queue[reviewIndex].answer.split(".")[0]}.${
-                          queue[reviewIndex].answer.split(".")[
-                            queue[reviewIndex].answer.split(".").length - 1
-                          ]
-                        }`
-                  }`}
+                  src={`/level${level}/${calcImgSrc(queue[reviewIndex].answer)}`}
                   alt={"answer image"}
                   width={200}
                   height={200}
@@ -459,11 +501,6 @@ export default function Page() {
                   onPress={() => {
                     handleNext(true);
                   }}
-                  // disabled={reviewLoading || returnLoading}
-                  // loading={returnLoading}
-                  // loadingText={"Please wait..."}
-                  // loadingTextEnabled={true}
-                  // reversed={true}
                   dangerous={true}
                 >
                   Mark for Review
@@ -480,12 +517,6 @@ export default function Page() {
                       "_blank"
                     );
                   }}
-                  // disabled={reviewLoading || returnLoading}
-                  // loading={returnLoading}
-                  // loadingText={"Please wait..."}
-                  // loadingTextEnabled={true}
-                  // reversed={true}
-                  // dangerous={true}
                 >
                   Open Dictionary
                 </KeybindButton>
@@ -497,14 +528,8 @@ export default function Page() {
                 onPress={() => {
                   playCardSound();
                 }}
-                // disabled={reviewLoading || returnLoading}
-                // loading={returnLoading}
-                // loadingText={"Please wait..."}
-                // loadingTextEnabled={true}
-                // reversed={true}
-                // dangerous={true}
               >
-                Play sound
+                Play Sound
               </KeybindButton>
 
               <KeybindButton
@@ -514,12 +539,6 @@ export default function Page() {
                 onPress={() => {
                   handleFlip();
                 }}
-                // disabled={reviewLoading || returnLoading}
-                // loading={returnLoading}
-                // loadingText={"Please wait..."}
-                // loadingTextEnabled={true}
-                // reversed={true}
-                // dangerous={true}
               >
                 Flip
               </KeybindButton>
@@ -531,12 +550,6 @@ export default function Page() {
                   onPress={() => {
                     handleNext(false);
                   }}
-                  // disabled={reviewLoading || returnLoading}
-                  // loading={returnLoading}
-                  // loadingText={"Please wait..."}
-                  // loadingTextEnabled={true}
-                  // reversed={true}
-                  // dangerous={true}
                 >
                   Next
                 </KeybindButton>

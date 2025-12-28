@@ -297,122 +297,206 @@ export default function Page() {
   }, [trollModeEnabled, stopLeFishe, setOverride]);
 
   return (
-    <motion.div className={styles.container}>
-      <AnimatePresence mode={"popLayout"}>
-        {!gameStarted && (
-          <motion.div
-            className={styles.titleCtn}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"title-ctn"}
-          >
-            <h1 className={styles.title}>Level {level}</h1>
-            <p className={styles.desc}>
-              {timer > 0
-                ? `
+    <div className={styles.container}>
+      <div className={styles.levelInfoPage}>
+        <AnimatePresence mode={"popLayout"}>
+          {!gameStarted && (
+            <motion.div
+              className={styles.levelInfoCtn}
+              key={"title-ctn"}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                type: "spring",
+
+                // Stiffness/damping seems more stable
+                // than bounce + duration
+                stiffness: 120,
+                damping: 20,
+
+                // bounce: 0.2,
+                // duration: 1,
+
+                opacity: {
+                  duration: 0.2,
+                },
+              }}
+              layout
+            >
+              <div className={styles.levelInfoSection}>
+                <h1 className={styles.levelTitle}>Level {level}</h1>
+
+                <p className={styles.levelDesc}>
+                  {timer > 0
+                    ? `
           Timer: ${DateTime.fromSeconds(timer).toFormat("mm:ss")} minutes`
-                : `Timer: no timer`}
-            </p>
+                    : `Timer: no timer`}
+                </p>
 
-            <div className={styles.gameMode}>
-              Game Mode:
-
-              <div className={styles.gameModeSelect}>
-                <Selection
-                  value={selectedGameMode}
-                  onSelect={(value) => {
-                    setSelectedGameMode(value as T_GameMode);
-                  }}
-                >
-                  {Object.values(Z_GameMode.enum).map((mode) => (
-                    <Selection.Item key={`gameMode-${mode}`} value={mode}>
-                      {mode}
-                    </Selection.Item>
-                  ))}
-                </Selection>
+                <div className={styles.gameMode}>
+                  Game Mode:
+                  <div className={styles.gameModeSelect}>
+                    <Selection
+                      value={selectedGameMode}
+                      onSelect={(value) => {
+                        setSelectedGameMode(value as T_GameMode);
+                      }}
+                    >
+                      {Object.values(Z_GameMode.enum).map((mode) => (
+                        <Selection.Item key={`gameMode-${mode}`} value={mode}>
+                          {mode}
+                        </Selection.Item>
+                      ))}
+                    </Selection>
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
 
-        {!gameStarted && (
-          <motion.div
-            className={styles.toolrow}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"toolbar"}
-          >
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.escape]}
-              onPress={() => {
-                setReturnLoading(true);
+              <div className={styles.levelInfoSection}>
+                <motion.div
+                  className={styles.toolrow}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  key={"toolbar"}
+                >
+                  <KeybindButton
+                    forceTheme={"dark"}
+                    keybinds={[T_Keybind.escape]}
+                    onPress={() => {
+                      setReturnLoading(true);
 
-                setTimeout(() => {
-                  router.push(`/`);
-                }, 750);
-              }}
-              disabled={reviewLoading || returnLoading}
-              loading={returnLoading}
-              loadingText={"Please wait..."}
-              loadingTextEnabled={true}
-              reversed={false}
-              dangerous={true}
-              icon={<ArrowLeftIcon />}
+                      setTimeout(() => {
+                        router.push(`/`);
+                      }, 750);
+                    }}
+                    disabled={reviewLoading || returnLoading}
+                    loading={returnLoading}
+                    loadingText={"Please wait..."}
+                    loadingTextEnabled={true}
+                    reversed={false}
+                    dangerous={true}
+                    icon={<ArrowLeftIcon />}
+                  >
+                    Back
+                  </KeybindButton>
+                  <KeybindButton
+                    forceTheme={"dark"}
+                    keybinds={[T_Keybind.a]}
+                    onPress={() => {
+                      setAnswersVisible((prev) => !prev);
+                    }}
+                    disabled={reviewLoading || returnLoading}
+                    loadingText={"Please wait..."}
+                    loadingTextEnabled={true}
+                    icon={<ListChecks />}
+                  >
+                    {answersVisible ? "Hide Answers" : "Show Answers"}
+                  </KeybindButton>
+                  <KeybindButton
+                    forceTheme={"dark"}
+                    keybinds={[T_Keybind.f]}
+                    onPress={() => {
+                      setReviewLoading(true);
+
+                      setTimeout(() => {
+                        router.push(
+                          `/level/${level}/flashcards/${flashcardsMode}`
+                        );
+                      }, 750);
+                    }}
+                    loading={reviewLoading}
+                    disabled={reviewLoading || returnLoading}
+                    loadingText={"Please wait..."}
+                    loadingTextEnabled={true}
+                    icon={<BookCopy />}
+                  >
+                    Flashcards
+                  </KeybindButton>
+
+                  <KeybindButton
+                    forceTheme={"dark"}
+                    keybinds={[T_Keybind.enter]}
+                    onPress={() => {
+                      startGame();
+                    }}
+                    disabled={reviewLoading || returnLoading}
+                    loadingTextEnabled={false}
+                    icon={<Brain />}
+                  >
+                    Start Level
+                  </KeybindButton>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+
+          {!gameStarted && answersVisible && (
+            <motion.div
+              className={styles.gameCtn}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              key={"answers"}
             >
-              Back
-            </KeybindButton>
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.a]}
-              onPress={() => {
-                setAnswersVisible((prev) => !prev);
-              }}
-              disabled={reviewLoading || returnLoading}
-              loadingText={"Please wait..."}
-              loadingTextEnabled={true}
-              icon={<ListChecks />}
-            >
-              {answersVisible ? "Hide Answers" : "Show Answers"}
-            </KeybindButton>
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.f]}
-              onPress={() => {
-                setReviewLoading(true);
+              <div className={styles.option}>
+                {quiz.map((q) => (
+                  <div key={`awdaq_${q.question}`} className={styles.answerRow}>
+                    <div
+                      className={styles.question}
+                      onClick={() => {
+                        playCardSound(q);
+                      }}
+                    >
+                      <span className={styles.hint}>
+                        (click to play audio!)
+                      </span>
+                      {q.question} = {q.realanswer}
+                      <span className={styles.dict}>
+                        <Link
+                          href={`https://www.thai2english.com/?q=${encodeURIComponent(q.question)}`}
+                          target={"_blank"}
+                        >
+                          open in dictionary
+                        </Link>
+                      </span>
+                    </div>
+                    <div
+                      key={`awddasdaq_${q.question}`}
+                      className={styles.imageCtn}
+                      onClick={() => {
+                        playCardSound(q, true);
+                      }}
+                    >
+                      <Image
+                        key={`img_answer_${q.question}_${trollModeEnabled}`}
+                        src={`/level${level}/${
+                          trollModeEnabled
+                            ? q.answer
+                            : `${q.answer.split(".")[0]}.${
+                                q.answer.split(".")[
+                                  q.answer.split(".").length - 1
+                                ]
+                              }`
+                        }`}
+                        alt={"answer image"}
+                        width={200}
+                        height={200}
+                        className={styles.image}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-                setTimeout(() => {
-                  router.push(`/level/${level}/flashcards/${flashcardsMode}`);
-                }, 750);
-              }}
-              loading={reviewLoading}
-              disabled={reviewLoading || returnLoading}
-              loadingText={"Please wait..."}
-              loadingTextEnabled={true}
-              icon={<BookCopy />}
-            >
-              Flashcards
-            </KeybindButton>
-
-            <KeybindButton
-              forceTheme={"dark"}
-              keybinds={[T_Keybind.enter]}
-              onPress={() => {
-                startGame();
-              }}
-              disabled={reviewLoading || returnLoading}
-              loadingTextEnabled={false}
-              icon={<Brain />}
-            >
-              Start Level
-            </KeybindButton>
-          </motion.div>
-        )}
-
+      <AnimatePresence mode={"popLayout"}>
         {gameStarted && !win && !lost && (
           <motion.div
             className={styles.stageLabel}
@@ -568,65 +652,6 @@ export default function Page() {
           </motion.div>
         )}
 
-        {!gameStarted && answersVisible && (
-          <motion.div
-            className={styles.gameCtn}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            key={"answers"}
-          >
-            <div className={styles.option}>
-              {quiz.map((q) => (
-                <div key={`awdaq_${q.question}`} className={styles.answerRow}>
-                  <div
-                    className={styles.question}
-                    onClick={() => {
-                      playCardSound(q);
-                    }}
-                  >
-                    <span className={styles.hint}>(click to play audio!)</span>
-                    {q.question} = {q.realanswer}
-                    <span className={styles.dict}>
-                      <Link
-                        href={`https://www.thai2english.com/?q=${encodeURIComponent(q.question)}`}
-                        target={"_blank"}
-                      >
-                        open in dictionary
-                      </Link>
-                    </span>
-                  </div>
-                  <div
-                    key={`awddasdaq_${q.question}`}
-                    className={styles.imageCtn}
-                    onClick={() => {
-                      playCardSound(q, true);
-                    }}
-                  >
-                    <Image
-                      key={`img_answer_${q.question}_${trollModeEnabled}`}
-                      src={`/level${level}/${
-                        trollModeEnabled
-                          ? q.answer
-                          : `${q.answer.split(".")[0]}.${
-                              q.answer.split(".")[
-                                q.answer.split(".").length - 1
-                              ]
-                            }`
-                      }`}
-                      alt={"answer image"}
-                      width={200}
-                      height={200}
-                      className={styles.image}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
         {gameStarted && !win && !lost && (
           <motion.div
             className={styles.gameCtn}
@@ -776,6 +801,6 @@ export default function Page() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }

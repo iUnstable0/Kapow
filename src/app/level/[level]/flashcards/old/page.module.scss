@@ -107,8 +107,6 @@
 
   border-radius: 24px;
 
-  //background: red;
-
   position: relative;
   z-index: 1;
 }
@@ -213,8 +211,10 @@
 
 .reviewTools {
   display: flex;
-  gap: 28px;
-
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+
+  flex-direction: column;
+
+  gap: 28px;
 }

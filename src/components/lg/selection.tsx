@@ -178,6 +178,7 @@ function SelectionItem({ children, value, className }: SelectionItemProps) {
   return (
     <div
       className={clsx(styles.selectionItem, className)}
+      data-selected={context.selectedValue === value}
       onClick={(e) => {
         e.stopPropagation();
 
@@ -187,12 +188,15 @@ function SelectionItem({ children, value, className }: SelectionItemProps) {
       }}
     >
       <motion.span
-        className={clsx(
-          styles.itemText,
-          context.selectedValue === value && styles.itemTextSelected
-        )}
+        // className={clsx(
+        //   styles.itemText,
+        //   context.selectedValue === value && styles.itemTextSelected
+        // )}
+        animate={{
+          opacity: context.selectedValue === value ? 0.5 : 1,
+        }}
         layoutId={`selection-item-${value}`}
-        layout={"position"}
+        layout
       >
         {children}
       </motion.span>

@@ -134,16 +134,16 @@
       cursor: pointer;
     }
 
-    &:hover:has(.itemTextSelected) {
+    &:hover[data-selected="true"] {
       cursor: not-allowed;
     }
 
-    .itemText {
-      transition: opacity 0.2s ease;
+    // .itemText {
+    //transition: opacity 0.2s ease;
 
-      &.itemTextSelected {
-        opacity: 0.5;
-      }
-    }
+    // &.itemTextSelected {
+    //   opacity: 0.5;
+    // }
+    // }
   }
 }
