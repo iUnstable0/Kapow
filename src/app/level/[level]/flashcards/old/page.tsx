@@ -30,7 +30,7 @@ export default function Page() {
   const { fireConfetti } = useConfetti();
   const { trollModeEnabled, flashcardsMode } = useSettings();
 
-  const { setVolume, setOverride, siteEntered } = useGlobalMusic();
+  const { etVolume, setOverride, siteEntered } = useGlobalMusic();
 
   const isProcessing = useRef(false);
 
@@ -52,6 +52,31 @@ export default function Page() {
   const [playAlert] = useSound("/alert.mp3", {
     volume: 2,
   });
+
+  const [playFilmStart] = useSound("/filmstart.mp3", {
+    volume: 0.1,
+    interrupt: true,
+  });
+
+  const [playFilmRoll, { stop: stopFilmRoll }] = useSound(
+    "/filmloopbetter.mp3",
+    {
+      volume: 0.1,
+      loop: true,
+      html5: true,
+      interrupt: true,
+    },
+  );
+
+  const [playEntertainer, { stop: stopEntertainer }] = useSound(
+    "/entertainer.mp3",
+    {
+      volume: 0.5,
+      loop: true,
+      html5: true,
+      interrupt: true,
+    },
+  );
 
   const [playBen1] = useSound("/ben/ben 1.mp3", {
     volume: 1,
@@ -234,21 +259,40 @@ export default function Page() {
     }
   }, [win, fireConfetti, playAlert, reviews, quiz]);
 
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     // setReviewStarted(true);
+  //     // setFirstLoad(false);
+  //
+  //     playEntertainer();
+  //   }, 2000);
+  // }, [playEntertainer]);
+
   useEffect(() => {
     if (!siteEntered) return;
 
-    setTimeout(() => {
-      setReviewStarted(true);
-      setFirstLoad(false);
-    }, 2000);
-  }, [siteEntered]);
+    playFilmStart();
+    playFilmRoll();
 
-  useEffect(() => {
-    if (!trollModeEnabled) {
-      stopLeFishe();
-      setOverride(false);
-    }
-  }, [trollModeEnabled, stopLeFishe, setOverride]);
+    setTimeout(() => {
+      // setReviewStarted(true);
+      // setFirstLoad(false);
+
+      playEntertainer();
+    }, 2000);
+
+    return () => {
+      stopFilmRoll();
+      stopEntertainer();
+    };
+  }, [
+    playFilmRoll,
+    playFilmStart,
+    playEntertainer,
+    stopFilmRoll,
+    stopEntertainer,
+    siteEntered,
+  ]);
 
   useEffect(() => {
     router.replace(`/level/${level}/flashcards/${flashcardsMode}`);

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Special_Elite } from "next/font/google";
 
 import { MusicProvider } from "@/components/context/music";
 import { SettingsProvider } from "@/components/context/settings";
@@ -18,6 +18,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const specialElite = Special_Elite({
+  weight: ["400"],
+  variable: "--font-special-elite",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Kapow",
   description: "Pad kapow",
@@ -31,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${specialElite.variable} antialiased`}
       >
         <SettingsProvider>
           <MusicProvider>

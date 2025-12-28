@@ -9,6 +9,8 @@ import React, {
   useState,
 } from "react";
 
+import { usePathname } from "next/navigation";
+
 import { Howl } from "howler";
 import { AnimatePresence, motion } from "motion/react";
 
@@ -62,6 +64,7 @@ interface T_MusicContext {
   toggle: () => void;
   currentTrack: string;
   setOverride: (override: boolean) => void;
+  siteEntered: boolean;
 }
 
 let hasUserInteractedGlobal = false;
@@ -69,6 +72,8 @@ let hasUserInteractedGlobal = false;
 const MusicContext = createContext<T_MusicContext | null>(null);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   const soundRef = useRef<Howl | null>(null);
   const handleNextRef = useRef<() => void>(() => {});
 
@@ -169,13 +174,13 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (!sound.playing()) {
-      sound.off("fade");
+    // if (!sound.playing()) {
+    sound.off("fade");
 
-      sound.volume(0);
-      sound.play();
-      sound.fade(0, volumeRef.current, 2000);
-    }
+    sound.volume(0);
+    sound.play();
+    sound.fade(0, volumeRef.current, 2000);
+    // }
   };
 
   const pause = useCallback(() => {
@@ -278,6 +283,14 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isLocked, musicEnabled]);
 
+  useEffect(() => {
+    if (pathname.endsWith("/old")) {
+      setOverride(true);
+    } else {
+      setOverride(false);
+    }
+  }, [pathname, setOverride]);
+
   return (
     <MusicContext.Provider
       value={{
@@ -292,6 +305,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         toggle,
         currentTrack: queue[queueIndex],
         setOverride,
+        siteEntered,
       }}
     >
       <AnimatePresence mode="wait">
@@ -305,6 +319,10 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
             onClick={() => {
               if (!isLoaded) return;
+
+              const sound = soundRef.current;
+
+              if (!sound && musicEnabled) return;
 
               if (!siteEntered) {
                 setSiteEntered(true);
