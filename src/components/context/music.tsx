@@ -134,7 +134,9 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         onload: () => setIsLoaded(true),
         onloaderror: (id, error) => {
           console.error("Music failed to load", error);
-          alert("ERROR open console and report to me pls ty", error);
+
+          alert(`ERROR open console and report to me pls ty. ${error}`);
+
           setIsLoaded(true);
         },
         onplay: () => {
