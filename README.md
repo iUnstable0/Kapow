@@ -8,6 +8,13 @@ play it now at
 
 https://kapow.iunstable0.com
 
+Screenshot:
+
+
+<img width="3168" height="2546" alt="CleanShot 2025-12-28 at 17 46 45@2x" src="https://github.com/user-attachments/assets/386dfd9f-88a7-4774-ba9c-8eea94abbe33" />
+
+
+
 !!
 
 ## How to run locally
