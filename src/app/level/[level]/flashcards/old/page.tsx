@@ -30,7 +30,7 @@ const customScript: {
 } = {
   winAll: [
     {
-      title: "A TRIUMPH!",
+      title: "AND... SCENE!",
       time: 2000,
     },
     {
@@ -38,7 +38,7 @@ const customScript: {
       time: 500,
     },
     {
-      title: "THE CRITICS ARE WEEPING",
+      title: "ABSOLUTE CINEMA",
       time: 2000,
     },
     {
@@ -46,7 +46,7 @@ const customScript: {
       time: 500,
     },
     {
-      title: "A CINEMATIC MASTERPIECE",
+      title: "YOU ATE",
       time: 2000,
     },
     {
@@ -54,11 +54,11 @@ const customScript: {
       time: 500,
     },
     {
-      title: "NO NOTES.",
+      title: "AND LEFT NO CRUMBS",
       time: 1500,
     },
     {
-      title: "PURE. CINEMA.",
+      title: "GOOOOD BOY!",
       time: 2000,
     },
   ],
@@ -97,11 +97,11 @@ const customScript: {
       time: 500,
     },
     {
-      title: "WE NEED RESHOOTS",
+      title: "IT'S GIVING... MID",
       time: 2000,
     },
     {
-      title: "BACK TO THE STUDIO",
+      title: "WE NEED RESHOOTS",
       time: 1500,
     },
   ],
@@ -116,15 +116,7 @@ const customScript: {
       time: 200,
     },
     {
-      title: "WHO HIRED THIS GUY?",
-      time: 3000,
-    },
-    {
-      title: "$wait$",
-      time: 500,
-    },
-    {
-      title: "A BOX OFFICE BOMB",
+      title: "ABSOLUTE DOG WATER",
       time: 2000,
     },
     {
@@ -132,7 +124,15 @@ const customScript: {
       time: 500,
     },
     {
-      title: "ZERO. ZILCH. NADA.",
+      title: "$score$ OUT OF $total$???",
+      time: 2000,
+    },
+    {
+      title: "$wait$",
+      time: 500,
+    },
+    {
+      title: "GO TOUCH SOME GRASS",
       time: 2000,
     },
     {
@@ -150,10 +150,6 @@ const customScript: {
   ],
 
   fish: [
-    {
-      title: "KILLER FISH FROM SAN DIEGO",
-      time: 2000,
-    },
     {
       title: "$wait$",
       time: 1000,
@@ -179,61 +175,61 @@ const customScript: {
       time: 2000,
     },
   ],
-
-  sharp: [
-    {
-      title: "I AM THE TWINSTAR",
-      time: 2000,
-    },
-    {
-      title: "$wait$",
-      time: 800,
-    },
-    {
-      title: "SCIENTIFICALLY DESIGNED",
-      time: 2000,
-    },
-    {
-      title: "$wait$",
-      time: 500,
-    },
-    {
-      title: "TO DESTROY",
-      time: 1500,
-    },
-    {
-      title: "$wait$",
-      time: 200,
-    },
-    {
-      title: "HUMANITY",
-      time: 100,
-    },
-    {
-      title: "$wait$",
-      time: 100,
-    },
-    {
-      title: "VEGETABLES",
-      time: 2000,
-    },
-    {
-      title: "$wait$",
-      time: 1000,
-    },
-    {
-      title: "PLS BUY ME IM $39.99",
-      time: 2000,
-    },
-    {
-      title: "$wait$",
-      time: 3000,
-    },
-    {
-      title: "OH BTW THE ANSWER WAS 'sharp'",
-      time: 2000,
-    },
-  ],
+  //
+  // sharp: [
+  //   {
+  //     title: "I AM THE TWINSTAR",
+  //     time: 2000,
+  //   },
+  //   {
+  //     title: "$wait$",
+  //     time: 800,
+  //   },
+  //   {
+  //     title: "SCIENTIFICALLY DESIGNED",
+  //     time: 2000,
+  //   },
+  //   {
+  //     title: "$wait$",
+  //     time: 500,
+  //   },
+  //   {
+  //     title: "TO DESTROY",
+  //     time: 1500,
+  //   },
+  //   {
+  //     title: "$wait$",
+  //     time: 200,
+  //   },
+  //   {
+  //     title: "HUMANITY",
+  //     time: 100,
+  //   },
+  //   {
+  //     title: "$wait$",
+  //     time: 100,
+  //   },
+  //   {
+  //     title: "VEGETABLES",
+  //     time: 2000,
+  //   },
+  //   {
+  //     title: "$wait$",
+  //     time: 1000,
+  //   },
+  //   {
+  //     title: "PLS BUY ME IM $39.99",
+  //     time: 2000,
+  //   },
+  //   {
+  //     title: "$wait$",
+  //     time: 3000,
+  //   },
+  //   {
+  //     title: "OH BTW THE ANSWER WAS 'sharp'",
+  //     time: 2000,
+  //   },
+  // ],
 
   fence: [
     {
@@ -263,11 +259,23 @@ export default function Page() {
 
   const { siteEntered } = useGlobalMusic();
 
-  const isProcessing = useRef(false);
+  // const isProcessing = useRef(false);
 
   const [toolsLocked, setToolsLocked] = useState<boolean>(false);
 
   const [flipped, setFlipped] = useState<boolean>(false);
+
+  const [reviewLoading, setReviewLoading] = useState<boolean>(false);
+  const [reviewRemainingLoading, setReviewRemainingLoading] =
+    useState<boolean>(false);
+
+  const [reviewStarted, setReviewStarted] = useState<boolean>(false);
+
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const [imagesPreloaded, setImagesPreloaded] = useState<boolean>(false);
+
+  const [win, setWin] = useState<boolean>(false);
+
   const [flipState, setFlipState] = useState<"question" | "answer">("question");
 
   const [exitReviewLoading, setExitReviewLoading] = useState<boolean>(false);
@@ -275,17 +283,30 @@ export default function Page() {
   const [queue, setQueue] = useState<typeof quiz>(quiz);
   const [reviews, setReviews] = useState<typeof quiz>([]);
 
-  const [win, setWin] = useState<boolean>(false);
-
-  const [reviewStarted, setReviewStarted] = useState<boolean>(false);
-  const [firstLoad, setFirstLoad] = useState<boolean>(true);
-
   const [reviewIndex, setReviewIndex] = useState<number>(0);
 
   const [activeText, setActiveText] = useState<string | null>(null);
 
-  const [playAlert] = useSound("/alert.mp3", {
-    volume: 2,
+  const [entertainerStopped, setEntertainerStopped] = useState<boolean>(false);
+
+  const [playPause] = useSound("/pause.mp3", {
+    volume: 1,
+    interrupt: true,
+  });
+
+  const [playSilence] = useSound("/silence.mp3", {
+    volume: 3,
+    interrupt: true,
+  });
+
+  const [playCry] = useSound("/cry.mp3", {
+    volume: 1,
+    interrupt: true,
+  });
+
+  const [playAngry] = useSound("/angry.mp3", {
+    volume: 1,
+    interrupt: true,
   });
 
   const [playFilmStart] = useSound("/filmstart.mp3", {
@@ -406,10 +427,6 @@ export default function Page() {
 
   const handleNext = useCallback(
     (review: boolean) => {
-      if (isProcessing.current) return;
-
-      isProcessing.current = true;
-
       const currentCard = queue[reviewIndex];
 
       if (review) {
@@ -428,20 +445,12 @@ export default function Page() {
 
         setReviewStarted(false);
         setReviewIndex(0);
-
-        isProcessing.current = false;
       } else {
-        setReviewIndex((prev) => Math.min(prev + 1, queue.length - 1));
-
-        console.log("FC NEXT");
-
-        setTimeout(() => {
-          isProcessing.current = false;
-          console.log("FC UNLOCK");
-        }, 300);
+        // setReviewIndex((prev) => Math.min(prev + 1, queue.length - 1));
+        setReviewIndex(Math.min(reviewIndex + 1, queue.length - 1));
       }
     },
-    [queue, reviewIndex, markForReview, isProcessing],
+    [queue, reviewIndex, markForReview],
   );
 
   const handleFlip = useCallback(() => {
@@ -449,6 +458,7 @@ export default function Page() {
 
     if (flipState === "question") {
       setFlipState("answer");
+      setToolsLocked(true);
     } else {
       setFlipState("question");
     }
@@ -470,7 +480,11 @@ export default function Page() {
 
     if (reviews.length < queue.length) {
       if (reviews.length === 0) {
-        fireConfetti(false);
+        scriptTimeoutsRef.current.push(
+          setTimeout(() => {
+            fireConfetti(false);
+          }, 5000),
+        );
 
         runScript(customScript.winAll);
       } else {
@@ -489,10 +503,62 @@ export default function Page() {
         runScript(modifiedScript);
       }
     } else {
-      runScript(customScript.lostAll);
-      playAlert();
+      const score = queue.length - reviews.length;
+      const total = queue.length;
+
+      const modifiedScript = customScript.lostAll.map((line) => {
+        return {
+          ...line,
+          title: line.title
+            .replace("$score$", score.toString())
+            .replace("$total$", total.toString()),
+        };
+      });
+
+      runScript(modifiedScript);
+
+      playFilmStart();
+
+      playPause();
+
+      stopEntertainer();
+      stopFilmRoll();
+
+      setEntertainerStopped(true);
+
+      scriptTimeoutsRef.current.push(
+        setTimeout(() => {
+          playSilence();
+        }, 1700),
+      );
+
+      scriptTimeoutsRef.current.push(
+        setTimeout(() => {
+          playCry();
+        }, 12200),
+      );
+
+      scriptTimeoutsRef.current.push(
+        setTimeout(() => {
+          playAngry();
+        }, 14200),
+      );
+
+      // playAlert();
     }
-  }, [win, fireConfetti, playAlert, reviews, queue]);
+  }, [
+    win,
+    fireConfetti,
+    playPause,
+    reviews,
+    queue,
+    playFilmStart,
+    stopEntertainer,
+    stopFilmRoll,
+    playSilence,
+    playCry,
+    playAngry,
+  ]);
 
   // useEffect(() => {
   //   const speech = queue[reviewIndex]?.answer.split(".")[0];
@@ -525,15 +591,17 @@ export default function Page() {
 
   useEffect(() => {
     if (!siteEntered) return;
+    if (!imagesPreloaded) return;
+    // if (win) return;
 
     playFilmStart();
     playFilmRoll();
 
     setTimeout(() => {
-      if (!win) {
-        setReviewStarted(true);
-        setFirstLoad(false);
-      }
+      // if (!win) {
+      setReviewStarted(true);
+      setFirstLoad(false);
+      // }
 
       playEntertainer();
     }, 3000);
@@ -551,7 +619,34 @@ export default function Page() {
     stopEntertainer,
     siteEntered,
     clearAllTimeouts,
+    imagesPreloaded,
+    // win,
   ]);
+
+  useEffect(() => {
+    const preloadImages = async () => {
+      const promises = quiz.map((item) => {
+        return new Promise((resolve, reject) => {
+          const img = new window.Image();
+
+          const filename = item.answer.split(".")[0];
+          img.src = `/level${level}/${filename}.old.gif`;
+
+          img.onload = () => resolve(true);
+
+          img.onerror = (error) => {
+            console.warn(`Failed to preload image: ${filename}`, error);
+            resolve(true);
+          };
+        });
+      });
+
+      await Promise.all(promises);
+      setImagesPreloaded(true);
+    };
+
+    preloadImages();
+  }, [level, quiz]);
 
   useEffect(() => {
     router.replace(`/level/${level}/flashcards/${flashcardsMode}`);
@@ -561,35 +656,40 @@ export default function Page() {
     <div className={clsx(styles.container, "animate-projector-jitter")}>
       <ProjectorOverlay />
 
-      {activeText && (
-        <div className={styles.frameCtn}>
-          <Image
-            src={"/frame-optimised.png"}
-            alt={"frame"}
-            width={200}
-            height={200}
-            className={styles.frame}
-            priority={true}
-          />
+      {/*{activeText && (*/}
+      <div
+        className={clsx(styles.frameCtn, activeText && styles.frameCtnActive)}
+      >
+        <Image
+          src={"/frame-optimised.png"}
+          alt={"frame"}
+          width={200}
+          height={200}
+          className={styles.frame}
+          priority={true}
+        />
 
-          <div className={styles.frameText}>{activeText.toUpperCase()}</div>
-
-          <div className={styles.actionTextTools}>
-            <KeybindButton
-              keybinds={[T_Keybind.escape]}
-              onPress={() => {
-                clearAllTimeouts();
-
-                setActiveText(null);
-                setToolsLocked(false);
-              }}
-              forceTheme={"dark"}
-            >
-              Skip Text
-            </KeybindButton>
-          </div>
+        <div className={styles.frameText}>
+          {(activeText || "").toUpperCase()}
         </div>
-      )}
+
+        <div className={styles.actionTextTools}>
+          <KeybindButton
+            keybinds={[T_Keybind.escape]}
+            onPress={() => {
+              clearAllTimeouts();
+
+              setActiveText(null);
+              setToolsLocked(false);
+            }}
+            disabled={!activeText}
+            forceTheme={"dark"}
+          >
+            Skip Text
+          </KeybindButton>
+        </div>
+      </div>
+      {/*)}*/}
 
       <AnimatePresence mode={"popLayout"}>
         {!reviewStarted && !toolsLocked && (
@@ -649,7 +749,13 @@ export default function Page() {
               forceTheme={"dark"}
               dangerous={true}
               loading={exitReviewLoading}
-              disabled={exitReviewLoading || !!activeText || toolsLocked}
+              disabled={
+                !!activeText ||
+                toolsLocked ||
+                reviewLoading ||
+                exitReviewLoading ||
+                reviewRemainingLoading
+              }
               loadingText={"Please wait..."}
               loadingTextEnabled={true}
             >
@@ -661,18 +767,52 @@ export default function Page() {
                 keybinds={[T_Keybind.shift, T_Keybind.enter]}
                 forceTheme={"dark"}
                 onPress={() => {
-                  setQueue(reviews);
-                  setReviews([]);
+                  const start = () => {
+                    setQueue(reviews);
+                    setReviews([]);
 
-                  setWin(false);
-                  setFlipped(false);
+                    setWin(false);
+
+                    // setFlipped(false);
+                  };
+
+                  if (entertainerStopped) {
+                    setEntertainerStopped(false);
+
+                    setReviewRemainingLoading(true);
+
+                    playFilmStart();
+                    playFilmRoll();
+
+                    setTimeout(() => {
+                      start();
+
+                      playEntertainer();
+
+                      setReviewRemainingLoading(false);
+
+                      setReviewStarted(true);
+                      setFirstLoad(false);
+                    }, 3000);
+
+                    return;
+                  }
+
+                  start();
 
                   setReviewStarted(true);
+                  setReviewRemainingLoading(false);
                 }}
-                disabled={!!activeText || toolsLocked}
-                // loading={returnLoading}
-                // loadingText={"Please wait..."}
-                // loadingTextEnabled={true}
+                disabled={
+                  !!activeText ||
+                  toolsLocked ||
+                  reviewLoading ||
+                  exitReviewLoading ||
+                  reviewRemainingLoading
+                }
+                loading={reviewRemainingLoading}
+                loadingText={"Please wait..."}
+                loadingTextEnabled={true}
                 // reversed={true}
               >
                 Review remaining
@@ -683,16 +823,50 @@ export default function Page() {
               keybinds={[T_Keybind.enter]}
               forceTheme={"dark"}
               onPress={() => {
-                setQueue(quiz);
-                setReviews([]);
-                setWin(false);
+                const start = () => {
+                  setQueue(quiz);
+                  setReviews([]);
+
+                  setWin(false);
+                };
+
+                if (entertainerStopped) {
+                  setEntertainerStopped(false);
+
+                  setReviewLoading(true);
+
+                  playFilmStart();
+                  playFilmRoll();
+
+                  setTimeout(() => {
+                    start();
+
+                    playEntertainer();
+
+                    setReviewLoading(false);
+
+                    setReviewStarted(true);
+                    setFirstLoad(false);
+                  }, 3000);
+
+                  return;
+                }
+
+                start();
 
                 setReviewStarted(true);
+                setReviewLoading(false);
               }}
-              disabled={!!activeText || toolsLocked}
-              // loading={returnLoading}
-              // loadingText={"Please wait..."}
-              // loadingTextEnabled={true}
+              disabled={
+                !!activeText ||
+                toolsLocked ||
+                reviewLoading ||
+                exitReviewLoading ||
+                reviewRemainingLoading
+              }
+              loading={reviewLoading}
+              loadingText={"Please wait..."}
+              loadingTextEnabled={true}
               // reversed={true}
             >
               {reviews.length > 0
@@ -719,6 +893,9 @@ export default function Page() {
               keybinds={[T_Keybind.shift, T_Keybind.escape]}
               onPress={() => {
                 setReviewStarted(false);
+                setFlipped(false);
+                setFlipState("question");
+
                 setReviewIndex(0);
               }}
               disabled={!!activeText || toolsLocked}
@@ -784,6 +961,7 @@ export default function Page() {
                     animate={{ opacity: 0.6 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.5 }}
+                    unoptimized={true}
                   />
 
                   <MotionImage
@@ -806,6 +984,7 @@ export default function Page() {
                     }}
                     exit={{ opacity: 0, filter: "blur(10px) sepia(0.75)" }}
                     transition={{ duration: 0.5 }}
+                    unoptimized={true}
                   />
                 </>
               )}
